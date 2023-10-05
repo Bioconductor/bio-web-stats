@@ -1,0 +1,11 @@
+ips|day_month_year|month_year|time|utc_offset|method|url|protocol|statuscode|bytes|referer|user_agent|biocrepo_relurl|biocrepo|biocversion|package|pkgversion|pkgtype
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:03|-0000|GET|/packages/3.12/data/experiment/src/contrib/dsQTL_0.28.0.tar.gz|HTTP/1.1|200|991465136|||/packages/3.12/data/experiment|experiment||dsQTL|0.28.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:14|-0000|GET|/packages/3.12/data/experiment/src/contrib/dyebiasexamples_1.30.0.tar.gz|HTTP/1.1|200|15940362|||/packages/3.12/data/experiment|experiment||dyebiasexamples|1.30.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:15|-0000|GET|/packages/3.12/bioc/src/contrib/EBarrays_2.54.0.tar.gz|HTTP/1.1|200|866870|||/packages/3.12/bioc|bioc||EBarrays|2.54.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:16|-0000|GET|/packages/3.12/bioc/src/contrib/EBSeqHMM_1.24.0.tar.gz|HTTP/1.1|200|1469038|||/packages/3.12/bioc|bioc||EBSeqHMM|1.24.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:15|-0000|GET|/packages/3.12/data/experiment/src/contrib/EatonEtAlChIPseq_0.28.0.tar.gz|HTTP/1.1|200|21495848|||/packages/3.12/data/experiment|experiment||EatonEtAlChIPseq|0.28.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:12|-0000|GET|/packages/3.12/bioc/src/contrib/dupRadar_1.20.0.tar.gz|HTTP/1.1|200|3886088|||/packages/3.12/bioc|bioc||dupRadar|1.20.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:17|-0000|GET|/packages/3.12/data/annotation/src/contrib/ecoliK12.db0_3.12.0.tar.gz|HTTP/1.1|200|5273918|||/packages/3.12/data/annotation|annotation||ecoliK12.db0|3.12.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:10|-0000|GET|/packages/3.12/bioc/src/contrib/DSS_2.38.0.tar.gz|HTTP/1.1|200|2124925|||/packages/3.12/bioc|bioc||DSS|2.38.0|tar.gz
+128.118.250.14|01/Jan/2021|Jan/2021|08:02:11|-0000|GET|/packages/3.12/bioc/src/contrib/DTA_2.36.0.tar.gz|HTTP/1.1|200|11006030|||/packages/3.12/bioc|bioc||DTA|2.36.0|tar.gz
+52.156.87.181|01/Jan/2021|Jan/2021|08:01:57|-0000|GET|/packages/3.12/bioc/src/contrib/graph_1.68.0.tar.gz|HTTP/1.1|200|957917|||/packages/3.12/bioc|bioc||graph|1.68.0|tar.gz

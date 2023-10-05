@@ -1,0 +1,46 @@
+# Python artifacts
+*.pyc
+*.pyo
+*.egg-info/
+__pycache__/
+*.egg
+*.log
+*.pot
+*.py[co]
+*.sqlite3
+*.tar.gz
+
+# Virtual environment and dependency management
+venv/
+*.venv/
+*.venv.*
+Pipfile.lock
+*.pip
+pip-log.txt
+pip-delete-this-directory.txt
+*.pipenv
+
+# IDEs and editors
+*.pycharm/
+.idea/
+*.swp
+*.swo
+*.swn
+*.code-workspace
+.vscode/
+
+# SQL
+*.sql.sqlite3
+
+# AWS
+*.pem
+*.ppk
+*.tfstate
+*.tfstate.*.backup
+*.tfvars
+terraform.tfstate.d/
+secrets.yml
+
+# OS-specific
+.DS_Store
+Thumbs.db
