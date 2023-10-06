@@ -11,7 +11,7 @@ app = Flask(__name__)
 def get_packages():
 
     query_request = DbQueryRequest(query_type=QueryRequestType. 
-        PACKAGE_NAMES,package_type=None,package_name=None,year=None)
+        PACKAGE_SCORES,package_type=None,package_name=None,year=None)
 
     query_response = dbquery(query_request)
 
@@ -44,7 +44,25 @@ def get_pakages_scores(package_type, package_type_2):
 
 
 #bioc/bioc_pkg_stats.tab
-# @app.route('/packages/stats/bioc/bioc_pkg_stats.tab', methods=['GET'])
+@app.route('/packages/stats/<package_type>/<package_type_2>_pkg_stats.tab', methods=['GET'])
+def get_packages_stats(package_type, package_type_2):
+    if  escape(package_type) != escape(package_type_2) or not packge_type_exists(package_type):
+        return Response(status=404)
+    
+    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_SCORES,package_type=package_type,package_name=None,year=None)
+    query_response = dbquery(query_request)
+
+    match query_response.status:
+
+        case DataRetrievalStatus.SUCCESS:
+            return Response(query_response.result, content_type="text/tab-separated-values")
+        case DataRetrievalStatus.TIMEOUT:
+            return Response(status=429)
+        case _:
+           return Response(status=500)
+    
+
+
 
 
 # #bioc/S4Vectors/
