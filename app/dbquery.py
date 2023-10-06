@@ -20,6 +20,7 @@ Additional Information:
 """
 from collections import namedtuple
 from enum import Enum, auto
+from flask import abort
 
 class QueryRequestType(Enum):
     PACKAGE_SCORES = auto()     # Return package names and scores, one row for each package
@@ -113,6 +114,9 @@ def dbquery(request: DbQueryRequest) -> DbQueryResponse:
             return r
         case _:
             raise Exception(f'Invalid request type ({DbQueryRequest})')
+
+# TODO abourt 504 for DB timeout, and 500 for all other error conditions
+# TODO log errors
 
 def get_db_values():
     return "hello world"

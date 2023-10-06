@@ -1,4 +1,4 @@
-from flask import Flask, make_response, Response
+from flask import Flask, make_response, Response, abort
 from markupsafe import escape
 
 from dbquery import *
@@ -14,17 +14,10 @@ def get_packages():
         PACKAGE_NAMES,package_type=None,package_name=None,year=None)
 
     query_response = dbquery(query_request)
-
-    match query_response.status:
-
-        case DataRetrievalStatus.SUCCESS:
-            response = make_response('\n'.join([u.package_name for u in query_response.result]))
-            response.headers["Content-Type"] = "text/plain"
-            return response
-        case DataRetrievalStatus.TIMEOUT:
-            return Response(status=429)
-        case _:
-           return Response(status=500)
+    response = make_response('\n'.join([u.package_name for u in query_response.result]))
+    response.headers["Content-Type"] = "text/plain"
+    return response
+            
 
 #bioc/bioc_pkg_scores.tab
 @app.route('/packages/stats/<package_type>/<package_type_2>_pkg_scores.tab', methods=['GET'])
