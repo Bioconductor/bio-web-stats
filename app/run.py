@@ -1,4 +1,7 @@
 from flask import Flask, Response
+from markupsafe import escape
+
+from dbquery import *
 
 # TODO for initial test only
 app = Flask(__name__)
@@ -8,7 +11,7 @@ app = Flask(__name__)
 def get_packages():
 
     query_request = DbQueryRequest(query_type=QueryRequestType. 
-                                       PACKAGE_NAMES,package_type=None,package_name=None,year=None)
+        PACKAGE_NAMES,package_type=None,package_name=None,year=None)
 
     query_response = dbquery(query_request)
 
@@ -22,10 +25,12 @@ def get_packages():
            return Response(status=500)
 
 #bioc/bioc_pkg_scores.tab
-@app.route('/packages/stats/bioc/bioc_pkg_scores.tab', methods=['GET'])
-def get_pakages_scores():
-
-    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_SCORES,package_type=None,package_name=None,year=None)
+@app.route('/packages/stats/<package_type>/<package_type_2>_pkg_scores.tab', methods=['GET'])
+def get_pakages_scores(package_type, package_type_2):
+    if  escape(package_type) != escape(package_type_2) or not packge_type_exists(package_type):
+        return Response(status=404)
+    
+    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_SCORES,package_type=package_type,package_name=None,year=None)
     query_response = dbquery(query_request)
 
     match query_response.status:

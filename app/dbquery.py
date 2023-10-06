@@ -27,13 +27,13 @@ class QueryRequestType(Enum):
     PACKAGE_NAMES = auto()
 
 class PackageType(Enum):
-    BIOC = "software"
+    BIOC = "bioc"
     EXPERIMENT = "experiment"
     ANNOTATION = "annotation"
     WORKFLOW = "workflow"
 
 
-def matches_package_type(value: str) -> bool:
+def packge_type_exists(value: str) -> bool:
     """
 	Is a string a valid PackageType
     """
@@ -120,3 +120,6 @@ def dbquery(request: DbQueryRequest) -> DbQueryResponse:
         case _:
             raise Exception(f'Invalid request type ({DbQueryRequest})')
 
+def get_db_values():
+    get_db_values.return_value = None
+    yield
