@@ -80,11 +80,6 @@ Represents a single entry in the result set, containing a date and a count.
 """
 DbResultEntry = namedtuple("DbResultEntry", ["package_name", "date", "isYearly", "uniqueIpCount", "downloadCount"])
 
-def get_db_connection():
-    raise NotImplementedError("This function has not yet been implemented.")
-    return None
-
-
 def dbquery(request: DbQueryRequest) -> DbQueryResponse:
     """
     Executes a query against the bioc_package_stats database
@@ -96,10 +91,9 @@ def dbquery(request: DbQueryRequest) -> DbQueryResponse:
         db.QueryResponse - The return status code
                 If .statusCode is SUCCESS, then the data as well
     Raises:
-        TODO: ERROR -- INVALID Query format
+        Exception "Invalid Request Type"
     """
     
-    # TODO Call dbAdapter
     match request.query_type:
         case QueryRequestType.PACKAGE_SCORES:
             u = DbResultEntry(request.package_name, '2021-03-01', False, 1543, 12345)
@@ -113,13 +107,12 @@ def dbquery(request: DbQueryRequest) -> DbQueryResponse:
             return r
         case QueryRequestType.PACKAGE_NAMES:
             # TODO THIS IS A STUB
-            u = DbResultEntry(['Bob'], '2021-03-01', False, 1422, None)
+            u = [DbResultEntry('Bob', None, None, None, None), DbResultEntry('Niknil', None, None, None, None)]
             r = DbQueryResponse(status=DataRetrievalStatus.SUCCESS,
-                                    result=[u])
+                                    result=u)
             return r
         case _:
             raise Exception(f'Invalid request type ({DbQueryRequest})')
 
 def get_db_values():
-    get_db_values.return_value = None
-    yield
+    return "hello world"

@@ -1,4 +1,4 @@
-from flask import Flask, Response
+from flask import Flask, make_response, Response
 from markupsafe import escape
 
 from dbquery import *
@@ -10,15 +10,17 @@ app = Flask(__name__)
 @app.route('/packages/stats/bioc/bioc_packages.txt', methods=['GET'])
 def get_packages():
 
-    query_request = DbQueryRequest(query_type=QueryRequestType. 
-        PACKAGE_SCORES,package_type=None,package_name=None,year=None)
+    query_request = DbQueryRequest(query_type=QueryRequestType.
+        PACKAGE_NAMES,package_type=None,package_name=None,year=None)
 
     query_response = dbquery(query_request)
 
     match query_response.status:
 
         case DataRetrievalStatus.SUCCESS:
-            return Response(query_response.result, content_type="text/plain")
+            response = make_response('\n'.join([u.package_name for u in query_response.result]))
+            response.headers["Content-Type"] = "text/plain"
+            return response
         case DataRetrievalStatus.TIMEOUT:
             return Response(status=429)
         case _:
@@ -36,7 +38,7 @@ def get_pakages_scores(package_type, package_type_2):
     match query_response.status:
 
         case DataRetrievalStatus.SUCCESS:
-            return Response(query_response.result, content_type="text/tab-separated-values")
+            return Response(query_response.result, content_type="text/plain")
         case DataRetrievalStatus.TIMEOUT:
             return Response(status=429)
         case _:
@@ -49,13 +51,13 @@ def get_packages_stats(package_type, package_type_2):
     if  escape(package_type) != escape(package_type_2) or not packge_type_exists(package_type):
         return Response(status=404)
     
-    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_SCORES,package_type=package_type,package_name=None,year=None)
+    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_COUNTS,package_type=package_type,package_name=None,year=None)
     query_response = dbquery(query_request)
 
     match query_response.status:
 
         case DataRetrievalStatus.SUCCESS:
-            return Response(query_response.result, content_type="text/tab-separated-values")
+            return Response(query_response.result, content_type="text/plain")
         case DataRetrievalStatus.TIMEOUT:
             return Response(status=429)
         case _:
@@ -74,23 +76,16 @@ def get_existing_packages_stats_year(package_type,package_name, package_name_2, 
     if not packge_type_exists(package_type):
         return Response(status=404)
     
-    #TODO fuction packa_name_exists() needed to check if the package exists or not
-    if not (package_name_exists(package_name) and package_name_exists(package_name_2)):
-        return Response(status=404)
-    
     if package_name != package_name_2:
         return Response(status=404)
     
-    if not package_year.isdigit():
-        return Response(status=404)
-    
-    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_SCORES,package_type=package_type,package_name=package_name,year=package_year)
+    query_request = DbQueryRequest(query_type=QueryRequestType.PACKAGE_COUNTS,package_type=package_type,package_name=package_name,year=package_year)
     query_response = dbquery(query_request)
 
     match query_response.status:
 
         case DataRetrievalStatus.SUCCESS:
-            return Response(query_response.result, content_type="text/tab-separated-values")
+            return Response(query_response.result, content_type="text/plain")
         case DataRetrievalStatus.TIMEOUT:
             return Response(status=429)
         case _:
@@ -103,9 +98,6 @@ def get_existing_package_stats(package_type,package_name,package_name_2):
     if not packge_type_exists(package_type):
         return Response(status=404)
     
-    if not (package_name_exists(package_name) and package_name_exists(package_name_2)):
-        return Response(status=404)
-    
     if package_name != package_name_2:
         return Response(status=404)
     
@@ -115,7 +107,7 @@ def get_existing_package_stats(package_type,package_name,package_name_2):
     match query_response.status:
 
         case DataRetrievalStatus.SUCCESS:
-            return Response(query_response.result, content_type="text/tab-separated-values")
+            return Response(query_response.result, content_type="text/plain")
         case DataRetrievalStatus.TIMEOUT:
             return Response(status=429)
         case _:
