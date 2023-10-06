@@ -1,15 +1,13 @@
-'''
+"""
 conftest.py - shareable fixtures
-'''
+"""
 
 import pytest
 from unittest.mock import patch
 
 import sqlite3
 
-import app.dbquery 
-import app.dbquery_structures as dbs
-
+import dbquery 
 
 @pytest.fixture
 def mock_db_connection():
@@ -17,7 +15,7 @@ def mock_db_connection():
         mock_connection.return_value = None
         yield
 
- # test_sample.py
+# test_sample.py
 def test_some_db_function(mock_db_connection):
     # Your test code here. All calls to `get_db_connection` within this test will return None.
     assert mock_db_connection == None

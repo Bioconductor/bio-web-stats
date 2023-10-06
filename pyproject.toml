@@ -3,10 +3,9 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.poetry]
-name = "your_project_name"
+name = "bio-web-stats"
 version = "0.1.0"
-description = "Bioconductor package stats web application"
-authors = ["Your Name <youremail@example.com>"]
+description = "Flask application to render package download statistics in www.bioconductor.org"
 
 [tool.poetry.dependencies]
 python = "^3.11"
