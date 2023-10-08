@@ -3,8 +3,10 @@ from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, text
 from sqlalchemy.exc import SQLAlchemyError
 
+from typing import List, Tuple
+
 from datetime import date, datetime
-import random
+from random import randint
 
 # TODO HACK BELOW MERGE WITH dbquery.py
 from enum import Enum
@@ -76,17 +78,11 @@ class DatabaseService:
         for repo in [x.value for x in PackageType]:
             for pkg in [f'pkg{repo}{i}' for i in range(1, 2)]:
                 for d in dates_list:
-                    self.download_count_insert(repo, pkg, d, random.randint(1, 10000), random.randint(1, 10000))
+                    self.download_count_insert([(repo, pkg, d, randint(1, 10000), randint(1, 10000))])
 
-    def download_count_insert(self, 
-                repo: str, 
-                package: str, 
-                transaction_date: date,
-                ip_count: int,
-                download_count: int):
+    def download_count_insert(self, rows: List[Tuple]) -> None:
         with self.db.connection() as conn:
-            conn.execute(insert(self.download_summary).values(
-                [(repo, package, transaction_date, ip_count, download_count)]))
+            conn.execute(insert(self.download_summary).values(rows))
             conn.commit()
 
     def dump_db(self):
@@ -96,10 +92,10 @@ class DatabaseService:
             for row in result:
                 print(row)
 
-service = DatabaseService(TestDatabaseConnection())
-service.create()
-service.populate()
-service.dump_db()
+# service = DatabaseService(TestDatabaseConnection())
+# service.create()
+# service.populate()
+# service.dump_db()
 
  
 
