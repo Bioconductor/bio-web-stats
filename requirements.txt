@@ -1,4 +1,5 @@
 setuptools
+python-dateutil
 SQLAlchemy
 pytest
 Flask

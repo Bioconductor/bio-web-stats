@@ -7,8 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import List, Tuple
 from collections import namedtuple
 
-from datetime import date, datetime
-from random import randint
+from datetime import date
+from dateutil.relativedelta import relativedelta
+from random import seed, randint
 
 # TODO HACK BELOW MERGE WITH dbquery.py
 from enum import Enum
@@ -40,7 +41,6 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     def connection() -> Connection:
         return TestDatabaseConnection.engine().connect()
     
-# TODO
 class DatabaseService:
     '''
     TODO: refactor after real db is up
@@ -63,19 +63,20 @@ class DatabaseService:
         )
         metadata.create_all(self.db.engine())
 
-    def populate(self):
-        start_date = date(2022, 12, 1)
-        end_date = date(2023, 9, 1)
-
-        dates_list = [date(year, month, 1) 
-                    for year in range(start_date.year, end_date.year + 1) 
-                    for month in range(1, 13) 
-                    if date(year, month, 1) >= start_date and date(year, month, 1) <= end_date]
-        # HACK
-        for repo in [x.value for x in PackageType]:
-            for pkg in [f'pkg{repo}{i}' for i in range(1, 2)]:
-                for d in dates_list:
-                    self.download_count_insert([(repo, pkg, d, randint(1, 10000), randint(1, 10000))])
+    # TODO Replace randint with hash on all keys for better validation
+    def populate(self, seed_value: int, end_date: date, packages: [tuple]):
+        
+        seed(seed_value)
+        def months_sequence(start_date, end_date):
+            """Yield the first day of each month from start_date to end_date inclusive."""
+            current_date = start_date
+            while current_date <= end_date:
+                yield current_date
+                current_date += relativedelta(months=1)
+                
+        for repo, package, start_date in packages:
+            for d in months_sequence(start_date, end_date):
+                    self.download_count_insert([(repo, package, d, randint(1, 10000), randint(1, 100000))])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
         with self.db.connection() as conn:
