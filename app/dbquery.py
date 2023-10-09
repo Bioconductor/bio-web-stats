@@ -21,17 +21,12 @@ Additional Information:
 from collections import namedtuple
 from enum import Enum, auto
 from flask import abort
+from db.db import PackageType
 
 class QueryRequestType(Enum):
     PACKAGE_SCORES = auto()     # Return package names and scores, one row for each package
     PACKAGE_COUNTS = auto()     # Return package names and counts
     PACKAGE_NAMES = auto()
-
-class PackageType(Enum):
-    BIOC = "bioc"
-    EXPERIMENT = "experiment"
-    ANNOTATION = "annotation"
-    WORKFLOW = "workflow"
 
 
 def packge_type_exists(value: str) -> bool:

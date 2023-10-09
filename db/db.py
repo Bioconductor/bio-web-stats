@@ -3,6 +3,7 @@ from sqlalchemy import Engine, Connection, MetaData
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, text
 from sqlalchemy.exc import SQLAlchemyError
+import pandas as pd
 
 from typing import List, Tuple
 from collections import namedtuple
@@ -11,7 +12,6 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from random import seed, randint
 
-# TODO HACK BELOW MERGE WITH dbquery.py
 from enum import Enum
 
 class PackageType(Enum):
@@ -48,7 +48,7 @@ class DatabaseService:
     db: DatabaseConnectionInterface
     download_summary: Table
     
-    def __init__(self, db: DatabaseConnectionInterface):
+    def __init__(self, db: DatabaseConnectionInterface) -> None:
         self.db = db
         
     def create(self):
@@ -64,7 +64,7 @@ class DatabaseService:
         metadata.create_all(self.db.engine())
 
     # TODO Replace randint with hash on all keys for better validation
-    def populate(self, seed_value: int, end_date: date, packages: [tuple]):
+    def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> None:
         
         seed(seed_value)
         def months_sequence(start_date, end_date):
@@ -90,17 +90,14 @@ class DatabaseService:
             tuple_list = [tuple(row) for row in result]
             return tuple_list
 
-    def select(self) -> [namedtuple]:
+    def select(self) -> pd.DataFrame:
         with self.db.connection() as conn:
             result = conn.execute(select(self.download_summary))
-            DynamicUserTuple = namedtuple('DynamicUserTuple', result.keys())
             conn.commit()
-            return [DynamicUserTuple(*row) for row in result.fetchall()]
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
         
-    def execute(self, statement: str) -> [tuple]:
+    def execute(self, statement: str) -> pd.DataFrame:
         with self.db.connection() as conn:
             result = conn.execute(text(statement))
             conn.commit()
-            tuple_list = [tuple(row) for row in result]
-            return tuple_list
-        
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
