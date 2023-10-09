@@ -1,15 +1,18 @@
+
 from sqlalchemy import Engine, Connection, MetaData
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from typing import List, Tuple
+from collections import namedtuple
 
 from datetime import date, datetime
 from random import randint
 
 # TODO HACK BELOW MERGE WITH dbquery.py
 from enum import Enum
+
 class PackageType(Enum):
     BIOC = "bioc"
     EXPERIMENT = "experiment"
@@ -26,7 +29,6 @@ class DatabaseConnectionInterface:
 class TestDatabaseConnection(DatabaseConnectionInterface):
     # TODO echo=True ==> this is a trace parameter.
     _engine: Engine = None
-    _connection: Connection = None
 
     @staticmethod
     def engine() -> Engine:
@@ -38,12 +40,7 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     def connection() -> Connection:
         return TestDatabaseConnection.engine().connect()
     
-    @staticmethod
-    def close_connection():
-        if TestDatabaseConnection._connection:
-            TestDatabaseConnection._connection.close()
-            TestDatabaseConnection._connection = None
-
+# TODO
 class DatabaseService:
     '''
     TODO: refactor after real db is up
@@ -85,17 +82,24 @@ class DatabaseService:
             conn.execute(insert(self.download_summary).values(rows))
             conn.commit()
 
-    def dump_db(self):
+    def dump_db(self) -> [tuple]:
         with self.db.connection() as conn:
             result = conn.execute(select(self.download_summary))
             conn.commit()
-            for row in result:
-                print(row)
+            tuple_list = [tuple(row) for row in result]
+            return tuple_list
 
-# service = DatabaseService(TestDatabaseConnection())
-# service.create()
-# service.populate()
-# service.dump_db()
-
- 
-
+    def select(self) -> [namedtuple]:
+        with self.db.connection() as conn:
+            result = conn.execute(select(self.download_summary))
+            DynamicUserTuple = namedtuple('DynamicUserTuple', result.keys())
+            conn.commit()
+            return [DynamicUserTuple(*row) for row in result.fetchall()]
+        
+    def execute(self, statement: str) -> [tuple]:
+        with self.db.connection() as conn:
+            result = conn.execute(text(statement))
+            conn.commit()
+            tuple_list = [tuple(row) for row in result]
+            return tuple_list
+        
