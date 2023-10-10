@@ -14,3 +14,4 @@ def database_access():
     db_service = DatabaseService(TestDatabaseConnection)
     db_service.create()
     yield db_service
+    

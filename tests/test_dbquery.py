@@ -16,13 +16,12 @@ database_test_cases = [
     ]
 ]
 
-
-def test_populate_database_one_package(database_access):
+@pytest.mark.parametrize("test_case", database_test_cases)
+def test_populate_database_one_package(test_case, database_access):
     # Arrange
     sut = database_access
-    sut.populate(123, date(2023, 10, 1), database_test_cases[0])
-    expected = sut.select()
-
+    expected = sut.populate(123, date(2023, 10, 1), test_case)
+    
     # Act
     result = sut.select()
     pass
@@ -30,18 +29,16 @@ def test_populate_database_one_package(database_access):
     # Assert
     assert result.equals(expected)
     
-# def test_get_package_names(database_access):
-#     # Arrange
-#     sut, source_data = database_access
-#     expected_data = [('affy')]
-#     columns = ['package']
-#     expected = pd.DataFrame(expected_data, columns=columns)
-#     sut.populate(123, date(2023, 10, 1), [(PackageType.BIOC.value, 'affy', date(2023, 9, 1))])
+@pytest.mark.parametrize("test_case", database_test_cases)
+def test_get_package_names(test_case, database_access):
+    # Arrange
+    sut = database_access
+    df = sut.populate(123, date(2023, 10, 1), test_case)
+    expected = df[['package']].drop_duplicates()
 
-#     # Act
-#     result = sut.get_package_names()
-#     pass
+    # Act
+    result = sut.get_package_names()
 
-#     # Assert
-#     assert result.equals(expected)
+    # Assert
+    assert set(result.package) == set(expected.package)
 

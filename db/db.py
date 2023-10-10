@@ -27,6 +27,9 @@ class DatabaseConnectionInterface:
     def connection() -> Connection:
         raise NotImplementedError
     
+    def close() -> None:
+        raise NotImplementedError
+    
 class TestDatabaseConnection(DatabaseConnectionInterface):
     # TODO echo=True ==> this is a trace parameter.
     _engine: Engine = None
@@ -40,7 +43,7 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     @staticmethod
     def connection() -> Connection:
         return TestDatabaseConnection.engine().connect()
-    
+        
 class DatabaseService:
     '''
     TODO: refactor after real db is up
@@ -64,8 +67,13 @@ class DatabaseService:
         metadata.create_all(self.db.engine())
 
     # TODO Replace randint with hash on all keys for better validation
-    def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> None:
+    def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> pd.DataFrame:
         
+        # clear all previous entries
+        with self.db.connection() as conn:
+            conn.execute(self.download_summary.delete())
+            conn.commit()
+
         seed(seed_value)
         def months_sequence(start_date: date, end_date: date):
             """Yield the first day of each month from start_date to end_date inclusive."""
@@ -75,9 +83,12 @@ class DatabaseService:
                 yield current_date
                 current_date += relativedelta(months=1)
                 
-        for repo, package, start_date in packages:
-            for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date):
-                    self.download_count_insert([(repo, package, d, randint(1, 10000), randint(1, 100000))])
+        df = [(repo, package, d, randint(1, 10000), randint(1, 100000)) for repo, package, start_date in packages
+            for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date)]
+
+        self.download_count_insert(df)
+        
+        return pd.DataFrame(df, columns=['repo', 'package', 'date', 'ip_count', 'download_count'])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
         with self.db.connection() as conn:
