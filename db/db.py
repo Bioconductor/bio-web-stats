@@ -58,7 +58,7 @@ class DatabaseService:
         metadata = MetaData()
         self.download_summary = Table("download_summary", 
             metadata,
-            Column("repo", String, primary_key=True),
+            Column("category", String, primary_key=True),
             Column("package", String, primary_key=True),
             Column("date", Date, primary_key=True),
             Column("ip_count", BigInteger),
@@ -83,12 +83,12 @@ class DatabaseService:
                 yield current_date
                 current_date += relativedelta(months=1)
                 
-        df = [(repo, package, d, randint(1, 10000), randint(1, 100000)) for repo, package, start_date in packages
+        df = [(category, package, d, randint(1, 10000), randint(1, 100000)) for category, package, start_date in packages
             for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date)]
 
         self.download_count_insert(df)
         
-        return pd.DataFrame(df, columns=['repo', 'package', 'date', 'ip_count', 'download_count'])
+        return pd.DataFrame(df, columns=['category', 'package', 'date', 'ip_count', 'download_count'])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
         with self.db.connection() as conn:
