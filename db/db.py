@@ -8,7 +8,7 @@ import pandas as pd
 from typing import List, Tuple
 from collections import namedtuple
 
-from datetime import date
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from random import seed, randint
 
@@ -67,15 +67,16 @@ class DatabaseService:
     def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> None:
         
         seed(seed_value)
-        def months_sequence(start_date, end_date):
+        def months_sequence(start_date: date, end_date: date):
             """Yield the first day of each month from start_date to end_date inclusive."""
             current_date = start_date
+            
             while current_date <= end_date:
                 yield current_date
                 current_date += relativedelta(months=1)
                 
         for repo, package, start_date in packages:
-            for d in months_sequence(start_date, end_date):
+            for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date):
                     self.download_count_insert([(repo, package, d, randint(1, 10000), randint(1, 100000))])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
@@ -101,3 +102,14 @@ class DatabaseService:
             result = conn.execute(text(statement))
             conn.commit()
             return pd.DataFrame(result.fetchall(), columns=result.keys())
+    
+    # Methods below this point should be an a facade tier e.g. in the app
+    def get_package_names(self) -> pd.DataFrame:
+        with self.db.connection() as conn:
+            result = conn.execute(text('select distinct package from download_summary order by package'))
+            conn.commit()
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
+        return result
+
+        
+    
