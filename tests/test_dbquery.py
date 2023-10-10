@@ -5,12 +5,26 @@ from db.db import PackageType
 import pandas as pd
 import app.dbquery as queries
 
+
+database_test_cases = [
+    [
+        ('bioc', 'affydata', '2023-08-01')
+    ],
+    [
+        ('bioc', 'affy', '2023-09-01'), 
+        ('bioc', 'affydata', '2023-08-01')
+    ]
+]
+
+
 def test_populate_database_one_package(database_access):
     # Arrange
-    sut, expected = database_access
+    sut = database_access
+    sut.populate(123, date(2023, 10, 1), database_test_cases[0])
+    expected = sut.select()
 
     # Act
-    result = sut.execute('select repo, package, "date", ip_count, download_count from download_summary')
+    result = sut.select()
     pass
 
     # Assert
