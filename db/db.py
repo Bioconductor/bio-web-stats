@@ -116,4 +116,9 @@ class DatabaseService:
                 )
             conn.commit()
             return cursor_to_dataframe(result)
+        
+    def get_download_counts(self, category: PackageType, package=None):
+        raise NotImplemented
+        
+
 
