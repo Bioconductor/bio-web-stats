@@ -1,11 +1,11 @@
 
-from sqlalchemy import Engine, Connection, MetaData
+from sqlalchemy import CursorResult, Engine, Connection, MetaData
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, text
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 
-from typing import List, Tuple
+from typing import Any, List, Tuple
 from collections import namedtuple
 
 from datetime import date, datetime
@@ -13,6 +13,11 @@ from dateutil.relativedelta import relativedelta
 from random import seed, randint
 
 from enum import Enum
+
+def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
+    return pd.DataFrame(cursor.fetchall(), columns=cursor.keys())
+
+
 
 class PackageType(Enum):
     BIOC = "bioc"
@@ -65,6 +70,7 @@ class DatabaseService:
             Column("download_count", BigInteger)
         )
         metadata.create_all(self.db.engine())
+        
 
     # TODO Replace randint with hash on all keys for better validation
     def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> pd.DataFrame:
@@ -87,7 +93,6 @@ class DatabaseService:
             for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date)]
 
         self.download_count_insert(df)
-        
         return pd.DataFrame(df, columns=['category', 'package', 'date', 'ip_count', 'download_count'])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
@@ -95,32 +100,20 @@ class DatabaseService:
             conn.execute(insert(self.download_summary).values(rows))
             conn.commit()
 
-    def dump_db(self) -> [tuple]:
-        with self.db.connection() as conn:
-            result = conn.execute(select(self.download_summary))
-            conn.commit()
-            tuple_list = [tuple(row) for row in result]
-            return tuple_list
-
     def select(self) -> pd.DataFrame:
         with self.db.connection() as conn:
             result = conn.execute(select(self.download_summary))
             conn.commit()
-            return pd.DataFrame(result.fetchall(), columns=result.keys())
+            return cursor_to_dataframe(result)
         
-    def execute(self, statement: str) -> pd.DataFrame:
-        with self.db.connection() as conn:
-            result = conn.execute(text(statement))
-            conn.commit()
-            return pd.DataFrame(result.fetchall(), columns=result.keys())
-    
     # Methods below this point should be an a facade tier e.g. in the app
+    
     def get_package_names(self) -> pd.DataFrame:
         with self.db.connection() as conn:
-            result = conn.execute(text('select distinct package from download_summary order by package'))
+            result = conn.execute(
+                select(self.download_summary.c.package.distinct())
+                    .order_by(self.download_summary.c.package)
+                )
             conn.commit()
-            return pd.DataFrame(result.fetchall(), columns=result.keys())
-        return result
+            return cursor_to_dataframe(result)
 
-        
-    

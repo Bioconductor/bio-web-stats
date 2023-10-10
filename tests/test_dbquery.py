@@ -16,6 +16,9 @@ database_test_cases = [
     ]
 ]
 
+def dataframes_equivalent(a: pd.DataFrame, b:pd.DataFrame) -> bool:
+    return a.reset_index(drop=True).equals(b.reset_index(drop=True))
+
 @pytest.mark.parametrize("test_case", database_test_cases)
 def test_populate_database_one_package(test_case, database_access):
     # Arrange
@@ -34,11 +37,11 @@ def test_get_package_names(test_case, database_access):
     # Arrange
     sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
-    expected = df[['package']].drop_duplicates()
+    expected = df[['package']].drop_duplicates().sort_values(by='package')
 
     # Act
     result = sut.get_package_names()
 
     # Assert
-    assert set(result.package) == set(expected.package)
 
+    assert dataframes_equivalent(result, expected)
