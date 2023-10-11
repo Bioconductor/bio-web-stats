@@ -1,18 +1,18 @@
 
 from sqlalchemy import CursorResult, Engine, Connection, MetaData
 from sqlalchemy import Table, Column, BigInteger, String, Date
-from sqlalchemy import create_engine, select, insert, text
+from sqlalchemy import create_engine, select, insert, Enum as SQLEnum
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 
+
+from enum import Enum
 from typing import Any, List, Tuple
 from collections import namedtuple
 
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from random import seed, randint
-
-from enum import Enum
 
 def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
     return pd.DataFrame(cursor.fetchall(), columns=cursor.keys())
@@ -63,9 +63,9 @@ class DatabaseService:
         metadata = MetaData()
         self.download_summary = Table("download_summary", 
             metadata,
-            Column("category", String, primary_key=True),
-            Column("package", String, primary_key=True),
-            Column("date", Date, primary_key=True),
+            Column("category", SQLEnum(PackageType), nullable=False, primary_key=True),
+            Column("package", String, nullable=False, primary_key=True),
+            Column("date", Date, nullable=False, primary_key=True),
             Column("ip_count", BigInteger),
             Column("download_count", BigInteger)
         )
