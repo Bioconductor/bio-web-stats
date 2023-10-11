@@ -5,6 +5,7 @@ from db.db import PackageType
 import pandas as pd
 import app.dbquery as queries
 
+# pytest --snapshot-update #when necessary
 
 database_test_cases = [
     [
@@ -20,7 +21,7 @@ def dataframes_equivalent(a: pd.DataFrame, b:pd.DataFrame) -> bool:
     return a.reset_index(drop=True).equals(b.reset_index(drop=True))
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_populate_database_one_package(test_case, database_access):
+def test_populate_database_one_package(snapshot, test_case, database_access):
     # Arrange
     sut = database_access
     expected = sut.populate(123, date(2023, 10, 1), test_case)
