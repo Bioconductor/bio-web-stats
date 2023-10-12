@@ -136,8 +136,8 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 #            return Response(status=500)
     
 
-from flask import Flask, render_template
-import pandas as pd
+
+
 
 @app.route(PATH + '/<package_type>.html')
 def index1(package_type):
@@ -148,7 +148,8 @@ def index1(package_type):
         df = pd.DataFrame({
         'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
         'Score': [90, 85, 88, 95, 75, 80]
-    })
+        })
+        records = df.to_dict(orient='records')
         
     elif package_type == 'data-annotation':
         template_name = 'data-annotation.html'
@@ -156,16 +157,14 @@ def index1(package_type):
         df = pd.DataFrame({
         'Packages': ['GenomeInfoDbData', 'GO.db', 'org.Hs.eg.db', 'Package4', 'Package5', 'Package6'],
         'Score': [90, 85, 88, 95, 75, 80]
-    })
-        
-    
-
+        })
+        records = df.to_dict(orient='records')
 
     else:
         # Handle the case where package_type is not recognized
         return "Package type not found"
 
-    return render_template(template_name, df=df)
+    return render_template(template_name, records=records)
 
 if __name__ == '__main__':
     app.run(debug=True)
