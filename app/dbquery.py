@@ -119,5 +119,5 @@ def get_package_names() -> pd.DataFrame:
 #         case _:
 #             raise Exception(f'Invalid request type ({DbQueryRequest})')
 
-# # TODO abourt 504 for DB timeout, and 500 for all other error conditions
+# # TODO abort 504 for DB timeout, and 500 for all other error conditions
 # # TODO log errors
