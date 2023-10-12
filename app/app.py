@@ -1,7 +1,9 @@
 from flask import Flask, make_response, Response, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template
 from markupsafe import escape
 import pandas as pd
+
 
 import db.db as dbm
 from db.db import PackageType, packge_type_exists
@@ -84,8 +86,6 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 
 
 
-
-
 # # #bioc/S4Vectors/S4Vectors_2023_stats.tab
 # @app.route('/packages/stats/<package_type>/<package_name>/<package_name_2>_<package_year>_stats.tab', methods=['GET'])
 # def get_existing_packages_stats_year(package_type,package_name, package_name_2, package_year):
@@ -135,6 +135,48 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 #         case _:
 #            return Response(status=500)
     
+
+from flask import Flask, render_template
+import pandas as pd
+
+@app.route(PATH + '/<package_type>.html')
+def index1(package_type):
+    # Use the package_type variable to dynamically select the template and data
+    if package_type == 'bioc':
+        template_name = 'bioc.html'
+        
+        df = pd.DataFrame({
+        'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
+        'Score': [90, 85, 88, 95, 75, 80]
+    })
+        
+    elif package_type == 'data-annotation':
+        template_name = 'data-annotation.html'
+        
+        df = pd.DataFrame({
+        'Packages': ['GenomeInfoDbData', 'GO.db', 'org.Hs.eg.db', 'Package4', 'Package5', 'Package6'],
+        'Score': [90, 85, 88, 95, 75, 80]
+    })
+        
+    
+
+
+    else:
+        # Handle the case where package_type is not recognized
+        return "Package type not found"
+
+    return render_template(template_name, df=df)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
+
+
+
+
 
 
 # #bioc/S4Vectors/
