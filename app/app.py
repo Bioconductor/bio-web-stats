@@ -160,6 +160,24 @@ def index1(package_type):
         })
         records = df.to_dict(orient='records')
 
+    elif package_type == 'data-experiment':
+        template_name = 'data-experiment.html'
+        
+        df = pd.DataFrame({
+        'Packages': ['ALL', 'TCGAbiolinksGUI.data', 'celldex', 'Package4', 'Package5', 'Package6'],
+        'Score': [90, 85, 88, 95, 75, 80]
+        })
+        records = df.to_dict(orient='records')
+    
+    elif package_type == 'workflows':
+        template_name = 'workflows.html'
+        
+        df = pd.DataFrame({
+        'Packages': ['GenomeInfoDbData', 'GO.db', 'org.Hs.eg.db', 'Package4', 'Package5', 'Package6'],
+        'Score': [90, 85, 88, 95, 75, 80]
+        })
+        records = df.to_dict(orient='records')
+
     else:
         # Handle the case where package_type is not recognized
         return "Package type not found"

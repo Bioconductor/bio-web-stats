@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Download stats for Bioconductor software packages</TITLE>
+    <LINK rel="stylesheet" href="main.css" type="text/css">
+</HEAD>
+<BODY>
+    <TABLE style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
+        <TR>
+            <TD style="padding: 0px; text-align: right;">
+                <I>See download stats for:</I>&nbsp;&nbsp;&nbsp;&nbsp;
+                <I><A HREF="data-annotation.html">Bioconductor software packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                <I><A HREF="data-experiment.html">Bioconductor experiment packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                <I><A HREF="workflows.html">Bioconductor workflow packages</A></I>
+            </TD>
+        </TR>
+    </TABLE>
+    <H1 style="text-align: center;">Download stats for Bioconductor software packages</H1>
+    <P style="text-align: center;">
+        <I>This page was generated on 2023-10-11 01:29:48 -0400 (Wed, 11 Oct 2023).</I>
+    </P>
+    <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of distinct IPs that &ldquo;hit&rdquo; the package each month for the last 12 months (not counting the current month).</P>
+    <HR>
+    <H2>Top 30</H2>
+    <TABLE class="pkg_index">
+        <TR>
+            <TH>Rank</TH>
+            <TH>Package Name</TH>
+            <TH>Download Score</TH>
+        </TR>
+        {% for record in records %}
+        <TR>
+            <TD>{{ loop.index }}</TD>
+            <TD><A HREF="#">{{ record.Packages }}</A></TD>
+            <TD>{{ record.Score }}</TD>
+        </TR>
+        {% endfor %}
+    </TABLE>
+</BODY>
+</HTML>
