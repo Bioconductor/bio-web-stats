@@ -2,32 +2,31 @@ from flask import Flask, make_response, Response, abort
 from flask_sqlalchemy import SQLAlchemy
 
 from markupsafe import escape
-import db.db as db
+import db.db as dbm
 from dbquery import *
 #### CAUTION: WORK-IN-PROGRESS...NON-FUNCTIONAL AT 11-OCT-2023 9:23 AM
 # TODO for initial test only
-app = Flask(__name__)
-# TODO For mock-up test only FROM HERE VVVVV
+from datetime import date
+
+# TDODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
 test_database_spec = [
         (PackageType.BIOC, 'affy', '2023-09-01'), 
         (PackageType.BIOC, 'affydata', '2023-08-01'),
         (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
     ]
-from datetime import date
-with app.app_context():
-    db_service = db.DatabaseService(db.TestDatabaseConnection)
-    db_service.create()
-    db_service.populate(123, date(2023, 10, 1), test_database_spec)
-# TO HERE ^^^^^^^^^^^^^^^^^
+
+db = dbm.DatabaseService(dbm.TestDatabaseConnection)
+db.create()
+db.populate(123, date(2023, 10, 1), test_database_spec)
+
+app = Flask(__name__)
 
 # TODO How to express the URL prefix?
 @app.route('/packages/stats/bioc/bioc_packages.txt', methods=['GET'])
-def get_packages():
-    
-    payload = db_service.get_package_names()
-    response = ('\n').join([row for row in payload['package']])
-    return response
-            
+def get_packages():    
+    payload = db.get_package_names()
+    text = ('\n').join([row for row in payload['package']])
+    return Response(text, content_type='text/plain')
 
 # #bioc/bioc_pkg_scores.tab
 # @app.route('/packages/stats/<package_type>/<package_type_2>_pkg_scores.tab', methods=['GET'])

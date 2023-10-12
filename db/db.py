@@ -35,6 +35,7 @@ class DatabaseConnectionInterface:
     def close() -> None:
         raise NotImplementedError
     
+
 class TestDatabaseConnection(DatabaseConnectionInterface):
     # TODO echo=True ==> this is a trace parameter.
     _engine: Engine = None
@@ -42,7 +43,8 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     @staticmethod
     def engine() -> Engine:
         if TestDatabaseConnection._engine is None:
-            TestDatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+            # TestDatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+            TestDatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db')
         return TestDatabaseConnection._engine
 
     @staticmethod
