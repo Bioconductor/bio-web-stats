@@ -46,6 +46,8 @@ def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats
     text = ('\n').join([row for row in text])
     return Response(text, content_type='text/plain')
 
+
+#TODO - More work needed - the supervening code is in format_helpers.py and still needs work
 def df_enum_columns_to_values(df: pd.DataFrame) -> pd.DataFrame:
     for column in df.columns:
         # Check if any entry in the column is an instance of PackageType
@@ -73,31 +75,8 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     df['year'] = [d.year for d in df['date']]
     df['month'] = [d.month for d in df['date']]
 
-    # Drop the 'date' column
-    df.drop('date', axis=1, inplace=True)
-
-    # Ensure all months are covered for each package and year and fill missing values with 0
-    all_months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    all_years = df['year'].unique()
-    all_packages = df['package'].unique()
-    idx = pd.MultiIndex.from_product([all_packages, all_years, all_months], names=['package', 'year', 'month'])
-
-    df.set_index(['package', 'year', 'month'], inplace=True)
-    df = df.reindex(idx).reset_index()
-    df.fillna(0, inplace=True)
-
     # Reorder columns
     df = df[['package', 'year', 'month', 'ip_count', 'download_count']]
-
-    # TODO merge in the annual data
-    # Process the second dataframe (data x year) call it df2
-    # df2['year'] = df2['date'].dt.year
-    # df2['month'] = 'YearSummary'  # Or any other desired label
-    # df2.drop('date', axis=1, inplace=True)
-
-    # # Concatenate and sort
-    # final_df = pd.concat([df, df2], ignore_index=True)
-    # final_df.sort_values(by=['package', 'year', 'month'], inplace=True, key=lambda col: col.replace('YearSummary', 'Dec') if isinstance(col, str) else col)
 
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
