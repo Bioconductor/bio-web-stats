@@ -84,17 +84,26 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
+@app.route('/packages/stats/', defaults={'package_type': 'default'})
 @app.route(PATH + '/<package_type>.html')
-def index1(package_type):
-    # Use the package_type variable to dynamically select the template and data
-    if package_type == 'bioc':
-        template_name = 'bioc.html'
-        
+def show_packages_(package_type):
+    if package_type is 'default':
+        # This is the default route, so load the data and template accordingly
         df = pd.DataFrame({
-        'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
-        'Score': [90, 85, 88, 95, 75, 80]
+            'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
+            'Score': [90, 85, 88, 95, 75, 80]
         })
         records = df.to_dict(orient='records')
+        template_name = 'index.html'
+    
+    elif package_type == 'bioc':
+        # If 'package_type' is 'bioc', load a different template and data
+        df = pd.DataFrame({
+            'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
+            'Score': [90, 85, 88, 95, 75, 80]
+        })
+        records = df.to_dict(orient='records')
+        template_name = 'bioc.html'
         
     elif package_type == 'data-annotation':
         template_name = 'data-annotation.html'
