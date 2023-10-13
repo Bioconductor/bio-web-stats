@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 from datetime import date
 from db.db import PackageType
 from pandas import DataFrame
-import app.dbquery as queries
 
 # Archetype:
 # @pytest.mark.parametrize("test_case", database_test_cases)
