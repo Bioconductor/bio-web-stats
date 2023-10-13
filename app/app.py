@@ -129,12 +129,6 @@ def index1(package_type):
 
     return render_template(template_name, records=records)
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-
 
 
 
