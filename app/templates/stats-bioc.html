@@ -2,53 +2,35 @@
 <HTML>
 <HEAD>
     <TITLE>Download stats for Bioconductor software repository (all packages combined)</TITLE>
-    <LINK rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" type="text/css">
+    <LINK rel="stylesheet" href="../main.css" type="text/css">
 </HEAD>
-
 <BODY>
-    <TABLE style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
-        <TR>
-            <TD style="padding: 0px; text-align: left;">
-                <I><A HREF="../">Back to the &quot;Download stats for Bioconductor software packages&quot;</A></I>
-            </TD>
-        </TR>
-    </TABLE>
-    <H1 style="text-align: center">Download stats for Bioconductor software repository (all packages combined)</H1>
-    <P style="text-align: center;">
-        <I>This page was generated on 2023-10-11 01:29:44 -0400 (Wed, 11 Oct 2023).</I>
-    </P>
-    <P style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by year, from 2023 back to 2009 (years with no downloads are omitted):</P>
-    <HR>
-    <H2 style="text-align: center;">2023</H2>
-    <img src="data:image/png;base64,{{ image_base64 }}" width="720px" height="400px" alt="Barplot">
-    <TABLE WIDTH="90%" align="center">
-        <TR>
-            <TD style="text-align: center"><IMG SRC="{{ url_for('static', filename='barplot.png') }}" WIDTH="720px" HEIGHT="400px"></TD>
-            <TD style="text-align: center">
-                <TABLE class="stats" align="center">
-                    <TR>
-                        <TH style="text-align: right">Month</TH>
-                        <TH style="text-align: right; background: #aaaaff">Nb&nbsp;of&nbsp;distinct&nbsp;IPs</TH>
-                        <TH style="text-align: right; background: #ddddff">Nb&nbsp;of&nbsp;downloads</TH>
-                    </TR>
-                    <!-- You can loop through your data and generate table rows here -->
-                    {% for label in barlabels %}
-                    <TR>
-                        <TD style="text-align: right">{{ label|replace('/', '\n') }}</TD>
-                        <TD style="text-align: right; background: #aaaaff">{{ barlabel_to_C1[label] }}</TD>
-                        <TD style="text-align: right; background: #ddddff">{{ barlabel_to_C2[label] }}</TD>
-                    </TR>
-                    {% endfor %}
-                    <TR>
-                        <TH style="text-align: right">2023</TH>
-                        <TH style="text-align: right; background: #aaaaff">{{ c1_total }}</TH>
-                        <TH style="text-align: right; background: #ddddff">{{ c2_total }}</TH>
-                    </TR>
-                </TABLE>
-                <A HREF="bioc_2023_stats.tab">bioc_2023_stats.tab</A>
-            </TD>
-        </TR>
-    </TABLE>
-    <HR>
+<TABLE style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
+    <TR>
+        <TD style="padding: 0px; text-align: left;">
+            <I><A HREF="../">Back to the "Download stats for Bioconductor software packages"</A></I>
+        </TD>
+    </TR>
+</TABLE>
+<H1 style="text-align: center">Download stats for Bioconductor software repository (all packages combined)</H1>
+<P style="text-align: center;">
+    <I>This page was generated on 2023</I>
+</P>
+<P style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by year, from 2023 back to 2009 (years with no downloads are omitted):</P>
+<HR>
+
+<H2 style="text-align: center;">2023</H2>
+<TABLE WIDTH="90%" align="center">
+    <TR>
+        <TD style="text-align: center">
+            <img src="data:image/png;base64,{{ barplot_data }}" width="720px" height="400px">
+        </TD>
+        <TD style="text-align: center">
+            {{ stats_table | safe }}
+        </TD>
+    </TR>
+</TABLE>
+<HR>
+
 </BODY>
 </HTML>
