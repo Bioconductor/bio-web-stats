@@ -147,7 +147,7 @@ def show_packages_(package_type):
     return render_template(template_name, records=records)
 
 
-
+#fuction to plot the bar graphs
 def make_barplot2ylog(title, barlabels,
                       barlabel_to_C1, C1_label, C1_color,
                       barlabel_to_C2, C2_label, C2_color, Cmax=None):
@@ -194,6 +194,7 @@ def make_barplot2ylog(title, barlabels,
     return image_base64
 
 
+#TODO implement for variable path 
 @app.route('/packages/stats/bioc/BiocVersion/')
 def index5():
     # Dummy data - Replace with your data retrieval logic
@@ -206,18 +207,6 @@ def index5():
     image_base64 = make_barplot2ylog(title, barlabels, barlabel_to_C1, 'C1 Label', 'blue', barlabel_to_C2, 'C2 Label', 'red')
 
     return render_template('stats-bioc.html', image_base64=image_base64)
-
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -234,13 +223,7 @@ if __name__ == '__main__':
 # #bioc/S4Vectors/
 # @app.route('/packages/stats/<package_type>/<package_name>/', methods=['GET'])
 # def get_exixsting_package(package_type, package_name):
-#     
-
-
-
-# #ROOT
-# @app.route('/packages/stats/', methods=['GET'])
-
+#   
 
 # #BIOC
 # @app.route('/packages/stats/bioc', methods=['GET'])
