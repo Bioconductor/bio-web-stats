@@ -94,7 +94,7 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 
 @app.route('/packages/stats/', defaults={'package_type': 'default'})
 @app.route(PATH + '/<package_type>.html')
-def show_packages_(package_type):
+def show_packages_summery(package_type):
     if package_type is 'default':
         # This is the default route, so load the data and template accordingly
         df = pd.DataFrame({
@@ -147,6 +147,7 @@ def show_packages_(package_type):
     return render_template(template_name, records=records)
 
 
+
 #fuction to plot the bar graphs
 def make_barplot2ylog(title, barlabels,
                       barlabel_to_C1, C1_label, C1_color,
@@ -193,31 +194,62 @@ def make_barplot2ylog(title, barlabels,
 
     return image_base64
 
+def write_HTML_stats_TABLE(months, month_to_C1, C1_label, C1_color, month_to_C2, C2_label, C2_color, allmonths_label, allmonths_c1, allmonths_c2=None):
+    C1_style = 'style="text-align: right; background: %s"' % C1_color
+    C2_style = 'style="text-align: right; background: %s"' % C2_color
+    table_html = '<TABLE class="stats" align="center">\n'
+    table_html += '<TR>'
+    table_html += '<TH style="text-align: right">Month</TH>'
+    table_html += '<TH %s>%s</TH>' % (C1_style, C1_label)
+    table_html += '<TH %s>%s</TH>' % (C2_style, C2_label)
+    table_html += '</TR>\n'
+
+    sum2 = 0
+    for month in months:
+        c1 = month_to_C1[month]
+        c2 = month_to_C2[month]
+        sum2 += c2
+        table_html += '<TR>'
+        table_html += '<TD style="text-align: right">%s</TD>' % month
+        table_html += '<TD %s>%d</TD>' % (C1_style, c1)
+        table_html += '<TD %s>%d</TD>' % (C2_style, c2)
+        table_html += '</TR>\n'
+
+    if allmonths_c2 is None:
+        allmonths_c2 = sum2
+    elif allmonths_c2 != sum2:
+        return "Error: allmonths_c2 != sum2"
+
+    table_html += '<TR>'
+    table_html += '<TH style="text-align: right">%s</TH>' % allmonths_label
+    table_html += '<TH %s>%d</TH>' % (C1_style, allmonths_c1)
+    table_html += '<TH %s>%d</TH>' % (C2_style, allmonths_c2)
+    table_html += '</TR>\n'
+    table_html += '</TABLE>\n'
+
+    return table_html
+
 
 #TODO implement for variable path 
 @app.route('/packages/stats/bioc/BiocVersion/')
-def index5():
-    # Dummy data - Replace with your data retrieval logic
-    barlabels = ["Jan/2023", "Feb/2023", "Mar/2023", "Apr/2023", "May/2023", "Jun/2023", "Jul/2023", "Aug/2023", "Sep/2023", "Oct/2023", "Nov/2023", "Dec/2023"]
-    barlabel_to_C1 = {"Jan/2023": 3165198, "Feb/2023": 3488622, "Mar/2023": 4407007, "Apr/2023": 3892123, "May/2023": 4029362, "Jun/2023": 3623651, "Jul/2023": 3531188, "Aug/2023": 3718150, "Sep/2023": 3509979, "Oct/2023": 835681, "Nov/2023": 0, "Dec/2023": 0}
-    barlabel_to_C2 = {"Jan/2023": 96471, "Feb/2023": 108380, "Mar/2023": 134470, "Apr/2023": 126179, "May/2023": 127681, "Jun/2023": 122621, "Jul/2023": 122530, "Aug/2023": 121541, "Sep/2023": 130785, "Oct/2023": 43192, "Nov/2023": 0, "Dec/2023": 0}
+def index7():
+    months = ["Jan/2023", "Feb/2023", "Mar/2023", "Apr/2023", "May/2023", "Jun/2023", "Jul/2023", "Aug/2023", "Sep/2023", "Oct/2023", "Nov/2023", "Dec/2023"]
+    month_to_C1 = {month: 1000 for month in months}
+    month_to_C2 = {month: 2000 for month in months}
+    allmonths_label = "2023"
+    allmonths_c1 = sum(month_to_C1.values())
+    allmonths_c2 = sum(month_to_C2.values())
 
-    title = "Download Stats for Bioconductor Software Repository (2023)"
-    
-    image_base64 = make_barplot2ylog(title, barlabels, barlabel_to_C1, 'C1 Label', 'blue', barlabel_to_C2, 'C2 Label', 'red')
+    # Generate the barplot
+    barplot_data = make_barplot2ylog("2023 Download Stats", months, month_to_C1, "C1 Label", "#aaaaff", month_to_C2, "C2 Label", "#ddddff")
 
-    return render_template('stats-bioc.html', image_base64=image_base64)
+    # Generate the HTML stats table
+    stats_table = write_HTML_stats_TABLE(months, month_to_C1, "C1 Label", "#aaaaff", month_to_C2, "C2 Label", "2023", allmonths_c1, allmonths_c2)
+
+    return render_template('stats-bioc.html', barplot_data=barplot_data, stats_table=stats_table)
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
 
 
 # #bioc/S4Vectors/
