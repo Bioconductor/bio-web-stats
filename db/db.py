@@ -1,10 +1,10 @@
 
-from sqlalchemy import CursorResult, Engine, Connection, MetaData, asc, desc
+from sqlalchemy import CursorResult, Engine, Connection, MetaData, asc, desc, extract
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, Enum as SQLEnum
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
-
+from typing import Optional
 
 from enum import Enum
 from typing import Any, List, Tuple
@@ -127,21 +127,27 @@ class DatabaseService:
             return cursor_to_dataframe(result)
         
     # TODO lambda to make it more clear
-    def get_download_counts(self, category: PackageType, package=None):
+    def get_download_counts(self, category: PackageType, 
+                            package: Optional[str] = None, 
+                            year: Optional[int] = None):
         with self.db.connection() as conn:
             if package is None:
                 result = conn.execute(select(self.download_summary)
                         .where((self.download_summary.c.category == category))
                         .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
                     )
-            else:
+            elif year is None:
                 result = conn.execute(select(self.download_summary)
                         .where((self.download_summary.c.category == category) 
                             & (self.download_summary.c.package == package))
                         .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
                     )
+            else:
+                result = conn.execute(select(self.download_summary)
+                        .where((self.download_summary.c.category == category) 
+                            & (self.download_summary.c.package == package)
+                            & (extract('year',self.download_summary.c.date) == year))
+                        .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
+                    )
             conn.commit()
             return cursor_to_dataframe(result)
-        
-
-

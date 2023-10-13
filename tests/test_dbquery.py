@@ -84,7 +84,6 @@ def test_get_download_counts_for_category(test_case, database_access):
     # Assert
     assert dataframes_equivalent(result, expected)
 
-# TODO Manifest constants for test cases
 @pytest.mark.parametrize("test_case", database_test_cases)
 def test_get_download_counts_for_pacakge(test_case, database_access):
     # Arrange
@@ -98,3 +97,20 @@ def test_get_download_counts_for_pacakge(test_case, database_access):
 
     # Assert
     assert dataframes_equivalent(result, expected)
+
+@pytest.mark.parametrize("test_case", database_test_cases)
+def test_get_download_counts_for_pacakge_year(test_case, database_access):
+    # Arrange
+    sut = database_access
+    df = sut.populate(123, date(2023, 10, 1), test_case)
+    # we will be looking for all rows 
+    expected = df[(df['category'] == PackageType.ANNOTATION) & 
+                (df['package'] == 'BSgenome.Hsapiens.UCSC.hg38') &
+                ([d.year == 2021 for d in df['date']])].sort_values(by=['package', 'date'])
+
+    # Act
+    result = sut.get_download_counts(PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', 2021)
+
+    # Assert
+    assert dataframes_equivalent(result, expected)
+
