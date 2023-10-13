@@ -94,57 +94,36 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 
 @app.route('/packages/stats/', defaults={'package_type': 'default'})
 @app.route(PATH + '/<package_type>.html')
-def show_packages_summery(package_type):
-    if package_type is 'default':
-        # This is the default route, so load the data and template accordingly
-        df = pd.DataFrame({
-            'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
-            'Score': [90, 85, 88, 95, 75, 80]
-        })
-        records = df.to_dict(orient='records')
-        template_name = 'index.html'
-    
-    elif package_type == 'bioc':
-        # If 'package_type' is 'bioc', load a different template and data
-        df = pd.DataFrame({
-            'Packages': ['S4Vectors', 'Biobase', 'BiocParallel', 'Package4', 'Package5', 'Package6'],
-            'Score': [90, 85, 88, 95, 75, 80]
-        })
-        records = df.to_dict(orient='records')
-        template_name = 'bioc.html'
-        
-    elif package_type == 'data-annotation':
-        template_name = 'data-annotation.html'
-        
-        df = pd.DataFrame({
-        'Packages': ['GenomeInfoDbData', 'GO.db', 'org.Hs.eg.db', 'Package4', 'Package5', 'Package6'],
-        'Score': [90, 85, 88, 95, 75, 80]
-        })
-        records = df.to_dict(orient='records')
+def show_packages_summary(package_type):
+    # Define the common data
+    common_data = {
+        'data': [
+            {'Packages': 'S4Vectors', 'Score': 90},
+            {'Packages': 'Biobase', 'Score': 85},
+            {'Packages': 'BiocParallel', 'Score': 88},
+            {'Packages': 'Package4', 'Score': 95},
+            {'Packages': 'Package5', 'Score': 75},
+            {'Packages': 'Package6', 'Score': 80},
+        ],
+    }
 
-    elif package_type == 'data-experiment':
-        template_name = 'data-experiment.html'
-        
-        df = pd.DataFrame({
-        'Packages': ['ALL', 'TCGAbiolinksGUI.data', 'celldex', 'Package4', 'Package5', 'Package6'],
-        'Score': [90, 85, 88, 95, 75, 80]
-        })
-        records = df.to_dict(orient='records')
-    
-    elif package_type == 'workflows':
-        template_name = 'workflows.html'
-        
-        df = pd.DataFrame({
-        'Packages': ['GenomeInfoDbData', 'GO.db', 'org.Hs.eg.db', 'Package4', 'Package5', 'Package6'],
-        'Score': [90, 85, 88, 95, 75, 80]
-        })
-        records = df.to_dict(orient='records')
+    # Define a dictionary to map package types to template names
+    package_templates = {
+        'default': 'index.html',
+        'bioc': 'bioc.html',
+        'data-annotation': 'data-annotation.html',
+        'data-experiment': 'data-experiment.html',
+        'workflows': 'workflows.html',
+    }
 
+    # Check if the provided package_type is in the dictionary
+    if package_type in package_templates:
+        template_name = package_templates[package_type]
     else:
         # Handle the case where package_type is not recognized
         return "Package type not found"
 
-    return render_template(template_name, records=records)
+    return render_template(template_name, records=common_data['data'])
 
 
 
