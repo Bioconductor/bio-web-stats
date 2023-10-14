@@ -1,0 +1,9 @@
+{
+  "DatabaseName": "glue-sup-db",
+  "TableInput": {
+    "Name": "bw-dev_bioc_weblogs_small_test",
+    "StorageDescriptor": {
+      "Location": "s3://dev-bioc-weblogs-small-test/weblogs/"
+    }
+  }
+}
