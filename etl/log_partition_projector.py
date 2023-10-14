@@ -23,14 +23,15 @@ def log_partition_projector(source_bucket: str,
         print("No files to process.")
         exit()
 
+    # TODO Need to add chuck chaining...hard max of 1k files
     for item in response['Contents']:
         filename = item['Key']
         
         # Extract date information from the filename
         date_parts = filename.split('.')[1].split('-')
         
-        # TODO hard coded new prefix and dupicate on the right.
-        new_key = f"weblogs/{date_parts[0]}/{date_parts[1]}/{date_parts[2]}/{date_parts[3]}/{filename}"
+        # TODO parameterie hard coded new prefix
+        new_key = f"weblogs/{date_parts[0]}/{date_parts[1]}/{date_parts[2]}/{filename}"
         print(new_key)
         if not dry_run:
         # TODO Check result code result['ResponseMetadata']['HTTPStatusCode']
