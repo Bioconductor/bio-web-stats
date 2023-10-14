@@ -8,3 +8,4 @@ Flask-SQLAlchemy
 Mock
 syrupy
 matplotlib
+boto3
