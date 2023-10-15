@@ -1,0 +1,215 @@
+{
+    "Name": "bioc_web_logs",
+    "Description": "Mapping of cloudwatch logs",
+    "Retention": 0,
+    "StorageDescriptor": {
+        "Columns": [
+            {
+                "Name": "date",
+                "Type": "date",
+                "Comment": ""
+            },
+            {
+                "Name": "time",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "x-edge-location",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-bytes",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "c-ip",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-method",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs(host)",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-uri-stem",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-status",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "cs(referer)",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs(user-agent)",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-uri-query",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs(cookie)",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "x-edge-result-type",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "x-edge-request-id",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "x-host-header",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-protocol",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-bytes",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "time-taken",
+                "Type": "double",
+                "Comment": ""
+            },
+            {
+                "Name": "x-forwarded-for",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "ssl-protocol",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "ssl-cipher",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "x-edge-response-result-type",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "cs-protocol-version",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "fle-status",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "fle-encrypted-fields",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "c-port",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "time-to-first-byte",
+                "Type": "double",
+                "Comment": ""
+            },
+            {
+                "Name": "x-edge-detailed-result-type",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-content-type",
+                "Type": "string",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-content-len",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-range-start",
+                "Type": "bigint",
+                "Comment": ""
+            },
+            {
+                "Name": "sc-range-end",
+                "Type": "bigint",
+                "Comment": ""
+            }
+        ],
+        "Location": "s3://web-stats-dev/weblogs/",
+        "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+        "OutputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+        "Compressed": true,
+        "NumberOfBuckets": -1,
+        "SerdeInfo": {
+            "SerializationLibrary": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+            "Parameters": {
+                "field.delim": "\t"
+            }
+        },
+        "BucketColumns": [],
+        "SortColumns": [],
+        "Parameters": {
+            "sizeKey": "418475086",
+            "objectCount": "632",
+            "UPDATED_BY_CRAWLER": "support-test-crawler",
+            "CrawlerSchemaSerializerVersion": "1.0",
+            "recordCount": "690684",
+            "averageRecordSize": "327",
+            "CrawlerSchemaDeserializerVersion": "1.0",
+            "compressionType": "gzip",
+            "classification": "csv",
+            "columnsOrdered": "true",
+            "areColumnsQuoted": "false",
+            "delimiter": "\t",
+            "commentCharacter": "#",
+            "typeOfData": "file"
+        },
+        "StoredAsSubDirectories": false
+    },
+    "PartitionKeys": [],
+    "TableType": "EXTERNAL_TABLE",
+    "Parameters": {
+        "compressionType": "gzip",
+        "classification": "csv",
+        "columnsOrdered": "true",
+        "areColumnsQuoted": "false",
+        "delimiter": "\t",
+        "commentCharacter": "#",
+        "typeOfData": "file"
+    }
+}
