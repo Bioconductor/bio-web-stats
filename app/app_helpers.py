@@ -1,7 +1,7 @@
 """Utility functions for the Flask app.
 """
 
-from datetime import datetime,date,now
+from datetime import datetime,date
 
 # TODO: allow for mocking this class
 class app_config:

@@ -1,10 +1,11 @@
 
 from sqlalchemy import CursorResult, Engine, Connection, MetaData, asc, desc, extract
 from sqlalchemy import Table, Column, BigInteger, String, Date
-from sqlalchemy import create_engine, select, insert, Enum as SQLEnum
+from sqlalchemy import create_engine, select, insert, Enum as SQLEnum, bindparam, text, func
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 from typing import Optional
+from app_helpers import app_config
 
 from enum import Enum
 from typing import Any, List, Tuple
@@ -13,6 +14,8 @@ from collections import namedtuple
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from random import seed, randint
+
+import app.app_helpers as ah
 
 def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
     return pd.DataFrame(cursor.fetchall(), columns=cursor.keys())
@@ -125,12 +128,24 @@ class DatabaseService:
                 )
             conn.commit()
             return cursor_to_dataframe(result)
-        
-        # TODO lambda to make it more clear
+    
+    # TODO: add RANK
+    # TODO: Seperate call for single package ... category not needed
     def get_download_scores(self, category: PackageType, 
-                            package: Optional[str] = None):
-        # TODO THIS IS A STUB
-        return pd.DataFrame()
+                            package: Optional[str] = None) -> pd.DataFrame:
+        
+        start_date = app_config.today() - relativedelta(years=1)
+        end_date = app_config.today() - relativedelta(days=1)
+        with self.db.connection() as conn:
+                result = conn.execute(select(self.download_summary.c.package, func.avg(self.download_summary.c.ip_count).label('score'))
+                        .where((self.download_summary.c.category == category)
+                            & self.download_summary.c.date.between(start_date, end_date))
+                        .group_by(self.download_summary.c.package)
+                        .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
+                    )
+        result = cursor_to_dataframe(result)
+        result.score = result.score.round()
+        return result
 
         
     # TODO lambda to make it more clear
