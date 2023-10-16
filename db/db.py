@@ -137,14 +137,13 @@ class DatabaseService:
         start_date = app_config.today() - relativedelta(years=1)
         end_date = app_config.today() - relativedelta(days=1)
         with self.db.connection() as conn:
-                result = conn.execute(select(self.download_summary.c.package, func.avg(self.download_summary.c.ip_count).label('score'))
+                result = conn.execute(select(self.download_summary.c.package, func.sum(self.download_summary.c.ip_count).label('score') // 12)
                         .where((self.download_summary.c.category == category)
                             & self.download_summary.c.date.between(start_date, end_date))
                         .group_by(self.download_summary.c.package)
                         .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
                     )
         result = cursor_to_dataframe(result)
-        result.score = result.score.round()
         return result
 
         
