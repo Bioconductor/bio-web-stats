@@ -44,3 +44,7 @@ secrets.yml
 # OS-specific
 .DS_Store
 Thumbs.db
+
+etl/weblog_sample_short.tsv
+etl/weblog_sample.tsv
+.Rproj.user

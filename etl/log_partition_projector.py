@@ -33,7 +33,7 @@ def log_partition_projector(source_bucket: str,
         date_parts = filename.split('.')[1].split('-')
         
         # TODO parameterie hard coded new prefix
-        new_key = f"weblogs/{date_parts[0]}/{date_parts[1]}/{date_parts[2]}/{filename}"
+        new_key = f"{new_prefix}/{date_parts[0]}/{date_parts[1]}/{date_parts[2]}/{filename}"
         print(new_key)
         if not dryrun:
         # TODO Check result code result['ResponseMetadata']['HTTPStatusCode']
