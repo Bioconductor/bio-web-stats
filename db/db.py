@@ -126,6 +126,13 @@ class DatabaseService:
             conn.commit()
             return cursor_to_dataframe(result)
         
+        # TODO lambda to make it more clear
+    def get_download_scores(self, category: PackageType, 
+                            package: Optional[str] = None):
+        # TODO THIS IS A STUB
+        return pd.DataFrame()
+
+        
     # TODO lambda to make it more clear
     def get_download_counts(self, category: PackageType, 
                             package: Optional[str] = None, 
