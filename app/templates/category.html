@@ -9,26 +9,35 @@
         <TR>
             <TD style="padding: 0px; text-align: right;">
                 <I>See download stats for:</I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% if package_type != 'bioc' %}
                 <I><A HREF="bioc.html">Bioconductor software packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endif %}
+                {% if package_type != 'data-annotation' %}
+                <I><A HREF="data-annotation.html">Bioconductor annotation packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endif %}
+                {% if package_type != 'data-experiment' %}
                 <I><A HREF="data-experiment.html">Bioconductor experiment packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endif %}
+                {% if package_type != 'workflows' %}
                 <I><A HREF="workflows.html">Bioconductor workflow packages</A></I>
+                {% endif %}
             </TD>
         </TR>
     </TABLE>
     <H1 style="text-align: center;">Download stats for Bioconductor software packages</H1>
     <P style="text-align: center;">
-        <I>This page was generated on 2023-10-11 01:29:48 -0400 (Wed, 11 Oct 2023).</I>
+        <I>This page was generated on {{ generated_date }}.</I>
     </P>
-    <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of distinct IPs that &ldquo;hit&rdquo; the package each month for the last 12 months (not counting the current month).</P>
+    <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of distinct IPs that "hit" the package each month for the last 12 months (not counting the current month).</P>
     <HR>
-    <H2>Top 30</H2>
+    <H2>Top {{ top_count }}</H2>
     <TABLE class="pkg_index">
         <TR>
             <TH>Rank</TH>
             <TH>Package Name</TH>
             <TH>Download Score</TH>
         </TR>
-        {% for record in records %}
+        {% for record in data %}
         <TR>
             <TD>{{ loop.index }}</TD>
             <TD><A HREF="#">{{ record.Packages }}</A></TD>

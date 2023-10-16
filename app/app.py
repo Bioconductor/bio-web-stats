@@ -92,11 +92,15 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
-@app.route('/packages/stats/', defaults={'package_type': 'default'})
+
 @app.route(PATH + '/<package_type>.html')
 def show_packages_summary(package_type):
     # Define the common data
     common_data = {
+        'bioconductor_link': 'bioc.html',
+        'annotation_link': 'data-annotation.html',
+        'experiment_link': 'data-experiment.html',
+        'generated_date': '2023-10-11 01:29:48 -0400 (Wed, 11 Oct 2023)',
         'data': [
             {'Packages': 'S4Vectors', 'Score': 90},
             {'Packages': 'Biobase', 'Score': 85},
@@ -107,23 +111,23 @@ def show_packages_summary(package_type):
         ],
     }
 
-    # Define a dictionary to map package types to template names
-    package_templates = {
-        'default': 'index.html',
-        'bioc': 'bioc.html',
-        'data-annotation': 'data-annotation.html',
-        'data-experiment': 'data-experiment.html',
-        'workflows': 'workflows.html',
+    # Define a dictionary to map package types to the top_count
+    top_counts = {
+        'default': 75,
+        'bioc': 75,
+        'data-annotation': 30,
+        'data-experiment': 15,
+        'workflows': 75,
     }
 
     # Check if the provided package_type is in the dictionary
-    if package_type in package_templates:
-        template_name = package_templates[package_type]
+    if package_type in top_counts:
+        top_count = top_counts[package_type]
     else:
         # Handle the case where package_type is not recognized
         return "Package type not found"
 
-    return render_template(template_name, records=common_data['data'])
+    return render_template('category.html', top_count=top_count, **common_data)
 
 
 
@@ -210,6 +214,7 @@ def write_HTML_stats_TABLE(months, month_to_C1, C1_label, C1_color, month_to_C2,
 
 
 #TODO implement for variable path 
+#bioc/S4Vectors/
 @app.route('/packages/stats/bioc/BiocVersion/')
 def index7():
     months = ["Jan/2023", "Feb/2023", "Mar/2023", "Apr/2023", "May/2023", "Jun/2023", "Jul/2023", "Aug/2023", "Sep/2023", "Oct/2023", "Nov/2023", "Dec/2023"]
@@ -231,10 +236,3 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-# #bioc/S4Vectors/
-# @app.route('/packages/stats/<package_type>/<package_name>/', methods=['GET'])
-# def get_exixsting_package(package_type, package_name):
-#   
-
-# #BIOC
-# @app.route('/packages/stats/bioc', methods=['GET'])
