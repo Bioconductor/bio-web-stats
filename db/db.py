@@ -127,15 +127,27 @@ class DatabaseService:
             conn.commit()
             return cursor_to_dataframe(result)
     
-    # TODO: add RANK
-    # TODO: Seperate call for single package ... category not needed
-    def get_download_scores(self, category: PackageType, 
-                            package: Optional[str] = None) -> pd.DataFrame:
+    # TODO can combine with 'for_catagory with lambda function for where
+    def get_download_score_for_package(self, package: str) -> pd.DataFrame:
         
         start_date = app_config.today() - relativedelta(years=1)
         end_date = app_config.today() - relativedelta(days=1)
         with self.db.connection() as conn:
-                result = conn.execute(select(self.download_summary.c.package, func.sum(self.download_summary.c.ip_count).label('score') // 12)
+                result = conn.execute(select(self.download_summary.c.package, func.sum((self.download_summary.c.ip_count)// 12).label('score') )
+                        .where((self.download_summary.c.package == package)
+                            & self.download_summary.c.date.between(start_date, end_date))
+                        .group_by(self.download_summary.c.package)
+                        .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
+                    )
+        result = cursor_to_dataframe(result)
+        return result
+
+    def get_download_scores_for_category(self, category: PackageType) -> pd.DataFrame:
+        
+        start_date = app_config.today() - relativedelta(years=1)
+        end_date = app_config.today() - relativedelta(days=1)
+        with self.db.connection() as conn:
+                result = conn.execute(select(self.download_summary.c.package, func.sum((self.download_summary.c.ip_count)// 12).label('score') )
                         .where((self.download_summary.c.category == category)
                             & self.download_summary.c.date.between(start_date, end_date))
                         .group_by(self.download_summary.c.package)
