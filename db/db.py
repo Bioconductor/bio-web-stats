@@ -65,13 +65,14 @@ class DatabaseService:
     '''
     db: DatabaseConnectionInterface
     download_summary: Table
-    
+
     def __init__(self, db: DatabaseConnectionInterface) -> None:
         self.db = db
-        
+        self.download_summary = self.create()  # Initialize the table during initialization
+
     def create(self):
         metadata = MetaData()
-        self.download_summary = Table("download_summary", 
+        download_summary = Table("download_summary",
             metadata,
             Column("category", SQLEnum(PackageType), nullable=False, primary_key=True),
             Column("package", String, nullable=False, primary_key=True),
@@ -80,6 +81,7 @@ class DatabaseService:
             Column("download_count", BigInteger)
         )
         metadata.create_all(self.db.engine())
+        return download_summary
         
 
     # TODO Replace randint with hash on all keys for better validation
