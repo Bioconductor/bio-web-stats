@@ -13,7 +13,11 @@ import math
 import numpy
 
 import app.app_helpers as ah
+from db.db import DatabaseService, DatabaseConnectionInterface, TestDatabaseConnection
+from db.db import DatabaseService, TestDatabaseConnection, PackageType
 
+
+db_connection = TestDatabaseConnection()
 
 import db.db as dbm
 from db.db import PackageType, packge_type_exists
@@ -95,38 +99,35 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     return formatted_output
 
 
+
+# Instantiate DatabaseService using TestDatabaseConnection
+db = TestDatabaseConnection()
+database_service = DatabaseService(db)
+
+# Define the common data structure
+common_data = {
+    'bioconductor_link': 'bioc.html',
+    'annotation_link': 'data-annotation.html',
+    'experiment_link': 'data-experiment.html',
+    'workflows_link': 'workflows.html',
+    'generated_date': ah.app_config.today(),
+    'data': [],  # populate this with real data from the database
+}
+
+# Define a dictionary to map package types to the top_count
+top_counts = {
+    'bioc': 75,
+    'data-annotation': 30,
+    'data-experiment': 15,
+    'workflows': 5,
+}
+
 @app.route(PATH + '/<package_type>.html')
 def show_packages_summary(package_type):
-    # Define the common data
-    common_data = {
-        'bioconductor_link': 'bioc.html',
-        'annotation_link': 'data-annotation.html',
-        'experiment_link': 'data-experiment.html',
-        'workflows_link': 'workflows.html',
-        'generated_date': ah.app_config.today(),
-        'data': [
-            {'Packages': 'S4Vectors', 'Score': 90},
-            {'Packages': 'Biobase', 'Score': 85},
-            {'Packages': 'BiocParallel', 'Score': 88},
-            {'Packages': 'Package4', 'Score': 95},
-            {'Packages': 'Package5', 'Score': 75},
-            {'Packages': 'Package6', 'Score': 80},
-        ],
-    }
-
-    # Define a dictionary to map package types to the top_count
-    top_counts = {
-        'bioc': 75,
-        'data-annotation': 30,
-        'data-experiment': 15,
-        'workflows': 5,
-    }
-
     # Check if the provided package_type is in the dictionary
     if package_type in top_counts:
         top_count = top_counts[package_type]
     else:
-        # Handle the case where package_type is not recognized
         abort(404)
 
     # Add category links for the top of the page
@@ -139,8 +140,15 @@ def show_packages_summary(package_type):
 
     category_links[package_type] = [link for link in category_links[package_type] if link != package_type]
 
-    return render_template('category.html', top_count=top_count, **common_data, category_links=category_links, package_type=package_type)
+    # Retrieve package data from the database using the database_service
+    package_data = database_service.get_download_scores_for_category(PackageType(package_type))
 
+    # Replace the static data with the data from the database
+    common_data['data'] = [
+        {'Packages': row['package'], 'Score': row['score']} for _, row in package_data.iterrows()
+    ]
+
+    return render_template('category.html', top_count=top_count, **common_data, category_links=category_links, package_type=package_type)
 
 #fuction to plot the bar graphs
 def make_barplot2ylog(title, barlabels,
