@@ -92,7 +92,8 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
-
+@app.route(PATH)
+@app.route(PATH + '/')
 @app.route(PATH + '/<package_type>.html')
 def show_packages_summary(package_type):
     # Define the common data
@@ -113,11 +114,10 @@ def show_packages_summary(package_type):
 
     # Define a dictionary to map package types to the top_count
     top_counts = {
-        'default': 75,
         'bioc': 75,
         'data-annotation': 30,
         'data-experiment': 15,
-        'workflows': 75,
+        'workflows': 5,
     }
 
     # Check if the provided package_type is in the dictionary
