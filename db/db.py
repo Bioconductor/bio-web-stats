@@ -20,8 +20,6 @@ import app.app_helpers as ah
 def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
     return pd.DataFrame(cursor.fetchall(), columns=cursor.keys())
 
-
-
 class PackageType(Enum):
     BIOC = "bioc"
     EXPERIMENT = "experiment"
