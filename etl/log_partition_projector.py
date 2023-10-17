@@ -62,4 +62,3 @@ if __name__ == "__main__":
     
     result_code = log_partition_projector(args.source, args.destination, args.prefix, args.newprefix, args.dryrun)
     exit(result_code)
-

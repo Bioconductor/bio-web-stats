@@ -3,6 +3,7 @@ from typing import Any
 from unittest.mock import Mock, patch
 from datetime import date
 from db.db import DatabaseService, PackageType
+from app.app_helpers import app_config
 from pandas import DataFrame
 
 # Archetype:
@@ -22,6 +23,11 @@ from pandas import DataFrame
 # TODO add snapshot
 # pytest --snapshot-update #when necessary
 
+# This pair of dates is a 1 year span to go with the database test cases
+current_date = app_config.today()
+test_start_date = date(2022,10,1)
+test_end_date =  date(2023,9,30)
+
 database_test_cases = [
     [
         (PackageType.BIOC, 'affydata', '2023-08-01')
@@ -34,7 +40,6 @@ database_test_cases = [
         (PackageType.BIOC, 'affy', '2023-09-01'), 
         (PackageType.BIOC, 'affydata', '2023-08-01'),
         (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
-
     ]
 ]
 
@@ -99,7 +104,6 @@ def test_get_download_counts_for_pacakge(test_case: Any, database_access: Databa
     # Assert
     assert dataframes_equivalent(result, expected)
 
-# TODO finish binding test + build test for one-off
 @pytest.mark.parametrize("test_case", database_test_cases)
 def test_get_download_counts_for_pacakge_year(test_case: Any, database_access: DatabaseService):
     # Arrange
@@ -123,7 +127,8 @@ def test_get_scores_for_category_get(test_case: Any, database_access: DatabaseSe
     # Arrange
     sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
-    # we will be looking for all rows 
+    
+    
     expected = df[(df['category'] == PackageType.ANNOTATION) & 
                 (df['package'] == 'BSgenome.Hsapiens.UCSC.hg38') &
                 ([d.year == 2023 for d in df['date']])].sort_values(by=['package', 'date'])
@@ -141,14 +146,14 @@ def test_get_scores_for_category_get(test_case: Any, database_access: DatabaseSe
 def test_get_score_for_package_get(test_case: Any, database_access: DatabaseService):
     # Arrange
     sut = database_access
-    # THIS IS STUB create appropriate expected
     df = sut.populate(123, date(2023, 10, 1), test_case)
+    package = df.at[df.index[-1], 'package']
+    score = df[(df.package == package) & (df['date'] >= test_start_date) & (df['date'] <= test_end_date)].ip_count.sum() // 12
+    expected = DataFrame({'package': [package], 'score': [score] })
 
     # Act
-    result = sut.get_download_score_for_package(df["package"][0])
+    result = sut.get_download_score_for_package(package)
 
     # Assert
-    # TODO establish appropriate assert
-    # assert dataframes_equivalent(result, expected)
-    assert True
+    assert dataframes_equivalent(result, expected)
     

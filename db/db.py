@@ -52,7 +52,7 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     def engine() -> Engine:
         if TestDatabaseConnection._engine is None:
             # TestDatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
-            TestDatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db')
+            TestDatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
         return TestDatabaseConnection._engine
 
     @staticmethod
@@ -101,9 +101,9 @@ class DatabaseService:
                 yield current_date
                 current_date += relativedelta(months=1)
                 
-        df = [(category, package, d, randint(1, 10000), randint(1, 100000)) for category, package, start_date in packages
+        df = [(category, package, d, randint(1, 10000) + 0, randint(1, 100000) + 0) for category, package, start_date in packages
             for d in months_sequence(datetime.strptime(start_date, '%Y-%m-%d').date(), end_date)]
-
+        
         self.download_count_insert(df)
         return pd.DataFrame(df, columns=['category', 'package', 'date', 'ip_count', 'download_count'])
 
@@ -132,24 +132,35 @@ class DatabaseService:
     # TODO can combine with 'for_catagory with lambda function for where
     def get_download_score_for_package(self, package: str) -> pd.DataFrame:
         
-        start_date = app_config.today() - relativedelta(years=1)
-        end_date = app_config.today() - relativedelta(days=1)
+        x = app_config.today()
+        # the first of the current month
+        y = date(x.year, x.month, 1)
+        # the last day of the prior month
+        end_date = y - relativedelta(days=1)
+        # the first day of the date 1 year before the end date
+        start_date = y - relativedelta(months=12)
         with self.db.connection() as conn:
-                result = conn.execute(select(self.download_summary.c.package, func.sum((self.download_summary.c.ip_count)// 12).label('score') )
-                        .where((self.download_summary.c.package == package)
-                            & self.download_summary.c.date.between(start_date, end_date))
-                        .group_by(self.download_summary.c.package)
-                        .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
+            result = conn.execute(select(self.download_summary.c.package, 
+                        (func.sum(self.download_summary.c.ip_count) // 12).label('score'))
+                    .where((self.download_summary.c.package == package)
+                        & self.download_summary.c.date.between(start_date, end_date))
+                    .group_by(self.download_summary.c.package)
+                    .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
                     )
-        result = cursor_to_dataframe(result)
-        return result
+        df = cursor_to_dataframe(result)
+        return df
 
     def get_download_scores_for_category(self, category: PackageType) -> pd.DataFrame:
         
-        start_date = app_config.today() - relativedelta(years=1)
-        end_date = app_config.today() - relativedelta(days=1)
+        x = app_config.today()
+        # the first of the current month
+        y = date(x.year, x.month, 1)
+        # the last day of the prior month
+        end_date = y - relativedelta(days=1)
+        # the first day of the date 1 year before the end date
+        start_date = y - relativedelta(months=12)
         with self.db.connection() as conn:
-                result = conn.execute(select(self.download_summary.c.package, func.sum((self.download_summary.c.ip_count)// 12).label('score') )
+                result = conn.execute(select(self.download_summary.c.package, (func.sum(self.download_summary.c.ip_count)// 12).label('score') )
                         .where((self.download_summary.c.category == category)
                             & self.download_summary.c.date.between(start_date, end_date))
                         .group_by(self.download_summary.c.package)
