@@ -9,18 +9,9 @@
         <TR>
             <TD style="padding: 0px; text-align: right;">
                 <I>See download stats for:</I>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% if package_type != 'bioc' %}
-                <I><A HREF="bioc.html">Bioconductor software packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endif %}
-                {% if package_type != 'data-annotation' %}
-                <I><A HREF="data-annotation.html">Bioconductor annotation packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endif %}
-                {% if package_type != 'data-experiment' %}
-                <I><A HREF="data-experiment.html">Bioconductor experiment packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endif %}
-                {% if package_type != 'workflows' %}
-                <I><A HREF="workflows.html">Bioconductor workflow packages</A></I>
-                {% endif %}
+                {% for link in category_links[package_type] %}
+                <I><A HREF="{{ link }}.html">Bioconductor {{ link }} packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endfor %}
             </TD>
         </TR>
     </TABLE>

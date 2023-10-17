@@ -12,13 +12,15 @@ import base64
 import math
 import numpy
 
+import app.app_helpers as ah
+
 
 import db.db as dbm
 from db.db import PackageType, packge_type_exists
 
 PATH = '/packages/stats'
 
-# TDODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
+# TODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
 from datetime import date
 
 test_database_spec = [
@@ -92,8 +94,7 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
-@app.route(PATH)
-@app.route(PATH + '/')
+
 @app.route(PATH + '/<package_type>.html')
 def show_packages_summary(package_type):
     # Define the common data
@@ -101,7 +102,8 @@ def show_packages_summary(package_type):
         'bioconductor_link': 'bioc.html',
         'annotation_link': 'data-annotation.html',
         'experiment_link': 'data-experiment.html',
-        'generated_date': '2023-10-11 01:29:48 -0400 (Wed, 11 Oct 2023)',
+        'workflows_link': 'workflows.html',
+        'generated_date': ah.app_config.today(),
         'data': [
             {'Packages': 'S4Vectors', 'Score': 90},
             {'Packages': 'Biobase', 'Score': 85},
@@ -125,10 +127,19 @@ def show_packages_summary(package_type):
         top_count = top_counts[package_type]
     else:
         # Handle the case where package_type is not recognized
-        return "Package type not found"
+        abort(404)
 
-    return render_template('category.html', top_count=top_count, **common_data)
+    # Add category links for the top of the page
+    category_links = {
+        'bioc': ['data-experiment', 'data-annotation', 'workflows'],
+        'data-annotation': ['bioc', 'data-experiment', 'workflows'],
+        'data-experiment': ['bioc', 'data-annotation', 'workflows'],
+        'workflows': ['bioc', 'data-experiment', 'data-annotation'],
+    }
 
+    category_links[package_type] = [link for link in category_links[package_type] if link != package_type]
+
+    return render_template('category.html', top_count=top_count, **common_data, category_links=category_links, package_type=package_type)
 
 
 #fuction to plot the bar graphs

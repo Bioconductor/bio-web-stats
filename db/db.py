@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, select, insert, Enum as SQLEnum, bindparam
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 from typing import Optional
-from app_helpers import app_config
+from app.app_helpers import app_config
 
 from enum import Enum
 from typing import Any, List, Tuple
