@@ -134,7 +134,7 @@ def test_get_scores_for_category_get(test_case: Any, database_access: DatabaseSe
                 ([d.year == 2023 for d in df['date']])].sort_values(by=['package', 'date'])
 
     # Act
-    result = sut.get_download_scores_for_category(PackageType.ANNOTATION)
+    result = sut.get_download_scores_for_category(PackageType.BIOC)
 
     # Assert
     # TODO establish appropriate assert

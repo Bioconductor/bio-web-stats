@@ -58,7 +58,8 @@ class TestDatabaseConnection(DatabaseConnectionInterface):
     @staticmethod
     def connection() -> Connection:
         return TestDatabaseConnection.engine().connect()
-        
+
+# TODO: Error handling.
 class DatabaseService:
     '''
     TODO: refactor after real db is up
@@ -151,7 +152,18 @@ class DatabaseService:
         return df
 
     def get_download_scores_for_category(self, category: PackageType) -> pd.DataFrame:
+        """Computes an activity score and a rank for each package the given category.
         
+        See get_download_scores_for_package for the calculation of score
+        The rank is an ordinal that indicates relative activity.
+        Rank = 1 is the most downloaded package in the category, Raank=2 is next, etc.
+
+        Arguments:
+            category -- The PackageType for the category to score
+
+        Returns:
+            DataFrame with columsn (package, score, rank)
+        """
         x = app_config.today()
         # the first of the current month
         y = date(x.year, x.month, 1)
@@ -160,11 +172,15 @@ class DatabaseService:
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
         with self.db.connection() as conn:
-                result = conn.execute(select(self.download_summary.c.package, (func.sum(self.download_summary.c.ip_count)// 12).label('score') )
-                        .where((self.download_summary.c.category == category)
-                            & self.download_summary.c.date.between(start_date, end_date))
-                        .group_by(self.download_summary.c.package)
-                        .order_by(asc(self.download_summary.c.package), asc(self.download_summary.c.date))
+                result = conn.execute(select(self.download_summary.c.package, 
+                            (func.sum(self.download_summary.c.ip_count)// 12).label('score'),
+                            func.rank().over(order_by=func.sum(self.download_summary.c.ip_count).desc()).label('rank')
+
+                        )
+                    .where((self.download_summary.c.category == category)
+                        & self.download_summary.c.date.between(start_date, end_date))
+                    .group_by(self.download_summary.c.package)
+                    .order_by(asc(self.download_summary.c.package))
                     )
         result = cursor_to_dataframe(result)
         return result
