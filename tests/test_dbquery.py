@@ -3,8 +3,8 @@ from typing import Any
 from unittest.mock import Mock, patch
 from datetime import date
 from db import DatabaseService, PackageType
-from app.app_helpers import app_config
 from pandas import DataFrame
+from conftest import database_test_cases, test_start_date, test_end_date
 
 # Archetype:
 # @pytest.mark.parametrize("test_case", database_test_cases)
@@ -22,26 +22,6 @@ from pandas import DataFrame
 
 # TODO add snapshot
 # pytest --snapshot-update #when necessary
-
-# This pair of dates is a 1 year span to go with the database test cases
-current_date = app_config.today()
-test_start_date = date(2022,10,1)
-test_end_date =  date(2023,9,30)
-
-database_test_cases = [
-    [
-        (PackageType.BIOC, 'affydata', '2023-08-01')
-    ],
-    [
-        (PackageType.BIOC, 'affy', '2023-09-01'), 
-        (PackageType.BIOC, 'affydata', '2023-08-01')
-    ],
-    [
-        (PackageType.BIOC, 'affy', '2023-09-01'), 
-        (PackageType.BIOC, 'affydata', '2023-08-01'),
-        (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
-    ]
-]
 
 def dataframes_equivalent(a: DataFrame, b:DataFrame) -> bool:
     # Need to deal with empty dataframes seperatly due to equals semantics for empty dataframes

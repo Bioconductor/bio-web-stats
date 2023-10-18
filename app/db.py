@@ -16,6 +16,38 @@ from random import seed, randint
 
 import app.app_helpers as ah
 
+from flask import current_app, g
+
+
+def get_db() -> Engine:
+    if 'db' not in g:
+        g.db = create_engine('sqlite:////tmp/test.db', echo=True)
+        # db is of tyoe Engine
+        # TODO Both args from config
+        # TODO Simple test database for the moment
+        g.db
+    return g.db
+
+
+def close_db(e=None):
+    db = g.pop('db', None)
+
+    if db is not None:
+        db.close()
+
+def init_db() -> None:
+    db = get_db()
+
+    with current_app.open_resource('schema.sql') as f:
+        db.executescript(f.read().decode('utf8'))
+    # TODO fill it in
+
+    
+# Register the app
+def init_app(app):
+    app.teardown_appcontext(close_db)
+
+
 def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
     return pd.DataFrame(cursor.fetchall(), columns=cursor.keys())
 
@@ -31,32 +63,27 @@ def packge_type_exists(value: str) -> bool:
     """
     return value in [e.value for e in PackageType]
 
-class DatabaseConnection:
-    # TODO echo=True ==> this is a trace parameter.
-    _engine: Engine = None
+# class DatabaseConnection:
+#     # TODO echo=True ==> this is a trace parameter.
+#     _engine: Engine = None
 
-    @staticmethod
-    def engine() -> Engine:
-        if DatabaseConnection._engine is None:
-            # DatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
-            DatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
-        return DatabaseConnection._engine
+#     @staticmethod
+#     def engine() -> Engine:
+#         if DatabaseConnection._engine is None:
+#             # DatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+#             DatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
+#         return DatabaseConnection._engine
 
-    @staticmethod
-    def connection() -> Connection:
-        return DatabaseConnection.engine().connect()
+#     @staticmethod
+#     def connection() -> Connection:
+#         return DatabaseConnection.engine().connect()
 
 # TODO: Error handling.
 class DatabaseService:
-    '''
-    TODO: refactor after real db is up
-    '''
-    db: DatabaseConnection
-    download_summary: Table
 
-    def __init__(self, db: DatabaseConnection) -> None:
-        self.db = db
-        self.download_summary = self.create()  # Initialize the table during initialization
+    # def __init__(self, db: DatabaseConnection) -> None:
+    #     self.db = db
+    #     self.download_summary = self.create()  # Initialize the table during initialization
 
     def create(self):
         metadata = MetaData()
@@ -68,15 +95,14 @@ class DatabaseService:
             Column("ip_count", BigInteger),
             Column("download_count", BigInteger)
         )
-        metadata.create_all(self.db.engine())
-        return download_summary
+        metadata.create_all(g.db)
         
 
     # TODO Replace randint with hash on all keys for better validation
     def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> pd.DataFrame:
         
         # clear all previous entries
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             conn.execute(self.download_summary.delete())
             conn.commit()
 
@@ -96,12 +122,12 @@ class DatabaseService:
         return pd.DataFrame(df, columns=['category', 'package', 'date', 'ip_count', 'download_count'])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             conn.execute(insert(self.download_summary).values(rows))
             conn.commit()
 
     def select(self) -> pd.DataFrame:
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             result = conn.execute(select(self.download_summary))
             conn.commit()
             return cursor_to_dataframe(result)
@@ -109,7 +135,7 @@ class DatabaseService:
     # Methods below this point should be an a facade tier e.g. in the app
     
     def get_package_names(self) -> pd.DataFrame:
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             result = conn.execute(
                 select(self.download_summary.c.package.distinct())
                     .order_by(self.download_summary.c.package)
@@ -127,7 +153,7 @@ class DatabaseService:
         end_date = y - relativedelta(days=1)
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             result = conn.execute(select(self.download_summary.c.package, 
                         (func.sum(self.download_summary.c.ip_count) // 12).label('score'))
                     .where((self.download_summary.c.package == package)
@@ -158,7 +184,7 @@ class DatabaseService:
         end_date = y - relativedelta(days=1)
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
                 result = conn.execute(select(self.download_summary.c.package, 
                             (func.sum(self.download_summary.c.ip_count)// 12).label('score'),
                             func.rank().over(order_by=func.sum(self.download_summary.c.ip_count).desc()).label('rank')
@@ -177,7 +203,7 @@ class DatabaseService:
     def get_download_counts(self, category: PackageType, 
                             package: Optional[str] = None, 
                             year: Optional[int] = None):
-        with self.db.connection() as conn:
+        with g.db.connection() as conn:
             if package is None:
                 result = conn.execute(select(self.download_summary)
                         .where((self.download_summary.c.category == category))

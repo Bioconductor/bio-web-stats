@@ -1,7 +1,9 @@
-from flask import Flask, make_response, Response, abort
-from flask import Flask, render_template
+from flask import Response, abort, Blueprint,  g, render_template
 from markupsafe import escape
 import pandas as pd
+
+bp = Blueprint('stats', __name__)
+
 
 import matplotlib
 matplotlib.use('Agg')  # Set Matplotlib to use a non-GUI backend
@@ -12,7 +14,6 @@ import math
 import numpy
 
 import app.app_helpers as ah
-from db import DatabaseService, DatabaseConnection
 from db import DatabaseService, DatabaseConnection, PackageType
 
 
@@ -23,20 +24,21 @@ from db import PackageType, packge_type_exists
 
 PATH = '/packages/stats'
 
-# TODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
-from datetime import date
+# TODO Remove
+# # TODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
+# from datetime import date
 
-test_database_spec = [
-        (PackageType.BIOC, 'affy', '2023-09-01'), 
-        (PackageType.BIOC, 'affydata', '2023-08-01'),
-        (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
-    ]
+# test_database_spec = [
+#         (PackageType.BIOC, 'affy', '2023-09-01'), 
+#         (PackageType.BIOC, 'affydata', '2023-08-01'),
+#         (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
+#     ]
 
-db = dbm.DatabaseService(dbm.DatabaseConnection)
-db.create()
-db.populate(123, date(2023, 10, 1), test_database_spec)
+# db = dbm.DatabaseService(dbm.DatabaseConnection)
+# db.create()
+# db.populate(123, date(2023, 10, 1), test_database_spec)
 
-@app.route(PATH + '/bioc/bioc_packages.txt', methods=['GET'])
+@bp.route(PATH + '/bioc/bioc_packages.txt', methods=['GET'])
 def show_packages():    
     payload = db.get_package_names()
     text = ('\n').join([row for row in payload['package']])
@@ -44,7 +46,7 @@ def show_packages():
 
 # #bioc/bioc_pkg_scores.tab and package_stats.tab
 # TODO Need to add format /bioc/bioc_2022_stats.tab
-@app.route(PATH + '/<package_type>/<package_type_in_filenames>_pkg_<scores_or_stats>.tab', methods=['GET'])
+@bp.route(PATH + '/<package_type>/<package_type_in_filenames>_pkg_<scores_or_stats>.tab', methods=['GET'])
 def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats):
     # We match the legacy system, where both the path and the file_name included the category
     if  escape(package_type) != escape(package_type_in_filenames) or not packge_type_exists(package_type):
@@ -119,7 +121,7 @@ top_counts = {
     'workflows': 5,
 }
 
-@app.route(PATH + '/<package_type>.html')
+@bp.route(PATH + '/<package_type>.html')
 def show_packages_summary(package_type):
     # Check if the provided package_type is in the dictionary
     if package_type in top_counts:
@@ -149,8 +151,8 @@ def show_packages_summary(package_type):
 
 #fuction to plot the bar graphs
 def make_barplot2ylog(title, barlabels,
-                      barlabel_to_C1, C1_label, C1_color,
-                      barlabel_to_C2, C2_label, C2_color, Cmax=None):
+                    barlabel_to_C1, C1_label, C1_color,
+                    barlabel_to_C2, C2_label, C2_color, Cmax=None):
     c1_vals = []
     c2_vals = []
     Cmax0 = 0
@@ -231,7 +233,7 @@ def write_HTML_stats_TABLE(months, month_to_C1, C1_label, C1_color, month_to_C2,
 
 #TODO implement for variable path 
 #bioc/S4Vectors/
-@app.route('/packages/stats/bioc/BiocVersion/')
+@bp.route('/packages/stats/bioc/BiocVersion/')
 def index7():
     months = ["Jan/2023", "Feb/2023", "Mar/2023", "Apr/2023", "May/2023", "Jun/2023", "Jul/2023", "Aug/2023", "Sep/2023", "Oct/2023", "Nov/2023", "Dec/2023"]
     month_to_C1 = {month: 1000 for month in months}
@@ -247,8 +249,4 @@ def index7():
     stats_table = write_HTML_stats_TABLE(months, month_to_C1, "C1 Label", "#aaaaff", month_to_C2, "C2 Label", "2023", allmonths_c1, allmonths_c2)
 
     return render_template('stats-bioc.html', barplot_data=barplot_data, stats_table=stats_table)
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
 
