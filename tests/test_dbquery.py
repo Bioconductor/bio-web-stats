@@ -2,7 +2,7 @@ import pytest
 from typing import Any
 from unittest.mock import Mock, patch
 from datetime import date
-from db.db import DatabaseService, PackageType
+from db import DatabaseService, PackageType
 from app.app_helpers import app_config
 from pandas import DataFrame
 

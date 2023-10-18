@@ -1,4 +1,3 @@
-
 from sqlalchemy import CursorResult, Engine, Connection, MetaData, asc, desc, extract
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, Enum as SQLEnum, bindparam, text, func
@@ -32,42 +31,30 @@ def packge_type_exists(value: str) -> bool:
     """
     return value in [e.value for e in PackageType]
 
-
-class DatabaseConnectionInterface:
-    def engine() -> Engine:
-        raise NotImplementedError
-    
-    def connection() -> Connection:
-        raise NotImplementedError
-    
-    def close() -> None:
-        raise NotImplementedError
-    
-
-class TestDatabaseConnection(DatabaseConnectionInterface):
+class DatabaseConnection:
     # TODO echo=True ==> this is a trace parameter.
     _engine: Engine = None
 
     @staticmethod
     def engine() -> Engine:
-        if TestDatabaseConnection._engine is None:
-            # TestDatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
-            TestDatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
-        return TestDatabaseConnection._engine
+        if DatabaseConnection._engine is None:
+            # DatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+            DatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
+        return DatabaseConnection._engine
 
     @staticmethod
     def connection() -> Connection:
-        return TestDatabaseConnection.engine().connect()
+        return DatabaseConnection.engine().connect()
 
 # TODO: Error handling.
 class DatabaseService:
     '''
     TODO: refactor after real db is up
     '''
-    db: DatabaseConnectionInterface
+    db: DatabaseConnection
     download_summary: Table
 
-    def __init__(self, db: DatabaseConnectionInterface) -> None:
+    def __init__(self, db: DatabaseConnection) -> None:
         self.db = db
         self.download_summary = self.create()  # Initialize the table during initialization
 

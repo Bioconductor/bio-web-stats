@@ -3,8 +3,8 @@ from flask import Flask, make_response, Response, abort
 from flask import Flask, render_template
 from markupsafe import escape
 import pandas as pd
-import db.db as dbm
-from db.db import PackageType
+import db as dbm
+from db import PackageType
  
 
 PATH = '/packages/stats'
@@ -34,7 +34,7 @@ test_database_spec = [
         (PackageType.ANNOTATION, 'BSgenome.Scerevisiae.UCSC.sacCer3', '2021-12-01')
     ]
 
-db = dbm.DatabaseService(dbm.TestDatabaseConnection)
+db = dbm.DatabaseService(dbm.DatabaseConnection)
 db.create()
 db.populate(123, date(2023, 10, 1), test_database_spec)
 

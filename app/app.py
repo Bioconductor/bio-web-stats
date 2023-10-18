@@ -12,14 +12,14 @@ import math
 import numpy
 
 import app.app_helpers as ah
-from db.db import DatabaseService, DatabaseConnectionInterface, TestDatabaseConnection
-from db.db import DatabaseService, TestDatabaseConnection, PackageType
+from db import DatabaseService, DatabaseConnection
+from db import DatabaseService, DatabaseConnection, PackageType
 
 
-db_connection = TestDatabaseConnection()
+db_connection = DatabaseConnection()
 
-import db.db as dbm
-from db.db import PackageType, packge_type_exists
+import db as dbm
+from db import PackageType, packge_type_exists
 
 PATH = '/packages/stats'
 
@@ -32,11 +32,9 @@ test_database_spec = [
         (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
     ]
 
-db = dbm.DatabaseService(dbm.TestDatabaseConnection)
+db = dbm.DatabaseService(dbm.DatabaseConnection)
 db.create()
 db.populate(123, date(2023, 10, 1), test_database_spec)
-
-app = Flask(__name__)
 
 @app.route(PATH + '/bioc/bioc_packages.txt', methods=['GET'])
 def show_packages():    
@@ -99,8 +97,8 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
 
 
 
-# Instantiate DatabaseService using TestDatabaseConnection
-db = TestDatabaseConnection()
+# Instantiate DatabaseService using DatabaseConnection
+db = DatabaseConnection()
 database_service = DatabaseService(db)
 
 # Define the common data structure
