@@ -4,7 +4,6 @@ pandas
 SQLAlchemy
 pytest
 Flask
-Flask-SQLAlchemy
 Mock
 syrupy
 matplotlib

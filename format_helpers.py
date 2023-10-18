@@ -1,6 +1,5 @@
 
 from flask import Flask, make_response, Response, abort
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template
 from markupsafe import escape
 import pandas as pd
