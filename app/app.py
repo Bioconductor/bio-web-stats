@@ -14,33 +14,13 @@ import math
 import numpy
 
 import app.app_helpers as ah
-from db import DatabaseService, DatabaseConnection, PackageType
-
-
-db_connection = DatabaseConnection()
-
-import db as dbm
-from db import PackageType, packge_type_exists
+from db import PackageType, package_type_exists
 
 PATH = '/packages/stats'
 
-# TODO Remove
-# # TODO: THIS IS MOCK DATABASE FOR INITIAL TESTING
-# from datetime import date
-
-# test_database_spec = [
-#         (PackageType.BIOC, 'affy', '2023-09-01'), 
-#         (PackageType.BIOC, 'affydata', '2023-08-01'),
-#         (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
-#     ]
-
-# db = dbm.DatabaseService(dbm.DatabaseConnection)
-# db.create()
-# db.populate(123, date(2023, 10, 1), test_database_spec)
-
 @bp.route(PATH + '/bioc/bioc_packages.txt', methods=['GET'])
 def show_packages():    
-    payload = db.get_package_names()
+    payload = g.db.get_package_names()
     text = ('\n').join([row for row in payload['package']])
     return Response(text, content_type='text/plain')
 
@@ -49,13 +29,13 @@ def show_packages():
 @bp.route(PATH + '/<package_type>/<package_type_in_filenames>_pkg_<scores_or_stats>.tab', methods=['GET'])
 def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats):
     # We match the legacy system, where both the path and the file_name included the category
-    if  escape(package_type) != escape(package_type_in_filenames) or not packge_type_exists(package_type):
+    if  escape(package_type) != escape(package_type_in_filenames) or not package_type_exists(package_type):
         abort(404)
     match scores_or_stats:
         case 'scores':
             raise NotImplementedError
         case 'stats':
-            payload = db.get_download_counts(PackageType(package_type))
+            payload = g.db.get_download_counts(PackageType(package_type))
         case '_':
             abort(404)
     text = dataframe_to_text_tab(payload)
@@ -97,12 +77,6 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
-
-
-# Instantiate DatabaseService using DatabaseConnection
-db = DatabaseConnection()
-database_service = DatabaseService(db)
-
 # Define the common data structure
 common_data = {
     'bioconductor_link': 'bioc.html',
@@ -140,7 +114,7 @@ def show_packages_summary(package_type):
     category_links[package_type] = [link for link in category_links[package_type] if link != package_type]
 
     # Retrieve package data from the database using the database_service
-    package_data = database_service.get_download_scores_for_category(PackageType(package_type))
+    package_data = g.db.get_download_scores_for_category(PackageType(package_type))
 
     # Replace the static data with the data from the database
     common_data['data'] = [

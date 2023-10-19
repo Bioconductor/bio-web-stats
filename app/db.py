@@ -21,11 +21,8 @@ from flask import current_app, g
 
 def get_db() -> Engine:
     if 'db' not in g:
-        g.db = create_engine('sqlite:////tmp/test.db', echo=True)
-        # db is of tyoe Engine
-        # TODO Both args from config
-        # TODO Simple test database for the moment
-        g.db
+        # TODO get from parameters
+        g.db = DatabaseService.initialize('sqlite:////tmp/test.db', echo=True)
     return g.db
 
 
@@ -36,10 +33,11 @@ def close_db(e=None):
         db.close()
 
 def init_db() -> None:
+    # TODO USE config
     db = get_db()
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    # with current_app.open_resource('schema.sql') as f:
+    #     db.executescript(f.read().decode('utf8'))
     # TODO fill it in
 
     
@@ -57,33 +55,19 @@ class PackageType(Enum):
     ANNOTATION = "annotation"
     WORKFLOW = "workflow"
     
-def packge_type_exists(value: str) -> bool:
+def package_type_exists(value: str) -> bool:
     """
 	Is a string a valid PackageType
     """
     return value in [e.value for e in PackageType]
 
-# class DatabaseConnection:
-#     # TODO echo=True ==> this is a trace parameter.
-#     _engine: Engine = None
 
-#     @staticmethod
-#     def engine() -> Engine:
-#         if DatabaseConnection._engine is None:
-#             # DatabaseConnection._engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
-#             DatabaseConnection._engine  = create_engine('sqlite:////tmp/test.db', echo=True)
-#         return DatabaseConnection._engine
-
-#     @staticmethod
-#     def connection() -> Connection:
-#         return DatabaseConnection.engine().connect()
-
-# TODO: Error handling.
 class DatabaseService:
-
-    # def __init__(self, db: DatabaseConnection) -> None:
-    #     self.db = db
-    #     self.download_summary = self.create()  # Initialize the table during initialization
+    _engine: Engine = None
+    
+    def initialize(self, connection_string, echo=True):
+        _engine  = create_engine(connection_string, echo=echo)
+        return self
 
     def create(self):
         metadata = MetaData()
