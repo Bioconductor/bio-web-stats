@@ -6,11 +6,11 @@ import db.db as dbm
 # Assuming that 'db' is an instance of your database
 PATH = '/packages/stats'
 
-def test_show_packages_endpoint(client):
+def test_show_packages_endpoint():
     
     #Arrange
     # Create a test client using the pytest-flask fixture
-    client = app.test_client()
+    client = app.show_packages()
 
     #Act
     # Simulate a call to the endpoint
