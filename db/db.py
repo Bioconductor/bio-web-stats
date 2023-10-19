@@ -1,4 +1,3 @@
-
 from sqlalchemy import CursorResult, Engine, Connection, MetaData, asc, desc, extract
 from sqlalchemy import Table, Column, BigInteger, String, Date
 from sqlalchemy import create_engine, select, insert, Enum as SQLEnum, bindparam, text, func
