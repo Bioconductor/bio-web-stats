@@ -21,7 +21,5 @@ def test_show_packages_endpoint(client):
 
     # Assuming db.get_package_names() returns a dictionary with a 'package' key
     # Check if the response content matches the expected result
-    expected_text = '\n'.join([row for row in db.get_package_names()['package']])
+    expected_text = '\n'.join([row for row in dbm.get_package_names()['package']])
     assert response.data.decode('utf-8') == expected_text
-
-    
