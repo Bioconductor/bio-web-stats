@@ -28,7 +28,7 @@ def get_db():
     if engine is None:
         engine = create_engine('sqlite:////tmp/test.db')
     metadata = MetaData()
-
+    metadata.reflect(bind=engine)
 
 def close_db(e=None):
     # TODO: Close db
@@ -64,15 +64,16 @@ def package_type_exists(value: str) -> bool:
 
 def create():
     global download_summary
-    download_summary = Table("download_summary",
-        metadata,
-        Column("category", SQLEnum(PackageType), nullable=False, primary_key=True),
-        Column("package", String, nullable=False, primary_key=True),
-        Column("date", Date, nullable=False, primary_key=True),
-        Column("ip_count", BigInteger),
-        Column("download_count", BigInteger)
-    )
-    metadata.create_all(engine)
+    if 'download_summary' not in metadata.tables:
+        download_summary = Table("download_summary",
+            metadata,
+            Column("category", SQLEnum(PackageType), nullable=False, primary_key=True),
+            Column("package", String, nullable=False, primary_key=True),
+            Column("date", Date, nullable=False, primary_key=True),
+            Column("ip_count", BigInteger),
+            Column("download_count", BigInteger)
+        )
+        metadata.create_all(engine)
     
 
 # TODO Replace randint with hash on all keys for better validation
