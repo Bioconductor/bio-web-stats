@@ -15,6 +15,11 @@ import app.app_helpers as ah
 from db.db import DatabaseService, DatabaseConnectionInterface, TestDatabaseConnection
 from db.db import DatabaseService, TestDatabaseConnection, PackageType
 
+import logging
+logging.basicConfig(filename='app.log',level=logging.DEBUG)
+
+#replace print() statements with login.debug()
+
 
 db_connection = TestDatabaseConnection()
 
