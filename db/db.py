@@ -14,6 +14,9 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from random import seed, randint
 
+import logging
+logging.basicConfig(filename='db.log',level=logging.DEBUG)
+
 import app.app_helpers as ah
 
 def cursor_to_dataframe(cursor: CursorResult[Any]) -> pd.DataFrame:
