@@ -1,4 +1,4 @@
-from flask import Response, abort, Blueprint, render_template
+from flask import Response, abort, Blueprint, render_template, g
 from markupsafe import escape
 import pandas as pd
 
@@ -10,12 +10,11 @@ import base64
 import math
 import numpy
 
+from db import PackageType
+import db
 import app.app_helpers as ah
-from db import PackageType, package_type_exists
-from db import DatabaseService as db
 
 bp = Blueprint('stats', __name__)
-
 
 # TODO Move to config
 PATH = '/packages/stats'
@@ -31,7 +30,7 @@ def show_packages():
 @bp.route(PATH + '/<package_type>/<package_type_in_filenames>_pkg_<scores_or_stats>.tab', methods=['GET'])
 def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats):
     # We match the legacy system, where both the path and the file_name included the category
-    if  escape(package_type) != escape(package_type_in_filenames) or not package_type_exists(package_type):
+    if  escape(package_type) != escape(package_type_in_filenames) or not db.package_type_exists(package_type):
         abort(404)
     match scores_or_stats:
         case 'scores':

@@ -2,9 +2,10 @@ import pytest
 from typing import Any
 from unittest.mock import Mock, patch
 from datetime import date
-from db import DatabaseService, PackageType
+from db import PackageType
+import db as sut
 from pandas import DataFrame
-from conftest import database_test_cases, test_start_date, test_end_date
+from app.app_helpers import app_config
 
 # Archetype:
 # @pytest.mark.parametrize("test_case", database_test_cases)
@@ -22,6 +23,27 @@ from conftest import database_test_cases, test_start_date, test_end_date
 
 # TODO add snapshot
 # pytest --snapshot-update #when necessary
+# This pair of dates is a 1 year span to go with the database test cases
+
+current_date = app_config.today()
+start_date_test = date(2022,10,1)
+end_date_test =  date(2023,9,30)
+
+database_test_cases = [
+    [
+        (PackageType.BIOC, 'affydata', '2023-08-01')
+    ],
+    [
+        (PackageType.BIOC, 'affy', '2023-09-01'), 
+        (PackageType.BIOC, 'affydata', '2023-08-01')
+    ],
+    [
+        (PackageType.BIOC, 'affy', '2023-09-01'), 
+        (PackageType.BIOC, 'affydata', '2023-08-01'),
+        (PackageType.ANNOTATION, 'BSgenome.Hsapiens.UCSC.hg38', '2019-01-01')
+    ]
+]
+
 
 def dataframes_equivalent(a: DataFrame, b:DataFrame) -> bool:
     # Need to deal with empty dataframes seperatly due to equals semantics for empty dataframes
@@ -29,22 +51,20 @@ def dataframes_equivalent(a: DataFrame, b:DataFrame) -> bool:
         return True
     return a.reset_index(drop=True).equals(b.reset_index(drop=True))
 
-@pytest.mark.parametrize("test_case", database_test_cases)
-def test_populate_database_one_package(snapshot, test_case: Any, database_access: DatabaseService):
+def test_populate_database_one_package():
     # Arrange
-    sut = database_access
-    expected = sut.populate(123, date(2023, 10, 1), test_case)
+    sut.init_db()
+    expected = sut.populate(123, date(2023, 10, 1), database_test_cases[2])
     
     # Act
-    result = sut.select()
+    result = sut.get_all_download_summary()
 
     # Assert
     assert result.equals(expected)
     
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_package_names(test_case: Any, database_access: DatabaseService):
+def test_get_package_names(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     expected = df[['package']].drop_duplicates().sort_values(by='package')
 
@@ -57,9 +77,8 @@ def test_get_package_names(test_case: Any, database_access: DatabaseService):
     
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_download_counts_for_category(test_case: Any, database_access: DatabaseService):
+def test_get_download_counts_for_category(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     # we will be looking for all rows 
     expected = df[df['category'] == PackageType.BIOC].sort_values(by=['package', 'date'])
@@ -71,9 +90,8 @@ def test_get_download_counts_for_category(test_case: Any, database_access: Datab
     assert dataframes_equivalent(result, expected)
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_download_counts_for_pacakge(test_case: Any, database_access: DatabaseService):
+def test_get_download_counts_for_pacakge(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     # we will be looking for all rows 
     expected = df[(df['category'] == PackageType.BIOC) & (df['package'] == 'affy')].sort_values(by=['package', 'date'])
@@ -85,9 +103,8 @@ def test_get_download_counts_for_pacakge(test_case: Any, database_access: Databa
     assert dataframes_equivalent(result, expected)
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_download_counts_for_pacakge_year(test_case: Any, database_access: DatabaseService):
+def test_get_download_counts_for_pacakge_year(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     # we will be looking for all rows 
     expected = df[(df['category'] == PackageType.ANNOTATION) & 
@@ -103,9 +120,8 @@ def test_get_download_counts_for_pacakge_year(test_case: Any, database_access: D
 
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_scores_for_category_get(test_case: Any, database_access: DatabaseService):
+def test_get_scores_for_category_get(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     
     
@@ -123,12 +139,11 @@ def test_get_scores_for_category_get(test_case: Any, database_access: DatabaseSe
 
 
 @pytest.mark.parametrize("test_case", database_test_cases)
-def test_get_score_for_package_get(test_case: Any, database_access: DatabaseService):
+def test_get_score_for_package_get(test_case: Any):
     # Arrange
-    sut = database_access
     df = sut.populate(123, date(2023, 10, 1), test_case)
     package = df.at[df.index[-1], 'package']
-    score = df[(df.package == package) & (df['date'] >= test_start_date) & (df['date'] <= test_end_date)].ip_count.sum() // 12
+    score = df[(df.package == package) & (df['date'] >= start_date_test) & (df['date'] <= end_date_test)].ip_count.sum() // 12
     expected = DataFrame({'package': [package], 'score': [score] })
 
     # Act
