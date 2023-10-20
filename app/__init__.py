@@ -5,11 +5,12 @@ from flask import Flask
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    
     # TODO: make appropriate database connection
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-    )
+    # app.config.from_mapping(
+    #     SECRET_KEY='dev',
+    #     DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+    # )
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -31,9 +32,3 @@ def create_app(test_config=None):
     app.register_blueprint(app2.bp)
     
     return app
-
-    # a simple page that says hello
-    @app.route('/')
-    def hello():
-        return 'Hello, World!'
-

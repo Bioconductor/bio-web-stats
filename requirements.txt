@@ -8,3 +8,4 @@ Mock
 syrupy
 matplotlib
 boto3
+Flask-SQLAlchemy

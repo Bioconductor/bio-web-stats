@@ -16,30 +16,19 @@ from random import seed, randint
 
 import app.app_helpers as ah
 
-from flask import current_app, g
-
-
-def get_db() -> Engine:
-    if 'db' not in g:
-        # TODO get from parameters
-        g.db = DatabaseService.initialize('sqlite:////tmp/test.db', echo=True)
-    return g.db
-
+from flask import current_app
 
 def close_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
+    # TODO: Close db
+    pass
 
 def init_db() -> None:
     # TODO USE config
-    db = get_db()
-
+    pass
     # with current_app.open_resource('schema.sql') as f:
     #     db.executescript(f.read().decode('utf8'))
-    # TODO fill it in
-
+    # TODO f
+    pass
     
 # Register the app
 def init_app(app):
@@ -63,10 +52,11 @@ def package_type_exists(value: str) -> bool:
 
 
 class DatabaseService:
-    _engine: Engine = None
+    db: Engine = None
     
     def initialize(self, connection_string, echo=True):
-        _engine  = create_engine(connection_string, echo=echo)
+        if db is None:
+            db  = create_engine(connection_string, echo=echo)
         return self
 
     def create(self):
@@ -79,14 +69,14 @@ class DatabaseService:
             Column("ip_count", BigInteger),
             Column("download_count", BigInteger)
         )
-        metadata.create_all(g.db)
+        metadata.create_all(self.db)
         
 
     # TODO Replace randint with hash on all keys for better validation
     def populate(self, seed_value: int, end_date: date, packages: [tuple]) -> pd.DataFrame:
         
         # clear all previous entries
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             conn.execute(self.download_summary.delete())
             conn.commit()
 
@@ -106,12 +96,12 @@ class DatabaseService:
         return pd.DataFrame(df, columns=['category', 'package', 'date', 'ip_count', 'download_count'])
 
     def download_count_insert(self, rows: List[Tuple]) -> None:
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             conn.execute(insert(self.download_summary).values(rows))
             conn.commit()
 
     def select(self) -> pd.DataFrame:
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             result = conn.execute(select(self.download_summary))
             conn.commit()
             return cursor_to_dataframe(result)
@@ -119,7 +109,7 @@ class DatabaseService:
     # Methods below this point should be an a facade tier e.g. in the app
     
     def get_package_names(self) -> pd.DataFrame:
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             result = conn.execute(
                 select(self.download_summary.c.package.distinct())
                     .order_by(self.download_summary.c.package)
@@ -137,7 +127,7 @@ class DatabaseService:
         end_date = y - relativedelta(days=1)
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             result = conn.execute(select(self.download_summary.c.package, 
                         (func.sum(self.download_summary.c.ip_count) // 12).label('score'))
                     .where((self.download_summary.c.package == package)
@@ -168,7 +158,7 @@ class DatabaseService:
         end_date = y - relativedelta(days=1)
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
                 result = conn.execute(select(self.download_summary.c.package, 
                             (func.sum(self.download_summary.c.ip_count)// 12).label('score'),
                             func.rank().over(order_by=func.sum(self.download_summary.c.ip_count).desc()).label('rank')
@@ -187,7 +177,7 @@ class DatabaseService:
     def get_download_counts(self, category: PackageType, 
                             package: Optional[str] = None, 
                             year: Optional[int] = None):
-        with g.db.connection() as conn:
+        with self.db.connection() as conn:
             if package is None:
                 result = conn.execute(select(self.download_summary)
                         .where((self.download_summary.c.category == category))

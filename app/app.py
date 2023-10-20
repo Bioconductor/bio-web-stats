@@ -1,9 +1,6 @@
-from flask import Response, abort, Blueprint,  g, render_template
+from flask import Response, abort, Blueprint, render_template
 from markupsafe import escape
 import pandas as pd
-
-bp = Blueprint('stats', __name__)
-
 
 import matplotlib
 matplotlib.use('Agg')  # Set Matplotlib to use a non-GUI backend
@@ -15,12 +12,17 @@ import numpy
 
 import app.app_helpers as ah
 from db import PackageType, package_type_exists
+from db import DatabaseService as db
 
+bp = Blueprint('stats', __name__)
+
+
+# TODO Move to config
 PATH = '/packages/stats'
 
 @bp.route(PATH + '/bioc/bioc_packages.txt', methods=['GET'])
 def show_packages():    
-    payload = g.db.get_package_names()
+    payload = db.get_package_names()
     text = ('\n').join([row for row in payload['package']])
     return Response(text, content_type='text/plain')
 
@@ -35,7 +37,7 @@ def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats
         case 'scores':
             raise NotImplementedError
         case 'stats':
-            payload = g.db.get_download_counts(PackageType(package_type))
+            payload = db.get_download_counts(PackageType(package_type))
         case '_':
             abort(404)
     text = dataframe_to_text_tab(payload)
@@ -114,7 +116,7 @@ def show_packages_summary(package_type):
     category_links[package_type] = [link for link in category_links[package_type] if link != package_type]
 
     # Retrieve package data from the database using the database_service
-    package_data = g.db.get_download_scores_for_category(PackageType(package_type))
+    package_data = db.get_download_scores_for_category(PackageType(package_type))
 
     # Replace the static data with the data from the database
     common_data['data'] = [
