@@ -7,4 +7,4 @@ Flask
 Mock
 syrupy
 matplotlib
-boto3
+boto3 
