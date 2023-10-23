@@ -1,0 +1,29 @@
+---
+- name: Configure EC2 Instance
+  hosts: your_ec2_instance
+  become: yes
+  remote_user: ec2-user  # Replace with the appropriate SSH username
+  
+  tasks:
+    - name: Update package cache and install common packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - package1
+        - package2
+        # Add more packages as needed
+
+    - name: Copy a file to the EC2 instance
+      copy:
+        src: /path/to/local/file
+        dest: /path/on/remote/server
+
+    - name: Ensure a service is started and enabled
+      service:
+        name: some-service
+        state: started
+        enabled: yes
+
+    # Add more tasks as needed to configure your EC2 instance.
+
