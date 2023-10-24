@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+
+        <h1 class="display-3">Test site for bioc_webstats</h1>
+        <p>Replacing stats.bioconductor.org</p>
+    </div>
+</div><!-- /.jumbotron -->
+
+<div class="container">
+        <table  class="table table-striped table-content-fit">
+            <thead>
+                <tr>
+                    <td class="px-1">Sample Path</td>
+                    <td class="px-1">Production</td>
+                    <td class="px-1">This site</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ref in targets %}
+                <tr>
+                    <td class="px-1">{{ ref }}</td>
+                    <td class="px-1"> <a href="https://bioconductor.org/packages/stats{{ ref }}">Old</a></td>
+                    <td class="px-1"> <a href="/packages/stats{{ ref }}">New</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+{% endblock %}

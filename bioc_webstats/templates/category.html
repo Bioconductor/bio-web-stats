@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
-    <TITLE>Download stats for Bioconductor software packages</TITLE>
+    <TITLE>Download stats for Bioconductor {{ category_name }} packages</TITLE>
     <LINK rel="stylesheet" href="main.css" type="text/css">
 </HEAD>
 <BODY>
@@ -9,13 +9,14 @@
         <TR>
             <TD style="padding: 0px; text-align: right;">
                 <I>See download stats for:</I>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% for link in category_links[package_type] %}
-                <I><A HREF="{{ link }}.html">Bioconductor {{ link }} packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% for ref, desc in category_links %}
+                <I><A HREF="{{ ref }}.html">Bioconductor {{ desc }} packages</A></I>&nbsp;&nbsp;&nbsp;&nbsp;
                 {% endfor %}
             </TD>
         </TR>
     </TABLE>
-    <H1 style="text-align: center;">Download stats for Bioconductor software packages</H1>
+    <H1 style="text-align: center;">Download stats for Bioconductor {{ category_name }} packages</H1>
+    <p> {{ url_list }} </p>
     <P style="text-align: center;">
         <I>This page was generated on {{ generated_date }}.</I>
     </P>

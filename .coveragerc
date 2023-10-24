@@ -1,0 +1,6 @@
+[run]
+source = bioc_webstats
+omit = 
+    tests/*
+    autoapp.py
+
