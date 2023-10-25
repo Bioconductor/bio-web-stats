@@ -27,6 +27,7 @@ pip-delete-this-directory.txt
 *.swn
 *.code-workspace
 .vscode/
+.Rproj.user
 
 # SQL
 *.sql.sqlite3
@@ -44,9 +45,8 @@ secrets.yml
 .DS_Store
 Thumbs.db
 
-etl/weblog_sample_short.tsv
-etl/weblog_sample.tsv
-.Rproj.user
+# Samples and input data
+/etl/data
 
 # C extensions
 *.so
@@ -101,4 +101,4 @@ env/
 .env
 
 # Development database
-*.db
+/instance

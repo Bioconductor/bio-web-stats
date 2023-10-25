@@ -18,11 +18,11 @@ CREATE OR REPLACE VIEW "bioc_web_downloads" AS
 SELECT "date",
     "c-ip",
     "sc-status",
-    regexp_extract(
+    replace(regexp_extract(
         "cs-uri-stem",
         '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',
         1
-    ) category,
+    ), 'data', '') category,
     regexp_extract(
         "cs-uri-stem",
         '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',
