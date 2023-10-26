@@ -5,7 +5,17 @@ import datetime as dt
 import enum
 from typing import Optional
 
-from sqlalchemy import BigInteger, Date, Enum, String, and_, asc, extract, select, Boolean
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Date,
+    Enum,
+    String,
+    and_,
+    asc,
+    extract,
+    select,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bioc_webstats.database import db
@@ -32,8 +42,12 @@ class Stats(db.Model):
 
     category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
     package: Mapped[str] = mapped_column(String, primary_key=True)
-    date: Mapped[dt.date] = mapped_column(Date, primary_key=True, comment='Dates repesenting months always have day=1, while years have month=12 and day=31')
-    is_monthly: Mapped[bool] = mapped_column(Boolean, nullable=False, comment='If true, date span is 1 month, if false, 1 year')
+    date: Mapped[dt.date] = mapped_column(
+        Date,
+        primary_key=True,
+        comment='Dates repesenting months always have day=1, while years have month=12 and day=31')
+    is_monthly: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, comment='If true, date span is 1 month, if false, 1 year')
     ip_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
     download_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
 
@@ -45,16 +59,19 @@ class Stats(db.Model):
         Returns:
             _description_
         """
-        return f"Stats(category={self.category}, package='{self.package}', date='{self.date}', ip_count={self.ip_count}, download_count={self.download_count})"
-         
-    
+        return (
+            f"Stats(category={self.category}, package='{self.package}', "
+            f"date='{self.date}', ip_count={self.ip_count}, "
+            f"download_count={self.download_count})"
+        )
+
     @staticmethod
     def get_package_names():
         """Return all the package names."""
-        return db.session.scalars(select(Stats.package)
-                                  .distinct()
-                                  .order_by(Stats.package.asc())
-                                  ).fetchall()
+        return db.session.scalars(
+            select(Stats.package)
+            .distinct()
+            .order_by(Stats.package.asc())).fetchall()
 
     @staticmethod
     def get_download_counts(category: PackageType,
