@@ -1,5 +1,4 @@
-/* TODO This needs to be moved to a more appropriate name/folder */
-
+<style>
 BODY {
     font-family: sans-serif;
     font-size: 10pt;
@@ -27,4 +26,3 @@ H4 {
 TABLE.stats {
     border: solid black 1px;
 }
-

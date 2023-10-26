@@ -115,16 +115,20 @@ def show_packages_summary(package_type="index"):
     if selected_category is None:
         abort(404)
     category_enum = selected_category["category"]
-    # Retrieve package data from the database using the database_service, order pairs for href and inner html
-    url_list = [[u["stem"],u["description"]] for u in category_map.values() if selected_category["category"] != u["category"]]
-    # Replace the static data with the data from the database
-
+    scores = db.Stats.get_download_scores(category_enum)
+    url_list = [[u["stem"], u["description"]] for u in category_map.values() if selected_category["category"] != u["category"]]
+    top_count = selected_category["top"]
+    top = sorted(scores, key=lambda x: x[-1])[:top_count]
+    
     return render_template(
         "category.html",
-        top_count=selected_category["top"],
+        top_count=top_count,
         category_links=url_list,
         package_type=category_enum,
-        category_name=selected_category["description"]
+        category_name=selected_category["description"],
+        generated_date=db.db_valid_thru_date(),
+        top=top,
+        scores=scores,
     )
 
 

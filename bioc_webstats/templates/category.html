@@ -1,9 +1,43 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
+
 <HEAD>
     <TITLE>Download stats for Bioconductor {{ category_name }} packages</TITLE>
-    <LINK rel="stylesheet" href="main.css" type="text/css">
+    <!-- TODO Use a jinja "extends  layout.html" verb here. And make an appropriate layout.html -->
+    <style>
+        BODY {
+            font-family: sans-serif;
+            font-size: 10pt;
+        }
+
+        H1 {
+            font-size: 16pt;
+        }
+
+        H2 {
+            font-size: 14pt;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        H3 {
+            font-size: 12pt;
+            margin-top: 0px;
+            margin-bottom: 4px;
+        }
+
+        H4 {
+            font-size: 11pt;
+            margin-top: 0px;
+            margin-bottom: 4px;
+        }
+
+        TABLE.stats {
+            border: solid black 1px;
+        }
+    </style>
 </HEAD>
+
 <BODY>
     <TABLE style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
         <TR>
@@ -20,22 +54,53 @@
     <P style="text-align: center;">
         <I>This page was generated on {{ generated_date }}.</I>
     </P>
-    <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of distinct IPs that "hit" the package each month for the last 12 months (not counting the current month).</P>
+    <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of
+        distinct IPs that "hit" the package each month for the last 12 months (not counting the current month).</P>
     <HR>
     <H2>Top {{ top_count }}</H2>
-    <TABLE class="pkg_index">
-        <TR>
-            <TH>Rank</TH>
-            <TH>Package Name</TH>
-            <TH>Download Score</TH>
-        </TR>
-        {% for record in data %}
-        <TR>
-            <TD>{{ loop.index }}</TD>
-            <TD><A HREF="#">{{ record.Packages }}</A></TD>
-            <TD>{{ record.Score }}</TD>
-        </TR>
-        {% endfor %}
-    </TABLE>
+    <table class="pkg_index">
+        <tbody>
+            <tr>
+                <td style="vertical-align: top; width:300px;">
+                    {% for package_name, package_score, pacakge_rank in top %}
+            <tr class="pkg_index">
+                <td style="width:25px; text-align: right">{{ loop.index }}</td>
+                <td><a href="{{ package_type.value }}/{{ package_name}}/">{{ package_name}}&nbsp;({{ package_score }})</a></td>
+                </tr>
+            {% endfor %}
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h2>All  {{ category_name }}  packages</h2>
+    <p>All {{ category_name }} package stats in one file:&nbsp;<a href="bioc/bioc_pkg_stats.tab">bioc_pkg_stats.tab</a></p>
+    <p>All {{ category_name }} package download scores in one file:&nbsp;<a href="bioc/bioc_pkg_scores.tab">bioc_pkg_scores.tab</a>
+    </p>
+    <p style="text-align: center"><a href="bioc/index.html">See Download stats for Bioconductor {{ desc }} repository (all
+            packages combined)</a></p>
+    <h3 style="font-family: monospace; font-size: larger;">A</h3>
+    <table class="pkg_index">
+        <!-- TODO Loop and parameterize -->
+        <tbody>
+            <tr>
+                <td style="vertical-align: top; width:300px;">
+                    <table>
+                        <tbody>
+                            <tr class="pkg_index">
+                                <td style="width:25px; text-align: right"></td>
+                                <td><a href="bioc/a4/">a4&nbsp;(56)</a></td>
+                            </tr>
+                            <tr class="pkg_index">
+                                <td style="width:25px; text-align: right"></td>
+                                <td><a href="bioc/a4Base/">a4Base&nbsp;(84)</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </BODY>
+
 </HTML>
