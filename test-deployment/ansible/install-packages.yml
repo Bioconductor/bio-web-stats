@@ -1,31 +1,21 @@
 ---
-- name: Install Python packages on Ubuntu
+- name: Install Python Packages and Apache
   hosts: ec2
-  become: yes
+  become: yes  # Use sudo to gain administrative privileges
 
   tasks:
-    - name: Update apt package cache
+    - name: Update APT package cache
       apt:
         update_cache: yes
-      when: ansible_os_family == 'Ubuntu'
+      when: ansible_os_family == 'Ubuntu'  
 
-    - name: Install required packages
-      package:
+    - name: Install system packages
+      apt:
         name: "{{ item }}"
         state: present
-      loop:
-        - setuptools
-        - python-dateutil
-        - pandas
-        - SQLAlchemy
-        - pytest
-        - Flask
-        - Mock
-        - syrupy
-        - matplotlib
-        - boto3
-      register: package_installation_result
+      with_items:
+        - apache2
 
-    - name: Display installed packages
-      debug:
-        var: package_installation_result
+    - name: Install Python packages from dev.txt
+      pip:
+        requirements: /requirements/dev.txt  
