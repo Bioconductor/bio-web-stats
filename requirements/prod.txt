@@ -41,3 +41,4 @@ environs==9.5.0
 # App 
 matplotlib
 pandas
+boto3
