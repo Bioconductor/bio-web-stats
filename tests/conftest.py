@@ -11,7 +11,7 @@ from webtest import TestApp
 
 from bioc_webstats.app import create_app
 from bioc_webstats.database import db as _db
-from bioc_webstats.models import PackageType
+from bioc_webstats.models import PackageType, db_valid_thru_date
 
 from .factories import StatsFactory
 
@@ -60,7 +60,7 @@ def generate_small_test_db_stats():
     """Create list of StatsFactory objects for small test database."""
 
     # TODO Mock EndDate?
-    end_date = dt.date(2023, 10, 4)
+    end_date = db_valid_thru_date()
 
     def months_sequence(start_date: dt.date, end_date: dt.date):
         """Yield the first day of each month from start_date to end_date inclusive."""

@@ -5,7 +5,7 @@ import datetime as dt
 import pytest
 from sqlalchemy import select
 
-from bioc_webstats.models import PackageType, Stats
+from bioc_webstats.models import db_valid_thru_date, PackageType, Stats
 
 from .factories import StatsFactory
 
@@ -13,6 +13,18 @@ from .factories import StatsFactory
 @pytest.mark.usefixtures("db", "stats")
 class TestStats:
     """Stats tests."""
+
+    def test_db_valid_thru_date(self, db):
+        """Verify appropriate last dtabase update date."""
+
+        # Arrange
+        expected = dt.date(2023, 10, 4)
+
+        # Act
+        result = db_valid_thru_date()
+
+        # Assert
+        assert result == expected
 
     def test_statsfactory_types(self, db):
         """Test stats factory."""
@@ -45,7 +57,7 @@ class TestStats:
     # TODO More tests using the stats ficture
     # TODO Threading problem with fixture?
 
-    def test_get_get_download_counts_year(self, db, stats):
+    def test_get_download_counts_year(self, db, stats):
         # Arrange
         category = PackageType.BIOC
         pacakge = "affy"
@@ -74,7 +86,7 @@ class TestStats:
         # Assert
         assert repr(expected) == repr(result)
 
-    def test_get_get_download_counts_full_year(self, db, stats):
+    def test_get_download_counts_full_year(self, db, stats):
         # Arrange
         #
         category = PackageType.ANNOTATION
@@ -89,7 +101,7 @@ class TestStats:
         # TODO CHeck the results (maybe with snapshot)
         assert True
 
-    def test_get_get_download_counts_package(self, db, stats):
+    def test_get_download_counts_package(self, db, stats):
         # Arrange
         #
         category = PackageType.ANNOTATION
@@ -101,7 +113,7 @@ class TestStats:
         # TODO CHeck the reulsts (maybe with snapshot)
         assert True
 
-    def test_get_get_download_counts_category(self, db, stats):
+    def test_get_download_counts_category(self, db, stats):
         # Arrange
         #
         category = PackageType.BIOC
@@ -147,3 +159,14 @@ class TestStats:
 
         # Assert
         assert repr(expected) == repr(result)
+
+    def test_get_download_scores(self, db, stats):
+        # Arrange
+        category = PackageType.BIOC
+        expected = [('affy', 0, 2), ('affydata', 5, 1)]
+
+        result = Stats.get_download_scores(category=category)
+
+        # Assert
+        assert result == expected
+
