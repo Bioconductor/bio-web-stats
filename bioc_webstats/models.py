@@ -94,7 +94,7 @@ class Stats(db.Model):
             _description_
         """
 
-        where_clause = [Stats.category == category]
+        where_clause = [Stats.category == category.value]
         if package is not None:
             where_clause.append(Stats.package == package)
         if year is not None:
@@ -109,8 +109,7 @@ class Stats(db.Model):
         return result
 
     @staticmethod
-    def get_download_scores(category: PackageType,
-                            package: Optional[str] = None) -> [(str, int, int)]:
+    def get_download_scores(category: PackageType) -> [(str, int, int)]:
         """Returns download a download score for each package.
 
         The rank is an ordinal that indicates relative activity.
@@ -144,11 +143,12 @@ class Stats(db.Model):
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
 
-        result = db.session.execute(select(
-            Stats.package,
-            (func.sum(Stats.ip_count) // 12).label('score'),
-            func.rank().over(order_by=func.sum(Stats.ip_count).desc()).label('rank'))
-            .where((Stats.category == category) & Stats.date.between(start_date, end_date))
+        result = db.session.execute(
+            select(
+                Stats.package,
+                (func.sum(Stats.ip_count) // 12).label('score'),
+                func.rank().over(order_by=func.sum(Stats.ip_count).desc()).label('rank'))
+            .where(and_(Stats.category == category.value, Stats.date.between(start_date, end_date)))
             .group_by(Stats.package)
             .order_by(asc(Stats.package)))
         return result.fetchall()
