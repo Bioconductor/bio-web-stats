@@ -1,21 +1,59 @@
 ---
-- name: Install Python Packages and Apache
-  hosts: ec2
+- name: Install Required Packages and Apache
+  hosts: ec2  
   become: yes  # Use sudo to gain administrative privileges
-
   tasks:
     - name: Update APT package cache
       apt:
         update_cache: yes
-      when: ansible_os_family == 'Ubuntu'  
+      when: ansible_os_family == 'Ubuntu'
 
-    - name: Install system packages
-      apt:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - apache2
+    - name: Install required system packages
+      package:
+        name: 
+          - apache2  # Install Apache
+          - python3-pip  # Install pip3 for Python package installation
+          - python3-venv  # Install Python3 venv
+      become: yes
+      when: ansible_os_family == 'Debian'
 
-    - name: Install Python packages from dev.txt
+    - name: Create a virtual environment
+      command: python3 -m venv /opt/myapp_venv
+      when: ansible_os_family == 'Debian'
+
+    - name: Activate the virtual environment
+      shell: source /opt/myapp_venv/bin/activate
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Python packages from prod.txt
       pip:
-        requirements: /requirements/dev.txt  
+        requirements: /path/to/prod.txt
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Python packages for testing
+      pip:
+        name:
+          - factory-boy==3.3.0
+          - pytest==7.4.2
+          - pytest-cov==4.1.0
+          - WebTest==3.0.0
+      when: ansible_os_family == 'Debian'
+
+    - name: Install lint and code style packages
+      pip:
+        name:
+          - black==23.10.0
+          - flake8-blind-except==0.2.1
+          - flake8-debugger==4.1.2
+          - flake8-docstrings==1.7.0
+          - flake8-isort==6.1.0
+          - flake8==6.1.0
+          - isort==5.12.0
+          - pep8-naming==0.13.3
+      when: ansible_os_family == 'Debian'
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+      when: ansible_os_family == 'Ubuntu'
