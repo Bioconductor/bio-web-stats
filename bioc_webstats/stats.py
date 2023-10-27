@@ -97,33 +97,22 @@ def show_packages():
     return Response(text, content_type="text/plain")
 
 
-# #bioc/bioc_pkg_scores.tab and package_stats.tab
 # TODO Need to add format /bioc/bioc_2022_stats.tab
 @bp.route(
-    "/<package_type>/<package_type_in_filenames>_pkg_<scores_or_stats>.tab",
-    methods=["GET"],
-)
-def show_pakages_scores(package_type, package_type_in_filenames, scores_or_stats):
+    "<package_type>/<package_type_in_filenames>_pkg_scores.tab"
+    )
+def show_pakages_scores(package_type, package_type_in_filenames):
     """_summary_."""
     # We match the legacy system, where both the path and the file_name included the category
-    if escape(package_type) != escape(
-        package_type_in_filenames
-    ) or not db.package_type_exists(package_type):
+    if package_type != package_type_in_filenames or not db.package_type_exists(package_type):
         abort(404)
-    match scores_or_stats:
-        case "scores":
-            raise NotImplementedError
-        case "stats":
-            payload = db.Stats.get_download_counts(category=PackageType(package_type))
-        case "_":
-            abort(404)
+    payload = db.Stats.get_download_scores(category=PackageType(package_type))
     text = "\n".join(
-        [f"{x.package}\t{x.date}\t{x.ip_count}\t{x.download_count}" for x in payload]
+        [f"{x[0]}\t{x[1]}" for x in payload]
     )
 
     return Response(text, content_type="text/plain")
 
-# TODO FIX THE LINKS
 @bp.route("/")
 @bp.route("/<package_type>.html")
 def show_packages_summary(package_type="index"):
@@ -265,11 +254,11 @@ def write_HTML_stats_TABLE(
 
     return table_html
 
-
-# TODO implement for variable path
-# bioc/S4Vectors/
-@bp.route("/packages/stats/bioc/BiocVersion/")
-def index7():
+# @bp.route("<category>/")
+# @bp.route("<category>/<package>.html")
+def show_package_details(category, package="index"):
+    """Display package detials."""
+    # TODO Rewrite
     months = [
         "Jan/2023",
         "Feb/2023",
@@ -317,3 +306,9 @@ def index7():
     return render_template(
         "stats-bioc.html", barplot_data=barplot_data, stats_table=stats_table
     )
+
+
+@bp.route('/<path:catch_all>')
+def catch_all_route(catch_all):
+    return f'You have reached the catch-all route: {catch_all}'
+
