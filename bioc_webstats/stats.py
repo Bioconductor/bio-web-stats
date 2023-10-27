@@ -10,6 +10,7 @@ import base64
 import math
 from io import BytesIO
 from collections import defaultdict
+from datetime import date
 
 import matplotlib.pyplot as plt
 import numpy
@@ -73,6 +74,22 @@ def split_to_dict_list(lst):
 
     return result
 
+def query_result_five_to_string(source):
+    result = ["Package\tYear\tMonth\tNb_of_distinct_IPs\tNb_of_downloads"]
+    split = {}
+    for t in source:
+        split.setdefault(t[0], []).append(t[1:])
+        
+    for k, v in split.items():
+        dates = set([u[0] for u in v])
+        y0 = min(dates).year
+        y1 = max(dates).year
+        holes = set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
+        out = sorted(v + [(w, 0, 0) for w in holes])
+        result.append('\n'.join([f"{k}\t{dt.year}\t{dt.strftime('%b') if dt.day == 1 else 'all'}\t{ip}\t{dl}" for dt, ip, dl in out]))
+
+    return "\n".join(result)
+
 @bp.route("/bioc/bioc_packages.txt", methods=["GET"])
 def show_packages():
     """_summary_."""
@@ -87,25 +104,31 @@ def show_packages():
 def show_pakages_scores(category, package):
     """_summary_."""
     # We match the legacy system, where both the path and the file_name included the category
-    if category != package or not db.package_type_exists(category):
+    
+    # if for category, in a form like this; /bio/bioc_pkg_scores.tab
+    if category == package and db.package_type_exists(category):
+        payload = db.Stats.get_download_scores(category=PackageType(category))
+    else:
         abort(404)
-    payload = db.Stats.get_download_scores(category=PackageType(category))
     text = "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
     return Response(text, content_type="text/plain")
 
 # TODO Need to add format /bioc/bioc_2022_stats.tab
-@bp.route(
-    "<category>/<package>_pkg_stats.tab"
-    )
-def show_pakages_stats(category, package):
+@bp.route("<category>/<package>_stats.tab")
+@bp.route("<category>/<package>_<year>_stats.tab")
+def show_pakages_stats(category, package, year=None):
     """_summary_."""
-    # We match the legacy system, where both the path and the file_name included the category
-    if category != package or not db.package_type_exists(category):
+    if not db.package_type_exists(category):
         abort(404)
-    payload = db.Stats.get_download_counts(category=PackageType(category))
-    # text = "\n".join([x for x in payload])
-    text = "hello world"
-    return Response(text, content_type="text/plain")
+    # If the url is for all the packages in the repo,
+    # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg
+    if category == package and year == 'pkg':
+        # No package signals getting all the packages for the category
+        package = None
+        year = None
+    payload = db.Stats.get_download_counts(PackageType(category), package, year)
+    
+    return Response(query_result_five_to_string(payload), content_type="text/plain")
 
 @bp.route("/")
 @bp.route("/<category>.html")

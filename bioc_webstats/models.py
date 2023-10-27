@@ -96,11 +96,11 @@ class Stats(db.Model):
         """
 
         where_clause = [Stats.category == category.value]
-        select_clause = [Stats.ip_count, Stats.download_count, Stats.date]
+        select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
             where_clause.append(Stats.package == package)
         else:
-            select_clause.append(Stats.package)
+            select_clause = [Stats.package] + select_clause
         if year is not None:
             where_clause.append(extract('year', Stats.date) == year)
             
