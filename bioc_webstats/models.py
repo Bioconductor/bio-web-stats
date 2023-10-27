@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
     and_,
     asc,
+    distinct,
     extract,
     func,
     select,
@@ -95,17 +96,20 @@ class Stats(db.Model):
         """
 
         where_clause = [Stats.category == category.value]
+        select_clause = [Stats.ip_count, Stats.download_count, Stats.date]
         if package is not None:
             where_clause.append(Stats.package == package)
+        else:
+            select_clause.append(Stats.package)
         if year is not None:
             where_clause.append(extract('year', Stats.date) == year)
+            
         final_where_clause = and_(*where_clause)
 
         # Execute query
-        result = db.session.scalars(select(Stats)
-                                    .where(final_where_clause)
-                                    .order_by(asc(Stats.package), asc(Stats.date))
-                                    ).fetchall()
+        text = select(*select_clause).where(final_where_clause).order_by(asc(Stats.package), asc(Stats.date))
+                                    
+        result = db.session.execute(text).fetchall()
         return result
 
     @staticmethod

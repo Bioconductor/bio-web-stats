@@ -73,22 +73,6 @@ def split_to_dict_list(lst):
 
     return result
 
-    """Split the list of tuples into a dictionary based on the letter of the package."""
-    char_to_dict = {}
-    result = {}
-
-    for t in sorted(tuple_list, key=lambda x: x[0].upper()):
-
-        first_char = t[0][0].upper()
-        if first_char not in char_to_dict:
-            char_to_dict[first_char] = {}
-        char_to_dict[first_char][t[0]] = t[1:]
-
-    for k, v in char_to_dict.items():
-        result.append({k: v})
-
-    return result
-
 @bp.route("/bioc/bioc_packages.txt", methods=["GET"])
 def show_packages():
     """_summary_."""
@@ -97,25 +81,35 @@ def show_packages():
     return Response(text, content_type="text/plain")
 
 
-# TODO Need to add format /bioc/bioc_2022_stats.tab
 @bp.route(
-    "<package_type>/<package_type_in_filenames>_pkg_scores.tab"
+    "<category>/<package>_pkg_scores.tab"
     )
-def show_pakages_scores(package_type, package_type_in_filenames):
+def show_pakages_scores(category, package):
     """_summary_."""
     # We match the legacy system, where both the path and the file_name included the category
-    if package_type != package_type_in_filenames or not db.package_type_exists(package_type):
+    if category != package or not db.package_type_exists(category):
         abort(404)
-    payload = db.Stats.get_download_scores(category=PackageType(package_type))
-    text = "\n".join(
-        [f"{x[0]}\t{x[1]}" for x in payload]
-    )
+    payload = db.Stats.get_download_scores(category=PackageType(category))
+    text = "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
+    return Response(text, content_type="text/plain")
 
+# TODO Need to add format /bioc/bioc_2022_stats.tab
+@bp.route(
+    "<category>/<package>_pkg_stats.tab"
+    )
+def show_pakages_stats(category, package):
+    """_summary_."""
+    # We match the legacy system, where both the path and the file_name included the category
+    if category != package or not db.package_type_exists(category):
+        abort(404)
+    payload = db.Stats.get_download_counts(category=PackageType(category))
+    # text = "\n".join([x for x in payload])
+    text = "hello world"
     return Response(text, content_type="text/plain")
 
 @bp.route("/")
-@bp.route("/<package_type>.html")
-def show_packages_summary(package_type="index"):
+@bp.route("/<category>.html")
+def show_packages_summary(category="index"):
     """_summary_."""
     
     # Map from incoming page name name to PackageType
@@ -127,7 +121,7 @@ def show_packages_summary(package_type="index"):
     }
 
     # Get the package name if present
-    selected_category = category_map.get(package_type, None)
+    selected_category = category_map.get(category, None)
     if selected_category is None:
         abort(404)
     category_enum = selected_category["category"]
@@ -140,7 +134,7 @@ def show_packages_summary(package_type="index"):
         "category.html",
         top_count=top_count,
         category_links=url_list,
-        package_type=category_enum,
+        category=category_enum,
         category_name=selected_category["description"],
         category_url_stem=selected_category["stem"],
         generated_date=db.db_valid_thru_date(),
