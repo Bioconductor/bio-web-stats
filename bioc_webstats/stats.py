@@ -9,6 +9,7 @@ Returns:
 import base64
 import math
 from io import BytesIO
+from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import numpy
@@ -61,6 +62,32 @@ def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
     formatted_output = dataframe_to_string_list(df)
     return formatted_output
 
+def split_to_dict_list(lst):
+    """Transform int a dictionary based on first letter (case insensitive)."""
+
+    result = defaultdict(list)
+
+    for item in sorted(lst, key=lambda x: x[0].upper()):
+        first_char = item[0][0].upper()  # Extract the first character of the string
+        result[first_char].append(item)
+
+    return result
+
+    """Split the list of tuples into a dictionary based on the letter of the package."""
+    char_to_dict = {}
+    result = {}
+
+    for t in sorted(tuple_list, key=lambda x: x[0].upper()):
+
+        first_char = t[0][0].upper()
+        if first_char not in char_to_dict:
+            char_to_dict[first_char] = {}
+        char_to_dict[first_char][t[0]] = t[1:]
+
+    for k, v in char_to_dict.items():
+        result.append({k: v})
+
+    return result
 
 @bp.route("/bioc/bioc_packages.txt", methods=["GET"])
 def show_packages():
@@ -128,7 +155,7 @@ def show_packages_summary(package_type="index"):
         category_name=selected_category["description"],
         generated_date=db.db_valid_thru_date(),
         top=top,
-        scores=scores,
+        scores=split_to_dict_list(scores),
     )
 
 

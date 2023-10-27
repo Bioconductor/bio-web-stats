@@ -57,36 +57,36 @@
     </P>
     <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of
         distinct IPs that "hit" the package each month for the last 12 months (not counting the current month).</P>
-        {% if top_count > 0 %}
+    {% if top_count > 0 %}
     <HR>
     <H2>Top {{ top_count }}</H2>
     <table class="pkg_index">
         <tbody>
             <tr>
                 <td style="vertical-align: top; width:300px;">
-                    <!-- TODO This loop is supposed to make things up-and-down. Need to debug -->
+                    <!-- This double loop to create 3 top-to-bottom columns -->
                     {% set N = top|length // 3 %}
                     {% for i in range(N) %}
-            <tr class="pkg_index">
-                {% for j_base in range(3) %}
-                {% set j = j_base * N %}
-                    {% set (package_name, package_score, package_rank)=top[i + j] %} <td
-                    style="width:25px; text-align: right">{{ package_rank }}</td>
-                    <td>
-                        <a href="{{ package_type.value }}/{{ package_name}}/">
-                            {{ package_name}}&nbsp;({{ package_score }})
-                        </a>
-                    </td>
-                    {% endfor %}
-            </tr>
-            {% endfor %}
-            </td>
+                <tr class="pkg_index">
+                        {% for j in range(3) %}
+                        {% set (package_name, package_score, package_rank)=top[i + j * N] %} <td
+                            style="width:25px; text-align: right">{{ package_rank }}</td>
+                        <td>
+                            <a href="{{ package_type.value }}/{{ package_name}}/">
+                                {{ package_name}}&nbsp;({{ package_score }})
+                            </a>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </td>
             </tr>
         </tbody>
     </table>
     <hr>
     <h2>All {{ category_name }} packages</h2>
     {% endif %}
+    <!-- TODO href=bioc to href{{xxx}} -->
     <p>All {{ category_name }} package stats in one file:&nbsp;<a href="bioc/bioc_pkg_stats.tab">bioc_pkg_stats.tab</a>
     </p>
     <p>All {{ category_name }} package download scores in one file:&nbsp;<a
@@ -95,28 +95,30 @@
     <p style="text-align: center"><a href="bioc/index.html">See Download stats for Bioconductor {{ desc }} repository
             (all
             packages combined)</a></p>
-    <h3 style="font-family: monospace; font-size: larger;">A</h3>
-    <table class="pkg_index">
-        <tbody>
-            <tr>
-                <td style="vertical-align: top; width:300px;">
-                    <table>
-                        <tbody>
-                            <p>TODO Add the data. The two entries below are just for format</p>
-                            <tr class="pkg_index">
-                                <td style="width:25px; text-align: right"></td>
-                                <td><a href="bioc/a4/">a4&nbsp;(56)</a></td>
-                            </tr>
-                            <tr class="pkg_index">
-                                <td style="width:25px; text-align: right"></td>
-                                <td><a href="bioc/a4Base/">a4Base&nbsp;(84)</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</BODY>
+
+        {% for letterkey, package_list in scores.items() %}
+        <h3 style="font-family: monospace; font-size: larger;">{{ letterkey }}</h3>
+
+        <table class="pkg_index">
+            <tbody>
+                <tr>
+                    <td style="vertical-align: top; width:300px;">
+                        <table>
+                            <tbody>
+                                <!-- TODO split into 3 columns -->
+                                {% for pkg in package_list %}
+                                    <tr class="pkg_index">
+                                        <td style="width:25px; text-align: right"></td>
+                                        <td><a href="bioc/{{ pkg.package_name }}/">{{ pkg[0] }}4&nbsp;({{ pkg[2]}})</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        {% endfor %}
+    </BODY>
 
 </HTML>
