@@ -65,19 +65,18 @@
             <tr>
                 <td style="vertical-align: top; width:300px;">
                     <!-- TODO This loop is supposed to make things up-and-down. Need to debug -->
-                    {% set N = top|length %}
-                    {% for i_base in range(0, N // 3) %}
-                    {% set i = i_base * 3 %}
+                    {% set N = top|length // 3 %}
+                    {% for i in range(N) %}
             <tr class="pkg_index">
-                {% for j in range(3) %}
-                {% if i + j < N %} {% set (package_name, package_score, package_rank)=top[i + j] %} <td
+                {% for j_base in range(3) %}
+                {% set j = j_base * N %}
+                    {% set (package_name, package_score, package_rank)=top[i + j] %} <td
                     style="width:25px; text-align: right">{{ package_rank }}</td>
                     <td>
                         <a href="{{ package_type.value }}/{{ package_name}}/">
                             {{ package_name}}&nbsp;({{ package_score }})
                         </a>
                     </td>
-                    {% endif %}
                     {% endfor %}
             </tr>
             {% endfor %}
