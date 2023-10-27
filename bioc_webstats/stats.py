@@ -132,8 +132,8 @@ def show_packages_summary(package_type="index"):
     # Map from incoming page name name to PackageType
     category_map = {
         "index": {"category": PackageType.BIOC, "description": "software", "stem": "index", "top": 75},
-        "data-experiment": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
-        "data-annotation": {"category": PackageType.EXPERIMENT, "description": "experiment", "stem": "data-experiment", "top": 30},
+        "data-annotation": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
+        "data-experiment": {"category": PackageType.EXPERIMENT, "description": "experiment", "stem": "data-experiment", "top": 30},
         "workflows": {"category": PackageType.WORKFLOW, "description": "workflow", "stem": "workflows",  "top": 0}
     }
 
@@ -153,6 +153,7 @@ def show_packages_summary(package_type="index"):
         category_links=url_list,
         package_type=category_enum,
         category_name=selected_category["description"],
+        category_url_stem=selected_category["stem"],
         generated_date=db.db_valid_thru_date(),
         top=top,
         scores=split_to_dict_list(scores),

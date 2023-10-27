@@ -3,7 +3,7 @@
 
 <HEAD>
     <TITLE>Download stats for Bioconductor {{ category_name }} packages</TITLE>
-    <!-- TODO Use a jinja "extends  layout.html" verb here. And make an appropriate layout.html -->
+    <!-- TODO Use a jinja extends layout.html verb here. And make an appropriate layout.html -->
     <!-- TODO Styling doesn't match old production -->
     <style>
         BODY {
@@ -72,7 +72,7 @@
                         {% set (package_name, package_score, package_rank)=top[i + j * N] %} <td
                             style="width:25px; text-align: right">{{ package_rank }}</td>
                         <td>
-                            <a href="{{ package_type.value }}/{{ package_name}}/">
+                            <a href="{{  category_url_stem }}/{{ package_name}}/">
                                 {{ package_name}}&nbsp;({{ package_score }})
                             </a>
                         </td>
@@ -86,30 +86,32 @@
     <hr>
     <h2>All {{ category_name }} packages</h2>
     {% endif %}
-    <!-- TODO href=bioc to href{{xxx}} -->
-    <p>All {{ category_name }} package stats in one file:&nbsp;<a href="bioc/bioc_pkg_stats.tab">bioc_pkg_stats.tab</a>
+    <p>All {{ category_name }} package stats in one file:&nbsp;<a href="{{ category_url_stem }}/bioc_pkg_stats.tab">bioc_pkg_stats.tab</a>
     </p>
     <p>All {{ category_name }} package download scores in one file:&nbsp;<a
-            href="bioc/bioc_pkg_scores.tab">bioc_pkg_scores.tab</a>
+            href="{{  category_url_stem }}/bioc_pkg_scores.tab">bioc_pkg_scores.tab</a>
     </p>
-    <p style="text-align: center"><a href="bioc/index.html">See Download stats for Bioconductor {{ desc }} repository
+    <p style="text-align: center"><a href="{{ category_url_stem }}/index.html">See Download stats for Bioconductor {{ desc }} repository
             (all
             packages combined)</a></p>
 
         {% for letterkey, package_list in scores.items() %}
         <h3 style="font-family: monospace; font-size: larger;">{{ letterkey }}</h3>
-
         <table class="pkg_index">
             <tbody>
                 <tr>
                     <td style="vertical-align: top; width:300px;">
                         <table>
                             <tbody>
-                                <!-- TODO split into 3 columns -->
-                                {% for pkg in package_list %}
-                                    <tr class="pkg_index">
+                    <!-- This double loop to create 3 top-to-bottom columns -->
+                    {% set N = package_list|length // 3 %}
+                    {% for i in range(N) %}
+                <tr class="pkg_index">
+                        {% for j in range(3) %}
+                        {% set (package_name, package_rank, package_score)=package_list[i + j * N] %}
                                         <td style="width:25px; text-align: right"></td>
-                                        <td><a href="bioc/{{ pkg.package_name }}/">{{ pkg[0] }}4&nbsp;({{ pkg[2]}})</a></td>
+                                        <td><a href="{{  category_url_stem }}//{{ package_name }}/">{{ package_name }}4&nbsp;({{ package_score }})</a></td>
+                                        {% endfor %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
