@@ -15,10 +15,7 @@ from datetime import date
 import matplotlib.pyplot as plt
 import numpy
 
-# TODO: Kill pandas and numpy when done
-import pandas as pd
 from flask import Blueprint, Response, abort, render_template
-from markupsafe import escape
 
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType
@@ -27,41 +24,6 @@ from bioc_webstats.models import PackageType
 PATH = "/packages/stats"
 
 bp = Blueprint("stats", __name__, url_prefix=PATH)
-
-# TODO - More work needed - the supervening code is in format_helpers.py and still needs work
-def df_enum_columns_to_values(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_."""
-    for column in df.columns:
-        # Check if any entry in the column is an instance of PackageType
-        if any(isinstance(value, PackageType) for value in df[column]):
-            df[column] = [e.value for e in df[column]]
-    return df
-
-# TODO These utility fuctions should be moved to a more appropriate location
-def dataframe_to_string_list(df: pd.DataFrame) -> [str]:
-    headers = list(df.columns)
-    header_string = "\t".join(headers)
-    rows = [header_string]
-    for _, row in df.iterrows():
-        row_string = "\t".join(map(str, row))
-        rows.append(row_string)
-    return rows
-
-
-# TODO Add the year summaries
-def dataframe_to_text_tab(df: pd.DataFrame) -> [str]:
-    # convert any enums to their values
-    df = df_enum_columns_to_values(df)
-
-    # Extract year and month
-    df["year"] = [d.year for d in df["date"]]
-    df["month"] = [d.month for d in df["date"]]
-
-    # Reorder columns
-    df = df[["package", "year", "month", "ip_count", "download_count"]]
-
-    formatted_output = dataframe_to_string_list(df)
-    return formatted_output
 
 def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
@@ -74,21 +36,64 @@ def split_to_dict_list(lst):
 
     return result
 
-def query_result_five_to_string(source):
-    result = ["Package\tYear\tMonth\tNb_of_distinct_IPs\tNb_of_downloads"]
-    split = {}
-    for t in source:
-        split.setdefault(t[0], []).append(t[1:])
-        
-    for k, v in split.items():
-        dates = set([u[0] for u in v])
+def query_result_to_text(source):
+    """Transforms tabular query results to string.
+    
+    The strings are exact replicas of the .tab files found under
+    www.bioconductor.org/packages/stats/.../<package>_stats.tab 
+    and <package>_scores.tab.
+    
+    The match exactly because they may be consumed by exteranl software.
+
+    Arguments:
+        source -- A list of tuples in the form
+            [(package, year, month, IP_count, Download_count)]
+            or
+            [(year, month, IP_count, Download_count)]
+
+    Returns:
+        A string in the format of a tab seperated file with one header row.
+
+    """
+
+    def process_one_package(package, rows):
+        """For one package produce the result. If package is None, return 4 columns"""
+
+        if package is None:
+            k = ""
+        else:
+            k = package + "\t"
+
+        dates = set([u[0] for u in rows])
         y0 = min(dates).year
         y1 = max(dates).year
         holes = set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
-        out = sorted(v + [(w, 0, 0) for w in holes])
-        result.append('\n'.join([f"{k}\t{dt.year}\t{dt.strftime('%b') if dt.day == 1 else 'all'}\t{ip}\t{dl}" for dt, ip, dl in out]))
+        out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: x[0])
 
-    return "\n".join(result)
+        return '\n'.join(
+            [f"{k}{dt.year}\t{dt.strftime('%b') if dt.day == 1 else 'all'}\t{ip}\t{dl}"
+                for dt, ip, dl in out])
+
+    if source == []:
+        return ""
+    heading = "Year\tMonth\tNb_of_distinct_IPs\tNb_of_downloads"
+    match len(source[0]):
+        case 3:
+            return heading + '\n' + (process_one_package(None, source))
+
+        case 4:
+            result = ["Package\t" + heading]
+            split = {}
+            for t in source:
+                split.setdefault(t[0], []).append(t[1:])
+
+            for k, v in split.items():
+                result.append(process_one_package(k, v))
+
+            return "\n".join(result)
+
+        case _:
+            raise AssertionError("query_result_to_text expects 4 or 5 columns")
 
 @bp.route("/bioc/bioc_packages.txt", methods=["GET"])
 def show_packages():
@@ -97,42 +102,50 @@ def show_packages():
     text = ("\n").join(payload)
     return Response(text, content_type="text/plain")
 
-
-@bp.route(
-    "<category>/<package>_pkg_scores.tab"
-    )
-def show_pakages_scores(category, package):
+@bp.route("<category>/<package>_pkg_scores.tab")
+def show_package_scores(category, package):
     """_summary_."""
     # We match the legacy system, where both the path and the file_name included the category
-    
+
     # if for category, in a form like this; /bio/bioc_pkg_scores.tab
     if category == package and db.package_type_exists(category):
         payload = db.Stats.get_download_scores(category=PackageType(category))
     else:
         abort(404)
-    text = "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
+    text = 'Package\tDownload_score\n' + '\n'.join([f"{x[0]}\t{x[1]}" for x in payload])
     return Response(text, content_type="text/plain")
 
 # TODO Need to add format /bioc/bioc_2022_stats.tab
 @bp.route("<category>/<package>_stats.tab")
 @bp.route("<category>/<package>_<year>_stats.tab")
-def show_pakages_stats(category, package, year=None):
+@bp.route("<category>/<package_path>/<package>_stats.tab")
+@bp.route("<category>/<package_path>/<package>_<year>_stats.tab")
+def show_package_stats(category, package, package_path=None, year=None):
     """_summary_."""
     if not db.package_type_exists(category):
         abort(404)
+    # If there is a second level in the path, then it can only be the package name
+    # and that name must match the package name at the leaf
+    if package_path is not None and package_path != package:
+        abort(404)
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg
-    if category == package and year == 'pkg':
+    if category == package:
         # No package signals getting all the packages for the category
         package = None
-        year = None
+        # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
+        if year == 'pkg':
+            year = None
     payload = db.Stats.get_download_counts(PackageType(category), package, year)
-    
-    return Response(query_result_five_to_string(payload), content_type="text/plain")
+
+    if payload == []:
+        abort(404)
+
+    return Response(query_result_to_text(payload), content_type="text/plain")
 
 @bp.route("/")
 @bp.route("/<category>.html")
-def show_packages_summary(category="index"):
+def show_package_summary(category="index"):
     """_summary_."""
     
     # Map from incoming page name name to PackageType
