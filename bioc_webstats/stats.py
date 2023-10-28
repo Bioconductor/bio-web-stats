@@ -195,7 +195,10 @@ def show_package_details(category, package=None):
 
     # TODO Aggregate all packages for category only.
     # TODO also need .tab for the same
-    source = db.Stats.get_download_counts(PackageType(category), package)
+    if package is None:
+        source = db.Stats.get_combined_counts(PackageType(category))
+    else:
+        source = db.Stats.get_download_counts(PackageType(category), package)
     if len(source) == 0:
         abort(404)
 

@@ -111,6 +111,21 @@ class Stats(db.Model):
                                     
         result = db.session.execute(text).fetchall()
         return result
+    
+    # TODO annual count must be computed seperately for "all packages in category" because distinct IP's is over the category
+    @staticmethod
+    def get_combined_counts(category: PackageType):
+        result = db.session.execute(
+            select(
+                Stats.date,
+                # TODO See TODO at head of method
+                    func.sum(Stats.ip_count).label('ip_count'),
+                    func.sum(Stats.download_count).label('download_count'))
+            .where(Stats.category == category.value)
+            .group_by(Stats.date)
+            .order_by(asc(Stats.date)))
+
+        return result.fetchall()
 
     @staticmethod
     def get_download_scores(category: PackageType) -> [(str, int, int)]:
