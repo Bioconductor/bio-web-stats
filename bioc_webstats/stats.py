@@ -18,6 +18,16 @@ from bioc_webstats.stats_plot import webstats_plot
 # TODO Move to config
 PATH = "/packages/stats"
 
+category_map = {
+    "index": {"category": PackageType.BIOC, "description": "software", "stem": "index", "top": 75},
+    "data-annotation": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
+    "data-experiment": {"category": PackageType.EXPERIMENT, "description": "experiment", "stem": "data-experiment", "top": 30},
+    "workflows": {"category": PackageType.WORKFLOW, "description": "workflow", "stem": "workflows",  "top": 0}
+}
+
+
+
+# TODO Add escape processing
 bp = Blueprint("stats", __name__, url_prefix=PATH)
 
 def split_to_dict_list(lst):
@@ -30,6 +40,17 @@ def split_to_dict_list(lst):
         result[first_char].append(item)
 
     return result
+
+def result_list_to_visual_list(rows):
+    """Transform 3 column databas results to 4 column visual results with dense months"""
+    
+    dates = set([u[0] for u in rows])
+    y0 = min(dates).year
+    y1 = max(dates).year
+    holes = set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
+    out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: x[0])
+    return [(dt.year, dt.strftime('%b') if dt.day == 1 else 'all', ip, dl) for dt, ip, dl in out]
+
 
 def query_result_to_text(source):
     """Transforms tabular query results to string.
@@ -59,15 +80,10 @@ def query_result_to_text(source):
         else:
             k = package + "\t"
 
-        dates = set([u[0] for u in rows])
-        y0 = min(dates).year
-        y1 = max(dates).year
-        holes = set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
-        out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: x[0])
-
+        out = result_list_to_visual_list(rows)
         return '\n'.join(
-            [f"{k}{dt.year}\t{dt.strftime('%b') if dt.day == 1 else 'all'}\t{ip}\t{dl}"
-                for dt, ip, dl in out])
+                [f"{k}{year}\t{month}\t{ip}\t{dl}" for year, month, ip, dl in out]
+            )
 
     if source == []:
         return ""
@@ -181,12 +197,31 @@ def show_package_summary(category="index"):
 def show_package_details(category, package=None):
     """Display package detials."""
 
-    # TODO , stats_table=stats_table
-    plot_image = webstats_plot()
-    
-    return render_template(
-        "stats-bioc.html", barplot_data=plot_image
-    )
+    if not db.package_type_exists(category):
+        abort(404)
+
+    # TODO Aggregate all packages for category only.
+    # TODO also need .tab for the same
+    source = db.Stats.get_download_counts(PackageType(category), package)
+    if len(source) == 0:
+        abort(404)
+
+    split = {}
+    for t in source:
+        split.setdefault(t[0].year, []).append(t)
+        
+    for year in split:
+        data_table = split[year]
+        
+        # TODO Need inner template        
+        plot_image = webstats_plot(data_table)
+        
+        return render_template(
+            "stats-bioc.html",
+            year=year,
+            barplot_data=plot_image,
+            data_table=result_list_to_visual_list(data_table)
+        )
 
 
 @bp.route('/<path:catch_all>')

@@ -6,7 +6,7 @@ from datetime import date
 import io
 import base64
 
-def webstats_plot():
+def webstats_plot(data_table):
     
     use('agg')
     # Sample data

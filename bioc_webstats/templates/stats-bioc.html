@@ -49,7 +49,8 @@
     <p style="text-align: center;">
         <i>This page was generated on TODO</i>
     </p>
-    <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by year, from 2023 back to 2009 (years with no downloads are omitted):</p>
+    <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
+        year, from 2023 back to 2009 (years with no downloads are omitted):</p>
     <hr>
 
     <h2 style="text-align: center;">TODO</h2>
@@ -59,8 +60,26 @@
                 <img src="data:image/png;base64,{{ barplot_data }}" width="720px" height="400px">
             </td>
             <td style="text-align: center">
-                <p> TODO here stats_table | safe </p> 
-            </td> 
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Nb of distinct IPs</th>
+                            <th>Nb of downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for year, month, ips, downloads in data_table %}
+                        <tr>
+                            <td style="text-align: right">{{month}}/{{ year }}</td>
+                            <td style="text-align: right; background: #aaaaff">{{ ips }}</td>
+                            <td style="text-align: right; background: #ddddff">{{ downloads }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </td>
         </tr>
     </table>
     <hr>
