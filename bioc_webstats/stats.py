@@ -20,16 +20,36 @@ PATH = "/packages/stats"
 
 # Map from incoming page name name to PackageType
 category_map = {
-    "index": {"category": PackageType.BIOC, "description": "software", "stem": "index", "top": 75},
-    "data-annotation": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
-    "data-experiment": {"category": PackageType.EXPERIMENT, "description": "experiment", "stem": "data-experiment", "top": 30},
-    "workflows": {"category": PackageType.WORKFLOW, "description": "workflow", "stem": "workflows",  "top": 0}
+    "index": {
+        "category": PackageType.BIOC,
+        "description": "software",
+        "stem": "index",
+        "top": 75,
+    },
+    "data-annotation": {
+        "category": PackageType.ANNOTATION,
+        "description": "annotation",
+        "stem": "data-annotation",
+        "top": 15,
+    },
+    "data-experiment": {
+        "category": PackageType.EXPERIMENT,
+        "description": "experiment",
+        "stem": "data-experiment",
+        "top": 30,
+    },
+    "workflows": {
+        "category": PackageType.WORKFLOW,
+        "description": "workflow",
+        "stem": "workflows",
+        "top": 0,
+    },
 }
-
 
 
 # TODO Add escape processing
 bp = Blueprint("stats", __name__, url_prefix=PATH)
+
 
 def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
@@ -42,24 +62,30 @@ def split_to_dict_list(lst):
 
     return result
 
+
 def result_list_to_visual_list(rows):
-    """Transform 3 column databas results to 4 column visual results with dense months"""
-    
+    """Transform 3 column databas results to 4 column visual results with dense months."""
+
     dates = set([u[0] for u in rows])
     y0 = min(dates).year
     y1 = max(dates).year
-    holes = set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
+    holes = (
+        set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
+    )
     out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: x[0])
-    return [(dt.year, dt.strftime('%b') if dt.day == 1 else 'all', ip, dl) for dt, ip, dl in out]
+    return [
+        (dt.year, dt.strftime("%b") if dt.day == 1 else "all", ip, dl)
+        for dt, ip, dl in out
+    ]
 
 
 def query_result_to_text(source):
     """Transforms tabular query results to string.
-    
+
     The strings are exact replicas of the .tab files found under
-    www.bioconductor.org/packages/stats/.../<package>_stats.tab 
+    www.bioconductor.org/packages/stats/.../<package>_stats.tab
     and <package>_scores.tab.
-    
+
     The match exactly because they may be consumed by exteranl software.
 
     Arguments:
@@ -74,7 +100,7 @@ def query_result_to_text(source):
     """
 
     def process_one_package(package, rows):
-        """For one package produce the result. If package is None, return 4 columns"""
+        """For one package produce the result. If package is None, return 4 columns."""
 
         if package is None:
             k = ""
@@ -82,16 +108,16 @@ def query_result_to_text(source):
             k = package + "\t"
 
         out = result_list_to_visual_list(rows)
-        return '\n'.join(
-                [f"{k}{year}\t{month}\t{ip}\t{dl}" for year, month, ip, dl in out]
-            )
+        return "\n".join(
+            [f"{k}{year}\t{month}\t{ip}\t{dl}" for year, month, ip, dl in out]
+        )
 
     if source == []:
         return ""
     heading = "Year\tMonth\tNb_of_distinct_IPs\tNb_of_downloads"
     match len(source[0]):
         case 3:
-            return heading + '\n' + (process_one_package(None, source))
+            return heading + "\n" + (process_one_package(None, source))
 
         case 4:
             result = ["Package\t" + heading]
@@ -107,12 +133,14 @@ def query_result_to_text(source):
         case _:
             raise AssertionError("query_result_to_text expects 4 or 5 columns")
 
+
 @bp.route("/bioc/bioc_packages.txt")
 def show_packages():
     """_summary_."""
     payload = db.Stats.get_package_names()
     text = ("\n").join(payload)
     return Response(text, content_type="text/plain")
+
 
 @bp.route("<category>/<package>_pkg_scores.tab")
 def show_package_scores(category, package):
@@ -124,8 +152,9 @@ def show_package_scores(category, package):
         payload = db.Stats.get_download_scores(category=PackageType(category))
     else:
         abort(404)
-    text = 'Package\tDownload_score\n' + '\n'.join([f"{x[0]}\t{x[1]}" for x in payload])
+    text = "Package\tDownload_score\n" + "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
     return Response(text, content_type="text/plain")
+
 
 # TODO Need to add format /bioc/bioc_2022_stats.tab
 @bp.route("<category>/<package>_stats.tab")
@@ -146,7 +175,7 @@ def show_package_stats(category, package, package_path=None, year=None):
         # No package signals getting all the packages for the category
         package = None
         # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
-        if year == 'pkg':
+        if year == "pkg":
             year = None
     payload = db.Stats.get_download_counts(PackageType(category), package, year)
 
@@ -155,21 +184,26 @@ def show_package_stats(category, package, package_path=None, year=None):
 
     return Response(query_result_to_text(payload), content_type="text/plain")
 
+
 @bp.route("/")
 @bp.route("/<category>.html")
 def show_package_summary(category="index"):
     """_summary_."""
-    
+
     # Get the package name if present
     selected_category = category_map.get(category, None)
     if selected_category is None:
         abort(404)
     category_enum = selected_category["category"]
     scores = db.Stats.get_download_scores(category_enum)
-    url_list = [[u["stem"], u["description"]] for u in category_map.values() if selected_category["category"] != u["category"]]
+    url_list = [
+        [u["stem"], u["description"]]
+        for u in category_map.values()
+        if selected_category["category"] != u["category"]
+    ]
     top_count = selected_category["top"]
     top = sorted(scores, key=lambda x: x[-1])[:top_count]
-    
+
     return render_template(
         "category.html",
         top_count=top_count,
@@ -211,10 +245,11 @@ def show_package_details(category, package=None):
         data_table = result_list_to_visual_list(data)
         data_list.append((year, data_table, webstats_plot(data_table)))
 
-    return render_template("stats-bioc.html", generated_date=db.db_valid_thru_date(), data_list=data_list)
+    return render_template(
+        "stats-bioc.html", generated_date=db.db_valid_thru_date(), data_list=data_list
+    )
 
 
-@bp.route('/<path:catch_all>')
+@bp.route("/<path:catch_all>")
 def catch_all_route(catch_all):
-    return f'You have reached the catch-all route: {catch_all}'
-
+    return f"You have reached the catch-all route: {catch_all}"

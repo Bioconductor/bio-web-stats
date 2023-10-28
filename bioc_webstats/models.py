@@ -14,7 +14,6 @@ from sqlalchemy import (
     String,
     and_,
     asc,
-    distinct,
     extract,
     func,
     select,
@@ -32,15 +31,18 @@ class PackageType(enum.Enum):
     ANNOTATION = "annotation"
     WORKFLOW = "workflow"
 
+
 def package_type_exists(value: str) -> bool:
     """Is a string a valid PackageType."""
     return value in [e.value for e in PackageType]
+
 
 def db_valid_thru_date() -> dt.date:
     """The date the database was last upated."""
 
     # TODO: Stub--get from DB
     return dt.date(2023, 10, 4)
+
 
 class Stats(db.Model):
     """The table of summary statisttics."""
@@ -50,9 +52,13 @@ class Stats(db.Model):
     date: Mapped[dt.date] = mapped_column(
         Date,
         primary_key=True,
-        comment='Dates repesenting months always have day=1, while years have month=12 and day=31')
+        comment="Dates repesenting months always have day=1, while years have month=12 and day=31",
+    )
     is_monthly: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, comment='If true, date span is 1 month, if false, 1 year')
+        Boolean,
+        nullable=False,
+        comment="If true, date span is 1 month, if false, 1 year",
+    )
     ip_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
     download_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
 
@@ -74,14 +80,13 @@ class Stats(db.Model):
     def get_package_names():
         """Return all the package names."""
         return db.session.scalars(
-            select(Stats.package)
-            .distinct()
-            .order_by(Stats.package.asc())).fetchall()
+            select(Stats.package).distinct().order_by(Stats.package.asc())
+        ).fetchall()
 
     @staticmethod
-    def get_download_counts(category: PackageType,
-                            package: Optional[str] = None,
-                            year: Optional[int] = None):
+    def get_download_counts(
+        category: PackageType, package: Optional[str] = None, year: Optional[int] = None
+    ):
         """_summary_.
 
         Arguments:
@@ -102,28 +107,47 @@ class Stats(db.Model):
         else:
             select_clause = [Stats.package] + select_clause
         if year is not None:
-            where_clause.append(extract('year', Stats.date) == year)
-            
+            where_clause.append(extract("year", Stats.date) == year)
+
         final_where_clause = and_(*where_clause)
 
         # Execute query
-        text = select(*select_clause).where(final_where_clause).order_by(asc(Stats.package), asc(Stats.date))
-                                    
+        text = (
+            select(*select_clause)
+            .where(final_where_clause)
+            .order_by(asc(Stats.package), asc(Stats.date))
+        )
+
         result = db.session.execute(text).fetchall()
         return result
-    
-    # TODO annual count must be computed seperately for "all packages in category" because distinct IP's is over the category
+
+    # TODO annual count must be computed seperately for "all packages in category"
+    # because distinct IP's is over the category
     @staticmethod
     def get_combined_counts(category: PackageType):
+        """Get counts combined for all packages in a given category.
+
+        TODO Returning ip_counts as sum of the packages, but must
+            be distinct across all the packages.
+            Database changes needed
+
+        Arguments:
+            category -- The category
+
+        Returns:
+            _description_
+        """
         result = db.session.execute(
             select(
                 Stats.date,
                 # TODO See TODO at head of method
-                    func.sum(Stats.ip_count).label('ip_count'),
-                    func.sum(Stats.download_count).label('download_count'))
+                func.sum(Stats.ip_count).label("ip_count"),
+                func.sum(Stats.download_count).label("download_count"),
+            )
             .where(Stats.category == category.value)
             .group_by(Stats.date)
-            .order_by(asc(Stats.date)))
+            .order_by(asc(Stats.date))
+        )
 
         return result.fetchall()
 
@@ -165,9 +189,18 @@ class Stats(db.Model):
         result = db.session.execute(
             select(
                 Stats.package,
-                (func.sum(Stats.ip_count) // 12).label('score'),
-                func.rank().over(order_by=func.sum(Stats.ip_count).desc()).label('rank'))
-            .where(and_(Stats.category == category.value, Stats.date.between(start_date, end_date)))
+                (func.sum(Stats.ip_count) // 12).label("score"),
+                func.rank()
+                .over(order_by=func.sum(Stats.ip_count).desc())
+                .label("rank"),
+            )
+            .where(
+                and_(
+                    Stats.category == category.value,
+                    Stats.date.between(start_date, end_date),
+                )
+            )
             .group_by(Stats.package)
-            .order_by(asc(Stats.package)))
+            .order_by(asc(Stats.package))
+        )
         return result.fetchall()
