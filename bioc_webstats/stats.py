@@ -6,19 +6,14 @@ Raises:
 Returns:
     _description_
 """
-import base64
-import math
-from io import BytesIO
 from collections import defaultdict
 from datetime import date
-
-import matplotlib.pyplot as plt
-import numpy
 
 from flask import Blueprint, Response, abort, render_template
 
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType
+from bioc_webstats.stats_plot import webstats_plot
 
 # TODO Move to config
 PATH = "/packages/stats"
@@ -95,7 +90,7 @@ def query_result_to_text(source):
         case _:
             raise AssertionError("query_result_to_text expects 4 or 5 columns")
 
-@bp.route("/bioc/bioc_packages.txt", methods=["GET"])
+@bp.route("/bioc/bioc_packages.txt")
 def show_packages():
     """_summary_."""
     payload = db.Stats.get_package_names()
@@ -179,162 +174,18 @@ def show_package_summary(category="index"):
     )
 
 
-# fuction to plot the bar graphs
-def make_barplot2ylog(
-    title,
-    barlabels,
-    barlabel_to_c1,
-    c1_label,
-    c1_color,
-    barlabel_to_c2,
-    c2_label,
-    c2_color,
-    Cmax=None,
-):
-    """_summary_."""
-
-    plt.use("Agg")  # Set Matplotlib to use a non-GUI backend
-
-    c1_vals = []
-    c2_vals = []
-    Cmax0 = 0
-    for label in barlabels:
-        C1 = barlabel_to_c1[label]
-        if C1 > Cmax0:
-            Cmax0 = C1
-        c1_vals.append(math.log10(1 + C1))
-        C2 = barlabel_to_c2[label]
-        if C2 > Cmax0:
-            Cmax0 = C2
-        c2_vals.append(math.log10(1 + C2))
-    xticks = numpy.arange(len(c1_vals)) + 0.5
-    width = 0.40  # the width of the bars
-
-    fig, ax = plt.subplots(figsize=(9, 5))  # Create a figure and axis
-    rects2 = ax.bar(xticks, c2_vals, width, align="edge", color=c2_color)
-    rects1 = ax.bar(xticks, c1_vals, -width, align="edge", color=c1_color)
-    xlabels = [label.replace("/", "\n") for label in barlabels]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(xlabels)
-
-    if Cmax == None:
-        Cmax = Cmax0
-    if Cmax < 100:
-        nb_pow10ticks = 3
-    else:
-        nb_pow10ticks = int(math.log10(Cmax)) + 2
-
-    # Add labels, legend, and adjust plot settings as needed
-
-    # Convert the plot to a PNG image
-    buffer = BytesIO()
-    plt.savefig(buffer, format="png")
-    buffer.seek(0)
-    plt.close(fig)  # Close the figure to release resources
-
-    # Encode the PNG image as base64
-    image_base64 = base64.b64encode(buffer.read()).decode("utf-8")
-
-    return image_base64
-
-
-def write_HTML_stats_TABLE(
-    months,
-    month_to_c1,
-    c1_label,
-    c1_color,
-    month_to_c2,
-    c2_label,
-    c2_color,
-    allmonths_label,
-    allmonths_c1,
-    allmonths_c2=None,
-):
-    c1_style = 'style="text-align: right; background: %s"' % c1_color
-    c2_style = 'style="text-align: right; background: %s"' % c2_color
-    table_html = '<TABLE class="stats" align="center">\n'
-    table_html += "<TR>"
-    table_html += '<TH style="text-align: right">Month</TH>'
-    table_html += "<TH %s>%s</TH>" % (c1_style, c1_label)
-    table_html += "<TH %s>%s</TH>" % (c2_style, c2_label)
-    table_html += "</TR>\n"
-
-    sum2 = 0
-    for month in months:
-        c1 = month_to_c1[month]
-        c2 = month_to_c2[month]
-        sum2 += c2
-        table_html += "<TR>"
-        table_html += '<TD style="text-align: right">%s</TD>' % month
-        table_html += "<TD %s>%d</TD>" % (c1_style, c1)
-        table_html += "<TD %s>%d</TD>" % (c2_style, c2)
-        table_html += "</TR>\n"
-
-    if allmonths_c2 is None:
-        allmonths_c2 = sum2
-    elif allmonths_c2 != sum2:
-        return "Error: allmonths_c2 != sum2"
-
-    table_html += "<TR>"
-    table_html += '<TH style="text-align: right">%s</TH>' % allmonths_label
-    table_html += "<TH %s>%d</TH>" % (c1_style, allmonths_c1)
-    table_html += "<TH %s>%d</TH>" % (c2_style, allmonths_c2)
-    table_html += "</TR>\n"
-    table_html += "</TABLE>\n"
-
-    return table_html
-
-# @bp.route("<category>/")
-# @bp.route("<category>/<package>.html")
-def show_package_details(category, package="index"):
+@bp.route("<category>/")
+@bp.route("<category>/<package>/")
+@bp.route("<category>/index.html")
+@bp.route("<category>/<package>/index.html")
+def show_package_details(category, package=None):
     """Display package detials."""
-    # TODO Rewrite
-    months = [
-        "Jan/2023",
-        "Feb/2023",
-        "Mar/2023",
-        "Apr/2023",
-        "May/2023",
-        "Jun/2023",
-        "Jul/2023",
-        "Aug/2023",
-        "Sep/2023",
-        "Oct/2023",
-        "Nov/2023",
-        "Dec/2023",
-    ]
-    month_to_c1 = {month: 1000 for month in months}
-    month_to_c2 = {month: 2000 for month in months}
-    allmonths_c1 = sum(month_to_c1.values())
-    allmonths_c2 = sum(month_to_c2.values())
 
-    # Generate the barplot
-    barplot_data = make_barplot2ylog(
-        "2023 Download Stats",
-        months,
-        month_to_c1,
-        "C1 Label",
-        "#aaaaff",
-        month_to_c2,
-        "C2 Label",
-        "#ddddff",
-    )
-
-    # Generate the HTML stats table
-    stats_table = write_HTML_stats_TABLE(
-        months,
-        month_to_c1,
-        "C1 Label",
-        "#aaaaff",
-        month_to_c2,
-        "C2 Label",
-        "2023",
-        allmonths_c1,
-        allmonths_c2,
-    )
-
+    # TODO , stats_table=stats_table
+    plot_image = webstats_plot()
+    
     return render_template(
-        "stats-bioc.html", barplot_data=barplot_data, stats_table=stats_table
+        "stats-bioc.html", barplot_data=plot_image
     )
 
 
