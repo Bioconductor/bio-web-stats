@@ -18,6 +18,7 @@ from bioc_webstats.stats_plot import webstats_plot
 # TODO Move to config
 PATH = "/packages/stats"
 
+# Map from incoming page name name to PackageType
 category_map = {
     "index": {"category": PackageType.BIOC, "description": "software", "stem": "index", "top": 75},
     "data-annotation": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
@@ -159,14 +160,6 @@ def show_package_stats(category, package, package_path=None, year=None):
 def show_package_summary(category="index"):
     """_summary_."""
     
-    # Map from incoming page name name to PackageType
-    category_map = {
-        "index": {"category": PackageType.BIOC, "description": "software", "stem": "index", "top": 75},
-        "data-annotation": {"category": PackageType.ANNOTATION, "description": "annotation", "stem": "data-annotation", "top": 15},
-        "data-experiment": {"category": PackageType.EXPERIMENT, "description": "experiment", "stem": "data-experiment", "top": 30},
-        "workflows": {"category": PackageType.WORKFLOW, "description": "workflow", "stem": "workflows",  "top": 0}
-    }
-
     # Get the package name if present
     selected_category = category_map.get(category, None)
     if selected_category is None:
@@ -208,20 +201,14 @@ def show_package_details(category, package=None):
 
     split = {}
     for t in source:
-        split.setdefault(t[0].year, []).append(t)
-        
-    for year in split:
-        data_table = split[year]
-        
-        # TODO Need inner template        
-        plot_image = webstats_plot(data_table)
-        
-        return render_template(
-            "stats-bioc.html",
-            year=year,
-            barplot_data=plot_image,
-            data_table=result_list_to_visual_list(data_table)
-        )
+        split.setdefault(t[0], []).append(t)
+
+    data_list = []
+    for year, data in split.items():
+        data_table = result_list_to_visual_list(data)
+        data_list.append((year, data_table, webstats_plot(data_table)))
+
+    return render_template("stats-bioc.html", generated_date=db.db_valid_thru_date(), data_list=data_list)
 
 
 @bp.route('/<path:catch_all>')

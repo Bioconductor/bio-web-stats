@@ -6,30 +6,38 @@ from datetime import date
 import io
 import base64
 
-def webstats_plot(data_table):
-    
-    use('agg')
-    # Sample data
-    reference_year = 2023
-    package = 'affy'
-    months = [date(reference_year, m + 1, 1).strftime('%b') for m in range(12)]
-    distinct_IPs = np.random.randint(4000, 8000, 12)  # Replace with your data
-    downloads = np.random.randint(6000, 10000, 12)  # Replace with your data
+def webstats_plot(data_table: [tuple]):
+    """Genreate plot from one years data.
 
+    Arguments:
+        data_table -- A list of tuples, all for the same year in the form
+        (year, month, ip_count, download_count)
+
+    Returns:
+        _description_
+    """
+
+    # exclude the annual total from the graph.
+    months, distinct_ips, downloads = map(list, zip(*[t[1:4] for t in data_table if t[1] != 'all']))
+    use('agg')
     # Plotting
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Use log scale for the y-axis
     ax.set_yscale('log')
 
+    light_blue = '#ddddff'
+    dark_blue = '#aaaaff'
+
     # Bar plot for distinct IPs
     bar_width = 0.35
     index = np.arange(len(months))
-    ax.bar(index, distinct_IPs, bar_width, label='Nb of distinct IPs', color='blue', alpha=0.7)
+    ax.bar(index, distinct_ips, bar_width, label='Nb of distinct IPs', color=dark_blue)
 
     # Bar plot for downloads
-    ax.bar(index + bar_width, downloads, bar_width, label='Nb of downloads', color='blue')
+    ax.bar(index + bar_width, downloads, bar_width, label='Nb of downloads', color=light_blue)
 
+    # TODO Have y-axis scientific notation, want explicit integers
     # Labeling and formatting
     ax.set_xlabel('Month')
     ax.set_ylabel('Counts (log scale)')
