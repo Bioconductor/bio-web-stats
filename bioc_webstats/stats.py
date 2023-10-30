@@ -238,7 +238,7 @@ def show_package_details(category, package=None):
 
     split = {}
     for t in source:
-        split.setdefault(t[0], []).append(t)
+        split.setdefault(t[0].year, []).append(t)
 
     data_list = []
     for year, data in split.items():
