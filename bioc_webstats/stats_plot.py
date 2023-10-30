@@ -6,7 +6,7 @@ from datetime import date
 import io
 import base64
 
-def webstats_plot(data_table: [tuple]):
+def webstats_plot(data_table: [tuple], plot_title: str):
     """Genreate plot from one years data.
 
     Arguments:
@@ -41,7 +41,7 @@ def webstats_plot(data_table: [tuple]):
     # Labeling and formatting
     ax.set_xlabel('Month')
     ax.set_ylabel('Counts (log scale)')
-    ax.set_title('affy 2023')
+    ax.set_title(plot_title)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(months)
     ax.legend()
