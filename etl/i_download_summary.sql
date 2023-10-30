@@ -1,4 +1,4 @@
-insert into download_summary
+insert into stats
 select category,
     package,
     date_trunc('MONTH', "date") "date",

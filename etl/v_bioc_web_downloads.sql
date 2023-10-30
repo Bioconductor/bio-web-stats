@@ -22,7 +22,7 @@ SELECT "date",
         "cs-uri-stem",
         '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',
         1
-    ), 'data', '') category,
+    ), 'data/', '') category,
     regexp_extract(
         "cs-uri-stem",
         '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',

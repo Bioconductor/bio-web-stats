@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE `download_summary`(
+CREATE EXTERNAL TABLE `stats`(
   `category` string, 
   `package` string,
   `date` date, 
