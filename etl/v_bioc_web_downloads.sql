@@ -20,12 +20,12 @@ SELECT "date",
     "sc-status",
     replace(regexp_extract(
         "cs-uri-stem",
-        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',
+        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$',
         1
     ), 'data/', '') category,
     regexp_extract(
         "cs-uri-stem",
-        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$',
+        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$',
         2
     ) package
 FROM "bioc_web_logs"
@@ -35,6 +35,6 @@ WHERE (
         )
         AND regexp_like(
             "cs-uri-stem",
-            '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:[^/]*/)*([^_]*)_.*tar\.(?:gz|zip|tgz)$'
+        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'
         )
     )

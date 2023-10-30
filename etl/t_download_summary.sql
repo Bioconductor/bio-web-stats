@@ -2,6 +2,7 @@ CREATE EXTERNAL TABLE `stats`(
   `category` string, 
   `package` string,
   `date` date, 
+  `is_monthly` boolean,
   `ip_count` bigint, 
   `download_count` bigint
   )
