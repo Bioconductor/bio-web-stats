@@ -12,9 +12,10 @@ Valid categories are: bioc, workflows, data/experiment, data/annotation
 Note: Wherever a '//' appears in the uri-stem, it is treated as a single '/'
 Note: The RE string is repeated multiple times becasue Athena does not have reasonable way
 to handle manifest constants (as of Oct-2023) 
-
 */
+
 CREATE OR REPLACE VIEW "bioc_web_downloads" AS
+with T as (
 SELECT "date",
     "c-ip",
     "sc-status",
@@ -38,3 +39,5 @@ WHERE (
         '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'
         )
     )
+)
+select * from T where package <> ''
