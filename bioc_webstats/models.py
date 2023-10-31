@@ -31,7 +31,6 @@ class PackageType(enum.Enum):
     ANNOTATION = "annotation"
     WORKFLOW = "workflow"
 
-
 def package_type_exists(value: str) -> bool:
     """Is a string a valid PackageType."""
     return value in [e.value for e in PackageType]
@@ -42,7 +41,6 @@ def db_valid_thru_date() -> dt.date:
 
     # TODO: Stub--get from DB
     return dt.date(2023, 10, 4)
-
 
 class Stats(db.Model):
     """The table of summary statisttics."""

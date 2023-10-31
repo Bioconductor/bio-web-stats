@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Extensions module. Each extension is initialized in the app factory located in app.py."""
-# TODO Trim the unneeded extensions
+
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_migrate import Migrate

@@ -46,10 +46,7 @@ category_map = {
     },
 }
 
-
-# TODO Add escape processing
 bp = Blueprint("stats", __name__, url_prefix=PATH)
-
 
 def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
@@ -227,8 +224,6 @@ def show_package_details(category, package=None):
     if not db.package_type_exists(category):
         abort(404)
 
-    # TODO Aggregate all packages for category only.
-    # TODO also need .tab for the same
     if package is None:
         source = db.Stats.get_combined_counts(PackageType(category))
     else:

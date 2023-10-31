@@ -1,10 +1,13 @@
-from flask import Flask, render_template
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import use
-from datetime import date
-import io
 import base64
+import io
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import use
+
+# At the top because this is a global declaration
+use('agg')
+
 
 def webstats_plot(data_table: [tuple], plot_title: str):
     """Genreate plot from one years data.
@@ -19,7 +22,6 @@ def webstats_plot(data_table: [tuple], plot_title: str):
 
     # exclude the annual total from the graph.
     months, distinct_ips, downloads = map(list, zip(*[t[1:4] for t in data_table if t[1] != 'all']))
-    use('agg')
     # Plotting
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -52,12 +54,11 @@ def webstats_plot(data_table: [tuple], plot_title: str):
     img = io.BytesIO()
     plt.savefig(img, format='png', bbox_inches='tight')
     img.seek(0)
-    
+
     # Convert the BytesIO object to a base64 string
     img_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
     plt.close()  # Close the matplotlib plot to free memory
-    
+
     # Pass the base64 string to the Jinja template
     # return render_template('plot_template.html', plot_img="data:image/png;base64," + img_base64)
     return img_base64
-
