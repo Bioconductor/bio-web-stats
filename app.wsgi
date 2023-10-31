@@ -2,6 +2,6 @@
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/var/www/test3/bio-web-stats')  
+sys.path.insert(0, '/var/www/test4/bio-web-stats')  
 
 from bioc_webstats.stats import bp as application
