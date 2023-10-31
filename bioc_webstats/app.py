@@ -7,7 +7,6 @@ from flask import Flask, render_template
 
 from bioc_webstats import commands, splash, stats
 from bioc_webstats.extensions import (
-    bcrypt,
     cache,
     csrf_protect,
     db,
@@ -27,8 +26,7 @@ def create_app(config_object="bioc_webstats.settings"):
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)
-    # TODO Enable or delete
-    # register_shellcontext(app)
+    register_shellcontext(app)
     register_commands(app)
     configure_logger(app)
     return app
@@ -36,7 +34,6 @@ def create_app(config_object="bioc_webstats.settings"):
 
 def register_extensions(app):
     """Register Flask extensions."""
-    bcrypt.init_app(app)
     cache.init_app(app)
     db.init_app(app)
     csrf_protect.init_app(app)
@@ -67,15 +64,14 @@ def register_errorhandlers(app):
     return None
 
 
-# def register_shellcontext(app):
-#     """Register shell context objects."""
+def register_shellcontext(app):
+    """Register shell context objects."""
 
-#     TODO Replace with appropriate ontext
-#     def shell_context():
-#         """Shell context objects."""
-#         return {"db": db, "User": user.models.User}
+    def shell_context():
+        """Shell context objects."""
+        return {"db": db}
 
-#     app.shell_context_processor(shell_context)
+    app.shell_context_processor(shell_context)
 
 
 def register_commands(app):

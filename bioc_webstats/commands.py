@@ -81,6 +81,5 @@ def gendb():
     from tests.conftest import generate_small_test_db_stats
 
     click.echo("Creating small test database")
-    # TODO operatiionalize
     generate_small_test_db_stats()
     db.session.commit()

@@ -26,9 +26,6 @@ supervisor==4.2.5
 # Flask Static Digest
 Flask-Static-Digest==0.4.0
 
-# Auth
-Flask-Bcrypt==1.0.1
-
 # Caching
 Flask-Caching>=2.0.2
 
