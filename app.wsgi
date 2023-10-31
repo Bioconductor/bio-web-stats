@@ -1,3 +1,7 @@
-import sys 
-sys.path.insert(0, '/var/www/test1/bio-web-stats')
+#!/usr/bin/python3
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, '/var/www/test3/bio-web-stats')  
+
 from flaskapp import app as application
