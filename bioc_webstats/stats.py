@@ -236,20 +236,27 @@ def show_package_details(category, package=None):
     if len(source) == 0:
         abort(404)
 
+    if category == 'bioc':
+        category_name = "software"
+    else:
+        category_name = category
+
     split = {}
     for t in source:
         split.setdefault(t[0].year, []).append(t)
 
+    plot_topic = package or category
     data_list = []
+
     for year, data in split.items():
         data_table = result_list_to_visual_list(data)
-        data_list.append((year, data_table, webstats_plot(data_table=data_table, plot_title=f"{package} {year}")))
+        data_list.append((year, data_table, webstats_plot(data_table=data_table, plot_title=f"{plot_topic} {year}")))
 
     return render_template(
-        "stats-bioc.html", generated_date=db.db_valid_thru_date(), data_list=data_list
+        "stats-bioc.html",
+        category=category,
+        category_name=category_name,
+        package=package,
+        generated_date=db.db_valid_thru_date(),
+        data_list=data_list
     )
-
-
-@bp.route("/<path:catch_all>")
-def catch_all_route(catch_all):
-    return f"You have reached the catch-all route: {catch_all}"
