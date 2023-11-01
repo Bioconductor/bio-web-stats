@@ -117,7 +117,7 @@
                         {% for j in range(3) %}
                         {% set (package_name, package_rank, package_score)=package_list[i + j * N] %}
                                         <td style="width:25px; text-align: right"></td>
-                                        <td><a href="{{  category_url_stem }}//{{ package_name }}/">{{ package_name }}4&nbsp;({{ package_score }})</a></td>
+                                        <td><a href="{{  category_url_stem }}/{{ package_name }}/">{{ package_name }}4&nbsp;({{ package_score }})</a></td>
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}

@@ -188,7 +188,6 @@ def show_package_stats(category, package, package_path=None, year=None):
 def show_package_summary(category="index"):
     """_summary_."""
 
-    # Get the package name if present
     selected_category = category_map.get(category, None)
     if selected_category is None:
         abort(404)
@@ -216,19 +215,21 @@ def show_package_summary(category="index"):
 
 
 @bp.route("<category>/")
+@bp.route("<category>/<package>")
 @bp.route("<category>/<package>/")
 @bp.route("<category>/index.html")
 @bp.route("<category>/<package>/index.html")
 def show_package_details(category, package=None):
     """Display package detials."""
 
-    if not db.package_type_exists(category):
+    selected_category = category_map.get(category, None)
+    if selected_category is None:
         abort(404)
 
     if package is None:
-        source = db.Stats.get_combined_counts(PackageType(category))
+        source = db.Stats.get_combined_counts(selected_category["category"])
     else:
-        source = db.Stats.get_download_counts(PackageType(category), package)
+        source = db.Stats.get_download_counts(selected_category["category"], package)
     if len(source) == 0:
         abort(404)
 
