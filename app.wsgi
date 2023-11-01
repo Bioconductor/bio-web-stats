@@ -5,4 +5,4 @@ logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0, '/var/www/test4/bio-web-stats')
 
 from bioc_webstats import app
-app.create_app()
+application = app.create_app()
