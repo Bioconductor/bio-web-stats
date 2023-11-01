@@ -23,7 +23,7 @@ category_map = {
     "index": {
         "category": PackageType.BIOC,
         "description": "software",
-        "stem": "index",
+        "stem": "bioc",
         "top": 75,
     },
     "data-annotation": {
@@ -160,21 +160,22 @@ def show_package_scores(category, package):
 @bp.route("<category>/<package_path>/<package>_<year>_stats.tab")
 def show_package_stats(category, package, package_path=None, year=None):
     """_summary_."""
-    if not db.package_type_exists(category):
+    selected_category = category_map.get(category, None)
+    if selected_category is None:
         abort(404)
     # If there is a second level in the path, then it can only be the package name
     # and that name must match the package name at the leaf
     if package_path is not None and package_path != package:
         abort(404)
     # If the url is for all the packages in the repo,
-    # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg
-    if category == package:
+    # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
+    if selected_category["description"] == package:
         # No package signals getting all the packages for the category
         package = None
         # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
         if year == "pkg":
             year = None
-    payload = db.Stats.get_download_counts(PackageType(category), package, year)
+    payload = db.Stats.get_download_counts(selected_category["category"], package, year)
 
     if payload == []:
         abort(404)

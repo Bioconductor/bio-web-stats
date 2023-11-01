@@ -86,10 +86,17 @@
     <hr>
     <h2>All {{ category_name }} packages</h2>
     {% endif %}
-    <p>All {{ category_name }} package stats in one file:&nbsp;<a href="{{ category_url_stem }}/bioc_pkg_stats.tab">bioc_pkg_stats.tab</a>
+    <p>
+        All {{ category_name }} package stats in one file:&nbsp;
+        <a href="{{ category_url_stem }}/{{ category_name }}_pkg_stats.tab">
+            {{ category_name }}_pkg_stats.tab
+        </a>
     </p>
-    <p>All {{ category_name }} package download scores in one file:&nbsp;<a
-            href="{{  category_url_stem }}/bioc_pkg_scores.tab">bioc_pkg_scores.tab</a>
+    <p>
+        All {{ category_name }} download scores in one file:&nbsp;
+        <a href="{{ category_url_stem }}/{{ category_name }}_pkg_scores.tab">
+            {{ category_name }}_scores.tab
+        </a>
     </p>
     <p style="text-align: center"><a href="{{ category_url_stem }}/index.html">See Download stats for Bioconductor {{ desc }} repository
             (all
