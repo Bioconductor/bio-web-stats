@@ -30,13 +30,13 @@ category_map = {
         "category": PackageType.ANNOTATION,
         "description": "annotation",
         "stem": "data-annotation",
-        "top": 15,
+        "top": 30,
     },
     "data-experiment": {
         "category": PackageType.EXPERIMENT,
         "description": "experiment",
         "stem": "data-experiment",
-        "top": 30,
+        "top": 15,
     },
     "workflows": {
         "category": PackageType.WORKFLOW,
