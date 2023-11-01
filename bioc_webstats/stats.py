@@ -253,6 +253,7 @@ def show_package_details(category, package=None):
         "stats-bioc.html",
         category=category,
         category_name=category_name,
+        category_stem=selected_category["stem"],
         package=package,
         generated_date=db.db_valid_thru_date(),
         data_list=data_list

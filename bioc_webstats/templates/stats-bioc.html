@@ -89,9 +89,11 @@ Bioconductor {{ category_name }} repository (all packages combined)
                             <td style="text-align: right; background: #ddddff">{{ downloads }}</td>
                         </tr>
                         {% endfor %}
-
                     </tbody>
                 </table>
+                <a href="{{ category_stem }}/{{ package }}_{{ year }}_stats.tab">
+                    {{ package }}_{{ year }}_stats.tab
+                </a>
             </td>
         </tr>
     </table>
