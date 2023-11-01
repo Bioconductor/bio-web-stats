@@ -157,7 +157,6 @@ def show_package_scores(category, package):
     return Response(text, content_type="text/plain")
 
 
-# TODO Need to add format /bioc/bioc_2022_stats.tab
 @bp.route("<category>/<package>_stats.tab")
 @bp.route("<category>/<package>_<year>_stats.tab")
 @bp.route("<category>/<package_path>/<package>_stats.tab")
@@ -169,16 +168,15 @@ def show_package_stats(category, package, package_path=None, year=None):
         abort(404)
     # If there is a second level in the path, then it can only be the package name
     # and that name must match the package name at the leaf
-    if (package_path is None and package == "bioc") or (package_path is not None and package_path != package):
-        abort(404)
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
-    if selected_category["description"] == package:
-        # No package signals getting all the packages for the category
+    if package_path is None and package == "bioc" or category == package:
         package = None
-        # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
-        if year == "pkg":
-            year = None
+    elif package_path is not None and package_path != package:
+        abort(404)
+    # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
+    if year == "pkg":
+        year = None
     payload = db.Stats.get_download_counts(selected_category["category"], package, year)
 
     if payload == []:
