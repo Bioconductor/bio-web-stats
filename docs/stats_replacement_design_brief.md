@@ -72,7 +72,7 @@ s3://bioc-cloudfront-logs/E1TVLJONPTUXV3.2023-09-17-00.0129f869.gz
 | software packages   | Monday 12:00    | bioc            |
 | annotation packages | Wednesday 15:00 | data-annotation |
 | experiment packages | Friday 03:00    | data-experiment |
-| workflow packages   | Saturday 15:00  | workflows                |
+| workflows packages   | Saturday 15:00  | workflows                |
 
 
 ### Data: Static Web Assets (.html,  .txt, .tab)

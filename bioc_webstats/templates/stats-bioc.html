@@ -50,7 +50,7 @@ Bioconductor {{ category_name }} repository (all packages combined)
     <table style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
         <tr>
             <td style="padding: 0px; text-align: left;">
-                <i><a href="../"> TODO Back to the "Download stats for Bioconductor software packages"</a></i>
+                <i><a href="../">Back to the "Download stats for Bioconductor software packages"</a></i>
             </td>
         </tr>
     </table>
@@ -59,10 +59,10 @@ Bioconductor {{ category_name }} repository (all packages combined)
         <i>This page was generated on {{ generated_date }}</i>
     </p>
     <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
-        year, from {{ generated_date.year }} back to 2009 TODO (years with no downloads are omitted):</p>
+        year, from {{ generated_date.year }} back to {{ data_list[0][0] }} (years with no downloads are omitted):</p>
     {% for year, data_table, barplot_data in data_list %}
     <p style="text-align: center;">
-        <b>affy</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
+        <b>{{ package }}</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
             version</a>, <a href="/packages/devel/{{ category }}/html/{{ package }}.html">devel version</a>.
     </p>
     <hr>

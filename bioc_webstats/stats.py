@@ -20,27 +20,31 @@ PATH = "/packages/stats"
 
 # Map from incoming page name name to PackageType
 category_map = {
-    "index": {
+    "bioc": {
         "category": PackageType.BIOC,
         "description": "software",
+        "package_index_page": "index",
         "stem": "bioc",
         "top": 75,
     },
     "data-annotation": {
         "category": PackageType.ANNOTATION,
         "description": "annotation",
+        "package_index_page": "data-annotation",
         "stem": "data-annotation",
         "top": 30,
     },
     "data-experiment": {
         "category": PackageType.EXPERIMENT,
         "description": "experiment",
+        "package_index_page": "data-experiment",
         "stem": "data-experiment",
         "top": 15,
     },
     "workflows": {
         "category": PackageType.WORKFLOW,
         "description": "workflow",
+        "package_index_page": "workflows",
         "stem": "workflows",
         "top": 0,
     },
@@ -83,7 +87,7 @@ def query_result_to_text(source):
     www.bioconductor.org/packages/stats/.../<package>_stats.tab
     and <package>_scores.tab.
 
-    The match exactly because they may be consumed by exteranl software.
+    The match exactly because they may be consumed by external software.
 
     Arguments:
         source -- A list of tuples in the form
@@ -165,7 +169,7 @@ def show_package_stats(category, package, package_path=None, year=None):
         abort(404)
     # If there is a second level in the path, then it can only be the package name
     # and that name must match the package name at the leaf
-    if package_path is not None and package_path != package:
+    if (package_path is None and package == "bioc") or (package_path is not None and package_path != package):
         abort(404)
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
@@ -184,8 +188,9 @@ def show_package_stats(category, package, package_path=None, year=None):
 
 
 @bp.route("/")
+@bp.route("/index.html")
 @bp.route("/<category>.html")
-def show_package_summary(category="index"):
+def show_package_summary(category="bioc"):
     """_summary_."""
 
     selected_category = category_map.get(category, None)
@@ -194,7 +199,7 @@ def show_package_summary(category="index"):
     category_enum = selected_category["category"]
     scores = db.Stats.get_download_scores(category_enum)
     url_list = [
-        [u["stem"], u["description"]]
+        [u["package_index_page"], u["description"]]
         for u in category_map.values()
         if selected_category["category"] != u["category"]
     ]

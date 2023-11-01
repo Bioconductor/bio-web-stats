@@ -98,9 +98,11 @@
             {{ category_name }}_scores.tab
         </a>
     </p>
-    <p style="text-align: center"><a href="{{ category_url_stem }}/index.html">See Download stats for Bioconductor {{ desc }} repository
-            (all
-            packages combined)</a></p>
+    <p style="text-align: center">
+        <a href="{{ category_url_stem }}/index.html">
+                See Download stats for Bioconductor {{ category_name }} repository (all packages combined)
+        </a>
+    </p>
 
         {% for letterkey, package_list in scores.items() %}
         <h3 style="font-family: monospace; font-size: larger;">{{ letterkey }}</h3>
@@ -117,7 +119,7 @@
                         {% for j in range(3) %}
                         {% set (package_name, package_rank, package_score)=package_list[i + j * N] %}
                                         <td style="width:25px; text-align: right"></td>
-                                        <td><a href="{{  category_url_stem }}/{{ package_name }}/">{{ package_name }}4&nbsp;({{ package_score }})</a></td>
+                                        <td><a href="{{  category_url_stem }}/{{ package_name }}/">{{ package_name }}&nbsp;({{ package_score }})</a></td>
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}
