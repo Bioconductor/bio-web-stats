@@ -46,3 +46,21 @@
       ErrorLog ${APACHE_LOG_DIR}/error.log
       CustomLog ${APACHE_LOG_DIR}/access.log combined
   </VirtualHost>
+
+
+## 6. Create the WSGI File
+Create a .wsgi file for your Flask app. This file will load the Flask app into the Apache WSGI process:
+
+- `sudo nano /var/www/bio-web-stats/app.wsgi`
+
+```python
+#!/usr/bin/python3
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, '/var/www/test4/bio-web-stats')
+from bioc_webstats import app
+application = app.create_app()
+
+
+
