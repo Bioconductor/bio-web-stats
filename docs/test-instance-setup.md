@@ -63,4 +63,11 @@ from bioc_webstats import app
 application = app.create_app()
 
 
+**Step 7: Enable the Site and Restart Apache**
+Enable the Apache site for your Flask app and restart Apache:
+
+```bash
+sudo a2ensite app
+sudo systemctl restart apache2
+
 
