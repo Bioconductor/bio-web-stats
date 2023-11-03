@@ -2,6 +2,11 @@
 
 Public accss to Bioconductor package download history
 
+Portions of this code base are derived from 
+[cookie-cutter-flask](https://github.com/cookiecutter-flask/cookiecutter-flask/)
+and used with permission granted under the 
+[MIT license](https://github.com/cookiecutter-flask/cookiecutter-flask/blob/master/LICENSE).
+
 ## Docker Quickstart
 
 This app can be run completely using `Docker` and `docker-compose`. **Using Docker is recommended, as it guarantees the application is run using compatible versions of Python and Node**.
