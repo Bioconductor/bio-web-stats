@@ -15,32 +15,40 @@ from bioc_webstats.models import PackageType, db_valid_thru_date
 
 from .factories import StatsFactory
 
+from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 
-@pytest.fixture(scope="function")
+
+@pytest.fixture
 def app():
     """Create application for the tests."""
+
+    engine = create_engine(
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+
     _app = create_app("tests.settings")
+
     _app.logger.setLevel(logging.CRITICAL)
     ctx = _app.test_request_context()
     ctx.push()
-
     yield _app
-
     ctx.pop()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def testapp(app):
     """Create Webtest app."""
     return TestApp(app)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def db(app):
     """Create database for the tests."""
     _db.app = app
     with app.app_context():
         _db.create_all()
+        generate_small_test_db_stats()
 
     yield _db
 
@@ -55,6 +63,7 @@ database_test_cases = [
     (PackageType.ANNOTATION, "BSgenome.Hsapiens.UCSC.hg38", "2019-01-01"),
     (PackageType.ANNOTATION, "BSgenome.Scerevisiae.UCSC.sacCer3", "2021-01-01"),
 ]
+
 
 def generate_small_test_db_stats():
     """Create list of StatsFactory objects for small test database."""
@@ -87,10 +96,8 @@ def generate_small_test_db_stats():
     return stats
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def stats(db):
     """Create stats for the tests."""
 
-    stats = generate_small_test_db_stats()
-    db.session.commit()
-    return stats
+    return generate_small_test_db_stats()

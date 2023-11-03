@@ -5,12 +5,11 @@ import datetime as dt
 import pytest
 from sqlalchemy import select
 
-from bioc_webstats.models import db_valid_thru_date, PackageType, Stats
+from bioc_webstats.models import PackageType, Stats, db_valid_thru_date
 
 from .factories import StatsFactory
 
 
-@pytest.mark.usefixtures("db", "stats")
 class TestStats:
     """Stats tests."""
 
@@ -36,6 +35,7 @@ class TestStats:
         assert isinstance(stats.category, PackageType)
         assert str(stats.package)
         assert isinstance(stats.date, dt.date)
+        assert bool(stats.is_monthly)
         assert int(stats.ip_count)
         assert int(stats.download_count)
 
@@ -49,7 +49,7 @@ class TestStats:
         expected = ['BSgenome.Hsapiens.UCSC.hg38', 'BSgenome.Scerevisiae.UCSC.sacCer3', 'affy', 'affydata']
 
         # Act
-        result = Stats.get_package_names()
+        result = db.Stats.get_package_names()
 
         # Assert
         assert expected == result
@@ -169,4 +169,3 @@ class TestStats:
 
         # Assert
         assert result == expected
-
