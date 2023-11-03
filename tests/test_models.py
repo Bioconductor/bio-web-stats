@@ -9,7 +9,6 @@ from bioc_webstats.models import PackageType, Stats, db_valid_thru_date
 
 from .factories import StatsFactory
 
-
 class TestStats:
     """Stats tests."""
 

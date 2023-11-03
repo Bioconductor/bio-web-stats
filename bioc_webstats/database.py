@@ -11,6 +11,17 @@ T = TypeVar("T", bound="PkModel")
 Column = db.Column
 relationship = db.relationship
 
+class DictMixin:
+
+    def as_dict(self, exclude=None):
+        if exclude is None:
+            exclude = []
+        table = self.__table__
+        return {
+            field: getattr(self, field)
+            for field in table.columns.keys()
+            if field not in exclude
+        }
 
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
@@ -44,7 +55,7 @@ class CRUDMixin(object):
         return
 
 
-class Model(CRUDMixin, db.Model):
+class Model(CRUDMixin, db.Model, DictMixin):
     """Base model class that includes CRUD convenience methods."""
 
     __abstract__ = True

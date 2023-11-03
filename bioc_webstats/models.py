@@ -43,7 +43,7 @@ def db_valid_thru_date() -> dt.date:
     return dt.date(2023, 10, 4)
 
 class Stats(db.Model):
-    """The table of summary statisttics."""
+    """The table of summary statistics."""
 
     category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
     package: Mapped[str] = mapped_column(String, primary_key=True)
