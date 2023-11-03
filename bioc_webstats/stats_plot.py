@@ -39,7 +39,7 @@ def webstats_plot(data_table: [tuple], plot_title: str):
     # Bar plot for downloads
     ax.bar(index + bar_width, downloads, bar_width, label='Nb of downloads', color=light_blue)
 
-    # TODO Have y-axis scientific notation, want explicit integers
+    # TODO  Have y-axis scientific notation, want explicit integers
     # Labeling and formatting
     ax.set_xlabel('Month')
     ax.set_ylabel('Counts (log scale)')
