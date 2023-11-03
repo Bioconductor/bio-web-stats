@@ -2,12 +2,12 @@
 """User views."""
 from flask import Blueprint, render_template
 
-# TODO here is were the prefix goes argument url_prefix
+# TODO @n1khilmane here is were the prefix goes argument url_prefix
 blueprint = Blueprint("spash", __name__)
-# TODO This is only for initial testing
 
 
-# TODO Exclude this from prod
+
+# TODO @n1khilmane Exclude this from prod
 @blueprint.route("/")
 def home():
     """Home page for testing only."""

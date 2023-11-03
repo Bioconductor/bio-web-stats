@@ -15,7 +15,7 @@ import bioc_webstats.models as db
 from bioc_webstats.models import PackageType
 from bioc_webstats.stats_plot import webstats_plot
 
-# TODO MOVE TO Config/Settings
+# TODO @n1khilmane MOVE TO Config /Settings
 URI_PATH_PREFIX = "/packages/stats"
 
 # Map from incoming page name name to PackageType
