@@ -20,7 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from bioc_webstats.database import db
+from bioc_webstats.database import db, Model
 
 
 class PackageType(enum.Enum):
@@ -35,6 +35,9 @@ def package_type_exists(value: str) -> bool:
     """Is a string a valid PackageType."""
     return value in [e.value for e in PackageType]
 
+def list_to_dict(u) -> [dict]:
+    """Transform list of sqlalchemy results to list of dictionaries."""
+    return [v.as_dict() for v in u]
 
 def db_valid_thru_date() -> dt.date:
     """The date the database was last upated."""
@@ -42,7 +45,7 @@ def db_valid_thru_date() -> dt.date:
     # TODO: Stub--get from DB
     return dt.date(2023, 10, 4)
 
-class Stats(db.Model):
+class Stats(Model):
     """The table of summary statistics."""
 
     category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
@@ -98,7 +101,7 @@ class Stats(db.Model):
             _description_
         """
 
-        where_clause = [Stats.category == category.value]
+        where_clause = [Stats.category == category]
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
             where_clause.append(Stats.package == package)
@@ -142,7 +145,7 @@ class Stats(db.Model):
                 func.sum(Stats.ip_count).label("ip_count"),
                 func.sum(Stats.download_count).label("download_count"),
             )
-            .where(Stats.category == category.value)
+            .where(Stats.category == category)
             .group_by(Stats.date)
             .order_by(asc(Stats.date))
         )
@@ -194,7 +197,7 @@ class Stats(db.Model):
             )
             .where(
                 and_(
-                    Stats.category == category.value,
+                    Stats.category == category,
                     Stats.date.between(start_date, end_date),
                 )
             )

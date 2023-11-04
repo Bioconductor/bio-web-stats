@@ -2,11 +2,12 @@
 # See https://github.com/Jedylemindee/articles/blob/98d163ee70f47b9a8b6fc1f9736822b13defe5ea/flask-pytest.md
 
 import datetime as dt
+import logging
+import math
+from zlib import crc32
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from factory import Sequence
-from flask_migrate import upgrade as flask_migrate_upgrade
 
 from bioc_webstats.app import create_app
 from bioc_webstats.extensions import db as _db
@@ -18,10 +19,11 @@ from .factories import StatsFactory
 @pytest.fixture(scope="session")
 def app():
     app = create_app("../tests/settings.py")
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG) # TODO Improve
     with app.app_context():
         _db.create_all()
-        generate_small_test_db_stats()
-        
+        u = generate_small_test_db_stats()
+        [StatsFactory(**v) for v in u]
         yield app
 
 @pytest.fixture(scope="function")
@@ -70,7 +72,7 @@ database_test_cases = [
 
 
 def generate_small_test_db_stats():
-    """Create list of StatsFactory objects for small test database."""
+    """Create list of dictionary objects corresponding to Stats columns for small test database."""
 
     # TODO Mock EndDate?
     end_date = db_valid_thru_date()
@@ -83,21 +85,23 @@ def generate_small_test_db_stats():
             yield current_date
             current_date += relativedelta(months=1)
 
-    stats = [
-        StatsFactory(
-            category=category,
-            package=package,
-            date=d,
-            is_monthly=True,
-            ip_count=Sequence(lambda n: (n + 1) * 10),
-            download_count=Sequence(lambda n: (n + 1) * 20),
-        )
-        for category, package, start_date in database_test_cases
-        for d in months_sequence(
-            dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date
-        )
-    ]
-    return stats
+    stats_dict = []
+    for category, package, start_date in database_test_cases:
+        for d in months_sequence(dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date):
+            u = {
+                'category': category,
+                'package': package,
+                'date': d,
+                'is_monthly': True
+            }
+
+            s = '|'.join(str(value) for value in u.values())
+            crc = crc32(s.encode('utf-8')) % 9007
+            u["ip_count"] = int(math.ceil(math.sqrt(crc)))
+            u["download_count"] = crc
+            stats_dict.append(u)
+
+    return stats_dict
 
 
 @pytest.fixture(scope="session")

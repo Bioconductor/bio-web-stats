@@ -11,6 +11,7 @@ T = TypeVar("T", bound="PkModel")
 Column = db.Column
 relationship = db.relationship
 
+
 class DictMixin:
 
     def as_dict(self, exclude=None):

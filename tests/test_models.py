@@ -2,12 +2,12 @@
 """Model unit tests."""
 import datetime as dt
 
-import pytest
 from sqlalchemy import select
 
-from bioc_webstats.models import PackageType, Stats, db_valid_thru_date
+from bioc_webstats.models import PackageType, Stats, db_valid_thru_date, list_to_dict
 
 from .factories import StatsFactory
+
 
 class TestStats:
     """Stats tests."""
@@ -39,51 +39,41 @@ class TestStats:
         assert int(stats.download_count)
 
     def test_stats_getall(self, db, stats):
-        result = db.session.scalars(select(Stats)).all()
-        # TODO compare stats to result
-        assert stats == result
-
-    def test_get_package_names(self, db, stats):
+        """Compare contents of stats table with the list of dictionaries from which it was created."""
         # Arrange
-        expected = ['BSgenome.Hsapiens.UCSC.hg38', 'BSgenome.Scerevisiae.UCSC.sacCer3', 'affy', 'affydata']
 
         # Act
-        result = db.Stats.get_package_names()
+        result = db.session.scalars(select(Stats))
+        result = list_to_dict(result)
+
+        # Assert
+        assert stats == result
+
+    def test_get_package_names(self, stats):
+        """Get the complete list of package names in collation sequence."""
+        # Arrange
+        expected = sorted({u["package"] for u in stats})
+
+        # Act
+        result = Stats.get_package_names()
 
         # Assert
         assert expected == result
 
-    # TODO More tests using the stats ficture
-    # TODO Threading problem with fixture?
-
-    def test_get_download_counts_year(self, db, stats):
-        # Arrange
+    # TODO Review database return values for consistency
+    # TODO Verify that we only want dates and counts for this function    
+    def test_get_download_counts_year(self, stats):
+        """Select category, package and year"""
         category = PackageType.BIOC
-        pacakge = "affy"
+        package = "affy"
         year = 2023
-        expected = [
-            Stats(
-                category=PackageType.BIOC,
-                package="affy",
-                date=dt.date(2023, 9, 1),
-                ip_count=10,
-                download_count=20,
-            ),
-            Stats(
-                category=PackageType.BIOC,
-                package="affy",
-                date=dt.date(2023, 10, 1),
-                ip_count=20,
-                download_count=40,
-            ),
-        ]
+        expected = [(x["date"], x["ip_count"], x["download_count"]) for x in stats
+                    if x["category"] == category and x["package"] == package and x["date"].year == year]
 
-        result = Stats.get_download_counts(
-            category=category, package=pacakge, year=year
-        )
+        result = Stats.get_download_counts(category=category, package=package, year=year)
 
         # Assert
-        assert repr(expected) == repr(result)
+        assert expected == result
 
     def test_get_download_counts_full_year(self, db, stats):
         # Arrange
