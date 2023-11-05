@@ -103,7 +103,7 @@ class Stats(Model):
         Returns:
             _description_
         """
-        where_clause = [Stats.category == category.value]  # TODO
+        where_clause = [Stats.category == category]  # TODO
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
             where_clause.append(Stats.package == package)
