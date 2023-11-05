@@ -1,3 +1,4 @@
+"""Create plot for package details."""
 import base64
 import io
 
@@ -19,7 +20,6 @@ def webstats_plot(data_table: [tuple], plot_title: str):
     Returns:
         _description_
     """
-
     # exclude the annual total from the graph.
     months, distinct_ips, downloads = map(list, zip(*[t[1:4] for t in data_table if t[1] != 'all']))
     # Plotting

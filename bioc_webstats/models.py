@@ -31,22 +31,25 @@ class PackageType(enum.Enum):
     ANNOTATION = "annotation"
     WORKFLOW = "workflows"
 
+
 def package_type_exists(value: str) -> bool:
     """Is a string a valid PackageType."""
     return value in [e.value for e in PackageType]
+
 
 def list_to_dict(u) -> [dict]:
     """Transform list of sqlalchemy results to list of dictionaries."""
     return [v.as_dict() for v in u]
 
-def db_valid_thru_date() -> dt.date:
-    """The date the database was last upated."""
 
+def db_valid_thru_date() -> dt.date:
+    """Retrieve date the database was last upated."""
     # TODO: Stub--get from DB
     return dt.date(2023, 10, 4)
 
+
 class Stats(Model):
-    """The table of summary statistics."""
+    """Create table of summary statistics."""
 
     category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
     package: Mapped[str] = mapped_column(String, primary_key=True)
@@ -100,7 +103,6 @@ class Stats(Model):
         Returns:
             _description_
         """
-
         where_clause = [Stats.category == category.value]  # TODO
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
@@ -154,7 +156,7 @@ class Stats(Model):
 
     @staticmethod
     def get_download_scores(category: PackageType) -> [(str, int, int)]:
-        """Returns download a download score for each package.
+        """Return download a download score for each package.
 
         The rank is an ordinal that indicates relative activity.
         Rank = 1 is the most downloaded package in the category, Raank=2 is next, etc.
@@ -178,7 +180,6 @@ class Stats(Model):
             A list of tuples (package_name, score, rank) where rank is the
             numerical rank of the the scores. The results are sorted by package name.
         """
-
         x = db_valid_thru_date()
         # the first of the current month
         y = dt.date(x.year, x.month, 1)

@@ -52,9 +52,9 @@ category_map = {
 
 bp = Blueprint("stats", __name__, url_prefix=PATH)
 
+
 def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
-
     result = defaultdict(list)
 
     for item in sorted(lst, key=lambda x: x[0].upper()):
@@ -66,7 +66,6 @@ def split_to_dict_list(lst):
 
 def result_list_to_visual_list(rows):
     """Transform 3 column databas results to 4 column visual results with dense months."""
-
     dates = set([u[0] for u in rows])
     y0 = min(dates).year
     y1 = max(dates).year
@@ -81,7 +80,7 @@ def result_list_to_visual_list(rows):
 
 
 def query_result_to_text(source):
-    """Transforms tabular query results to string.
+    """Transform tabular query results to string.
 
     The strings are exact replicas of the .tab files found under
     www.bioconductor.org/packages/stats/.../<package>_stats.tab
@@ -102,7 +101,6 @@ def query_result_to_text(source):
 
     def process_one_package(package, rows):
         """For one package produce the result. If package is None, return 4 columns."""
-
         if package is None:
             k = ""
         else:
@@ -189,8 +187,7 @@ def show_package_stats(category, package, package_path=None, year=None):
 @bp.route("/index.html")
 @bp.route("/<category>.html")
 def show_package_summary(category="bioc"):
-    """_summary_."""
-
+    """Render package summary page."""
     selected_category = category_map.get(category, None)
     if selected_category is None:
         abort(404)
@@ -224,7 +221,6 @@ def show_package_summary(category="bioc"):
 @bp.route("<category>/<package>/index.html")
 def show_package_details(category, package=None):
     """Display package detials."""
-
     selected_category = category_map.get(category, None)
     if selected_category is None:
         abort(404)

@@ -74,6 +74,7 @@ def lint(fix_imports, check):
     execute_tool("Formatting style", "black", *black_args)
     execute_tool("Checking code style", "flake8")
 
+
 @click.command()
 def gendb():
     """Generate small test database."""

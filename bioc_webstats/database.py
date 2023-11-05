@@ -25,6 +25,7 @@ class DictMixin:
             if field not in exclude
         }
 
+
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
 

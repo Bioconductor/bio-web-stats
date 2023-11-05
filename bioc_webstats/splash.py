@@ -11,7 +11,6 @@ blueprint = Blueprint("spash", __name__)
 @blueprint.route("/")
 def home():
     """Home page for testing only."""
-
     targets = [
         "/",
         "/data-experiment.html",

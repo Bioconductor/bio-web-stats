@@ -15,7 +15,6 @@ class TestStats:
 
     def test_db_valid_thru_date(self, db):
         """Verify appropriate last dtabase update date."""
-
         # Arrange
         expected = dt.date(2023, 10, 4)
 

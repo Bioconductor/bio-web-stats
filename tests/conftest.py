@@ -1,6 +1,4 @@
-# conftest.py
-# See https://github.com/Jedylemindee/articles/blob/98d163ee70f47b9a8b6fc1f9736822b13defe5ea/flask-pytest.md
-
+"""Initialization for pytests."""
 import datetime as dt
 import logging
 import math
@@ -31,14 +29,16 @@ def app():
 
     ctx.pop()
 
+
 @pytest.fixture(scope="function")
 def test_client(app):
+    """TODO."""
     return app.test_client()
+
 
 @pytest.fixture(scope="session")
 def db(app):
     """Session-wide test database."""
-
     _db.app = app
     with app.app_context():
         _db.create_all()
@@ -54,6 +54,7 @@ def db(app):
 
 @pytest.fixture(scope="function")
 def session(db, request):
+    """Create isolated transaction."""
     db.session.begin_nested()
 
     def commit():
@@ -79,6 +80,7 @@ database_test_cases = [
     (PackageType.ANNOTATION, "BSgenome.Scerevisiae.UCSC.sacCer3", "2021-01-01"),
 ]
 
+
 def create_hashed_counts(d: dict) -> (int, int):
     """Calculate reproducable hashed ip_count and download_count values for test stats rows.
 
@@ -92,16 +94,15 @@ def create_hashed_counts(d: dict) -> (int, int):
     Returns:
         an ordered pair, the hashed ip_count and the hashed download_count
     """
-
     s = '|'.join([str(d.get(tag, "")) for tag in ["category", "package", "date", "is_monthly"]])
     # 9007 is a prime number of a size to give a reasonable hash for test purposes
     download_count = crc32(s.encode('utf-8')) % 9007
     ip_count = int(math.ceil(math.sqrt(download_count)))
     return (ip_count, download_count)
 
+
 def generate_small_test_db_stats():
     """Create list of dictionary objects corresponding to Stats columns for small test database."""
-
     # TODO Mock EndDate?
     end_date = db_valid_thru_date()
 
@@ -129,11 +130,28 @@ def generate_small_test_db_stats():
 
 
 def check_hashed_counts(d: dict) -> bool:
+    """Check that a genearted test data with hashed counts are correct.
+
+    Arguments:
+        d -- Dictionary form of stats table row
+
+    Returns:
+        True ==> The ip_count and download_count matches the calcuated hash
+    """
     ip_count, download_count = create_hashed_counts(d)
     return d.get("ip_count", -1) == ip_count and d.get("download_count", -1) == download_count
 
 
 def check_hashed_count_list(d_list: [dict]) -> bool:
+    """Check that all stats rows in this list have expected hash counts.
+
+    Arguments:
+        d_list -- A list of dictionaries derivd from Stats Rows.
+
+    Returns:
+        True ==> All the rows have the expected count values.
+        False ==> At least one row was incorrect.
+    """
     for r in d_list:
         if not check_hashed_counts(r):
             return False
@@ -143,5 +161,4 @@ def check_hashed_count_list(d_list: [dict]) -> bool:
 @pytest.fixture(scope="session")
 def stats(db):
     """Create stats for the tests."""
-
     return generate_small_test_db_stats()
