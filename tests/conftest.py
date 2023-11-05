@@ -8,6 +8,8 @@ from zlib import crc32
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 
 from bioc_webstats.app import create_app
 from bioc_webstats.extensions import db as _db
@@ -18,30 +20,37 @@ from .factories import StatsFactory
 
 @pytest.fixture(scope="session")
 def app():
-    app = create_app("../tests/settings.py")
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG) # TODO Improve
-    with app.app_context():
-        _db.create_all()
-        u = generate_small_test_db_stats()
-        [StatsFactory(**v) for v in u]
-        yield app
+    """Create application for the tests."""
+    _app = create_app("../tests/settings.py")
+    create_engine('sqlite:///:memory:', connect_args={'check_same_thread': False}, poolclass=StaticPool)
+    _app.logger.setLevel(logging.DEBUG)
+    ctx = _app.test_request_context()
+    ctx.push()
+    
+    yield _app
+    
+    ctx.pop()
 
 @pytest.fixture(scope="function")
 def test_client(app):
     return app.test_client()
 
 @pytest.fixture(scope="session")
-def db(app, request):
+def db(app):
     """Session-wide test database."""
 
-    def teardown():
-        _db.drop_all()
     _db.app = app
+    with app.app_context():
+        _db.create_all()
+        u = generate_small_test_db_stats()
+        [StatsFactory(**v) for v in u]
+        _db.session.commit()
 
-    # TODO Evaluate the need for this
-    # flask_migrate_upgrade(directory="migrations")
-    # request.addfinalizer(teardown)
-    return _db
+    yield _db
+
+    _db.session.close()
+    _db.drop_all()
+
 
 @pytest.fixture(scope="function")
 def session(db, request):
@@ -70,6 +79,25 @@ database_test_cases = [
     (PackageType.ANNOTATION, "BSgenome.Scerevisiae.UCSC.sacCer3", "2021-01-01"),
 ]
 
+def create_hashed_counts(d: dict) -> (int, int):
+    """Calculate reproducable hashed ip_count and download_count values for test stats rows.
+
+    For small database tests, create ip_count and downlooad count values that are a function of the
+    other columns of the stats table. This function is used to both generate the test rows and to check
+    that the test rows return the correct values.
+
+    Arguments:
+        d -- A dictionary containing the tvalues of a stats record
+
+    Returns:
+        an ordered pair, the hashed ip_count and the hashed download_count
+    """
+
+    s = '|'.join([str(d.get(tag, "")) for tag in ["category", "package", "date", "is_monthly"]])
+    # 9007 is a prime number of a size to give a reasonable hash for test purposes
+    download_count = crc32(s.encode('utf-8')) % 9007
+    ip_count = int(math.ceil(math.sqrt(download_count)))
+    return (ip_count, download_count)
 
 def generate_small_test_db_stats():
     """Create list of dictionary objects corresponding to Stats columns for small test database."""
@@ -94,14 +122,22 @@ def generate_small_test_db_stats():
                 'date': d,
                 'is_monthly': True
             }
-
-            s = '|'.join(str(value) for value in u.values())
-            crc = crc32(s.encode('utf-8')) % 9007
-            u["ip_count"] = int(math.ceil(math.sqrt(crc)))
-            u["download_count"] = crc
+            u["ip_count"], u["download_count"] = create_hashed_counts(u)
             stats_dict.append(u)
 
     return stats_dict
+
+
+def check_hashed_counts(d: dict) -> bool:
+    ip_count, download_count = create_hashed_counts(d)
+    return d.get("ip_count", -1) == ip_count and d.get("download_count", -1) == download_count
+
+
+def check_hashed_count_list(d_list: [dict]) -> bool:
+    for r in d_list:
+        if not check_hashed_counts(r):
+            return False
+    return True
 
 
 @pytest.fixture(scope="session")

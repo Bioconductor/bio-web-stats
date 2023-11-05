@@ -1,14 +1,16 @@
-# -*- coding: utf-8 -*-
 """Model unit tests."""
 import datetime as dt
 
+import pytest
 from sqlalchemy import select
 
 from bioc_webstats.models import PackageType, Stats, db_valid_thru_date, list_to_dict
 
+from .conftest import check_hashed_count_list
 from .factories import StatsFactory
 
 
+@pytest.mark.usefixtures("db")
 class TestStats:
     """Stats tests."""
 
@@ -27,16 +29,18 @@ class TestStats:
     def test_statsfactory_types(self, db):
         """Test stats factory."""
         # Arrange
-        stats = StatsFactory()
+
         # Act
-        db.session.commit()
+        results = db.session.execute(select(Stats))
+        result = next(results, None)[0]
+
         # Assert
-        assert isinstance(stats.category, PackageType)
-        assert str(stats.package)
-        assert isinstance(stats.date, dt.date)
-        assert bool(stats.is_monthly)
-        assert int(stats.ip_count)
-        assert int(stats.download_count)
+        assert isinstance(result.category, PackageType)
+        assert str(result.package)
+        assert isinstance(result.date, dt.date)
+        assert bool(result.is_monthly)
+        assert int(result.ip_count)
+        assert int(result.download_count)
 
     def test_stats_getall(self, db, stats):
         """Compare contents of stats table with the list of dictionaries from which it was created."""
@@ -47,6 +51,7 @@ class TestStats:
         result = list_to_dict(result)
 
         # Assert
+        assert check_hashed_count_list(result)
         assert stats == result
 
     def test_get_package_names(self, stats):
@@ -61,7 +66,7 @@ class TestStats:
         assert expected == result
 
     # TODO Review database return values for consistency
-    # TODO Verify that we only want dates and counts for this function    
+    # TODO Verify that we only want dates and counts for this function
     def test_get_download_counts_year(self, stats):
         """Select category, package and year"""
         category = PackageType.BIOC
@@ -75,84 +80,49 @@ class TestStats:
         # Assert
         assert expected == result
 
-    def test_get_download_counts_full_year(self, db, stats):
+    def test_get_download_counts_full_year(self, stats):
         # Arrange
         #
         category = PackageType.ANNOTATION
         package = "BSgenome.Hsapiens.UCSC.hg38"
         year = 2022
+        expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats 
+                    if d["category"] == category and d["package"] == package and d["date"].year == year]
 
         result = Stats.get_download_counts(
             category=category, package=package, year=year
         )
 
         # Assert
-        # TODO CHeck the results (maybe with snapshot)
-        assert True
+        assert result == expected
 
-    def test_get_download_counts_package(self, db, stats):
+    def test_get_download_counts_package(self, stats):
         # Arrange
         #
         category = PackageType.ANNOTATION
         package = "BSgenome.Hsapiens.UCSC.hg38"
+        expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats
+                    if d["category"] == category and d["package"] == package]
 
         result = Stats.get_download_counts(category=category, package=package)
 
         # Assert
-        # TODO CHeck the reulsts (maybe with snapshot)
-        assert True
+        assert result == expected
 
-    def test_get_download_counts_category(self, db, stats):
+    def test_get_download_counts_category(self, stats):
         # Arrange
-        #
         category = PackageType.BIOC
-        expected = [
-            Stats(
-                category=PackageType.BIOC,
-                package="affy",
-                date="2023-09-01",
-                ip_count=10,
-                download_count=20,
-            ),
-            Stats(
-                category=PackageType.BIOC,
-                package="affy",
-                date="2023-10-01",
-                ip_count=20,
-                download_count=40,
-            ),
-            Stats(
-                category=PackageType.BIOC,
-                package="affydata",
-                date="2023-08-01",
-                ip_count=30,
-                download_count=60,
-            ),
-            Stats(
-                category=PackageType.BIOC,
-                package="affydata",
-                date="2023-09-01",
-                ip_count=40,
-                download_count=80,
-            ),
-            Stats(
-                category=PackageType.BIOC,
-                package="affydata",
-                date="2023-10-01",
-                ip_count=50,
-                download_count=100,
-            ),
-        ]
+        expected = [(d["package"], d["date"], d["ip_count"], d["download_count"]) for d in stats if d["category"] == category]
 
         result = Stats.get_download_counts(category=category)
 
         # Assert
-        assert repr(expected) == repr(result)
+        assert result == expected
 
-    def test_get_download_scores(self, db, stats):
+    def test_get_download_scores(self, stats):
         # Arrange
         category = PackageType.BIOC
-        expected = [('affy', 0, 2), ('affydata', 5, 1)]
+        expected = [('affy', 2, 2), ('affydata', 7, 1)]
 
         result = Stats.get_download_scores(category=category)
 
