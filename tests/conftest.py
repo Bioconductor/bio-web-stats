@@ -8,6 +8,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
+from webtest import TestApp
 
 from bioc_webstats.app import create_app
 from bioc_webstats.extensions import db as _db
@@ -30,12 +31,6 @@ def app():
     ctx.pop()
 
 
-@pytest.fixture(scope="function")
-def test_client(app):
-    """TODO."""
-    return app.test_client()
-
-
 @pytest.fixture(scope="session")
 def db(app):
     """Session-wide test database."""
@@ -50,6 +45,12 @@ def db(app):
 
     _db.session.close()
     _db.drop_all()
+
+
+@pytest.fixture(scope="session")
+def webapp(app, db):
+    """Fixture for app test."""
+    return TestApp(app)
 
 
 @pytest.fixture(scope="function")

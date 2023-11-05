@@ -15,8 +15,8 @@ import bioc_webstats.models as db
 from bioc_webstats.models import PackageType
 from bioc_webstats.stats_plot import webstats_plot
 
-# TODO Move to config
-PATH = "/packages/stats"
+# TODO MOVE TO Config/Settings
+URI_PATH_PREFIX = "/packages/stats"
 
 # Map from incoming page name name to PackageType
 category_map = {
@@ -50,7 +50,7 @@ category_map = {
     },
 }
 
-bp = Blueprint("stats", __name__, url_prefix=PATH)
+bp = Blueprint("stats", __name__, url_prefix=URI_PATH_PREFIX)
 
 
 def split_to_dict_list(lst):
