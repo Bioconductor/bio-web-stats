@@ -18,5 +18,5 @@ SECRET_KEY = env.str("SECRET_KEY")
 SEND_FILE_MAX_AGE_DEFAULT = env.int("SEND_FILE_MAX_AGE_DEFAULT")
 DEBUG_TB_ENABLED = DEBUG
 DEBUG_TB_INTERCEPT_REDIRECTS = False
-CACHE_TYPE = "SimpleCache" # Can be "MemcachedCache", "RedisCache", etc.
+CACHE_TYPE = "SimpleCache"  # Can be "MemcachedCache", "RedisCache", etc.
 SQLALCHEMY_TRACK_MODIFICATIONS = False

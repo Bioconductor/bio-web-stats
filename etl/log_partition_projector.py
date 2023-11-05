@@ -1,7 +1,6 @@
 #! /bin/python
-from os import environ
-import sys
 import argparse
+from os import environ
 
 import boto3
 
@@ -22,7 +21,7 @@ def log_partition_projector(
     dryrun: bool,
     first: str
 ) -> int:
-    
+
     s3 = boto3.client('s3')
 
     def fetch_objects(bucket_name, prefix):
@@ -39,7 +38,7 @@ def log_partition_projector(
 
             response = s3.list_objects_v2(**list_kwargs)
             yield from response.get('Contents', [])
-            
+
             if not response.get('IsTruncated'):  # Stop iteration if no more files
                 break
 
@@ -61,13 +60,13 @@ def log_partition_projector(
         print(new_key)
         object_count += 1
         if not dryrun:
-            result = s3.copy_object(
+            s3.copy_object(
                 Bucket=destination_bucket,
                 CopySource={"Bucket": source_bucket, "Key": filename},
                 Key=new_key,
             )
         pass
-            
+
     print(f"{object_count} objects rearranged.")
     return 0
 
@@ -88,10 +87,10 @@ if __name__ == "__main__":
         "-m", "--move", action="store_true", help="If move then source will be deleted"
     )
     parser.add_argument("--dryrun", action="store_true", help="Run in dry-run mode")
-    
+
     # HACK cli: aws --profile prod sso login
     environ["AWS_PROFILE"] = "prod"
-    
+
     test_args = "-s bioc-cloudfront-logs -d web-stats-dev -n weblogs -f E1TVLJONPTUXV3.2023-05".split(" ")
     # TODO DEBUG ONLY
     args = parser.parse_args(test_args)

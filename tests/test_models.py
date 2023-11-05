@@ -7,7 +7,6 @@ from sqlalchemy import select
 from bioc_webstats.models import PackageType, Stats, db_valid_thru_date, list_to_dict
 
 from .conftest import check_hashed_count_list
-from .factories import StatsFactory
 
 
 @pytest.mark.usefixtures("db")
@@ -68,7 +67,7 @@ class TestStats:
     # TODO Review database return values for consistency
     # TODO Verify that we only want dates and counts for this function
     def test_get_download_counts_year(self, stats):
-        """Select category, package and year"""
+        """Select category, package and year."""
         category = PackageType.BIOC
         package = "affy"
         year = 2023
@@ -81,12 +80,13 @@ class TestStats:
         assert expected == result
 
     def test_get_download_counts_full_year(self, stats):
+        """Select one full year of download counts."""
         # Arrange
         #
         category = PackageType.ANNOTATION
         package = "BSgenome.Hsapiens.UCSC.hg38"
         year = 2022
-        expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats 
+        expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats
                     if d["category"] == category and d["package"] == package and d["date"].year == year]
 
         result = Stats.get_download_counts(
@@ -97,6 +97,7 @@ class TestStats:
         assert result == expected
 
     def test_get_download_counts_package(self, stats):
+        """Select all the download counts for a given package."""
         # Arrange
         #
         category = PackageType.ANNOTATION
@@ -110,9 +111,11 @@ class TestStats:
         assert result == expected
 
     def test_get_download_counts_category(self, stats):
+        """Select all the download counts for a given category."""
         # Arrange
         category = PackageType.BIOC
-        expected = [(d["package"], d["date"], d["ip_count"], d["download_count"]) for d in stats if d["category"] == category]
+        expected = [(d["package"], d["date"], d["ip_count"], d["download_count"])
+                    for d in stats if d["category"] == category]
 
         result = Stats.get_download_counts(category=category)
 
@@ -120,6 +123,7 @@ class TestStats:
         assert result == expected
 
     def test_get_download_scores(self, stats):
+        """Select all the scores for a given category."""
         # Arrange
         category = PackageType.BIOC
         expected = [('affy', 2, 2), ('affydata', 7, 1)]

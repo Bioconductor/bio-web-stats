@@ -20,7 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from bioc_webstats.database import db, Model
+from bioc_webstats.database import Model, db
 
 
 class PackageType(enum.Enum):
@@ -101,7 +101,7 @@ class Stats(Model):
             _description_
         """
 
-        where_clause = [Stats.category == category]
+        where_clause = [Stats.category == category.value]  # TODO
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
             where_clause.append(Stats.package == package)

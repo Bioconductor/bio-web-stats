@@ -26,9 +26,9 @@ def app():
     _app.logger.setLevel(logging.DEBUG)
     ctx = _app.test_request_context()
     ctx.push()
-    
+
     yield _app
-    
+
     ctx.pop()
 
 @pytest.fixture(scope="function")

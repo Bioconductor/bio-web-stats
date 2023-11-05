@@ -2,7 +2,6 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from typing import Optional, Type, TypeVar
 
-from .compat import basestring
 from .extensions import db
 
 T = TypeVar("T", bound="PkModel")
@@ -13,8 +12,10 @@ relationship = db.relationship
 
 
 class DictMixin:
+    """Add-in class for SQLAlchemy tables to transform Rows into Dictionaries."""
 
     def as_dict(self, exclude=None):
+        """Self-explanitory."""
         if exclude is None:
             exclude = []
         table = self.__table__
@@ -73,7 +74,7 @@ class PkModel(Model):
         """Get record by ID."""
         if any(
             (
-                isinstance(record_id, basestring) and record_id.isdigit(),
+                isinstance(record_id, (str, bytes)) and record_id.isdigit(),
                 isinstance(record_id, (int, float)),
             )
         ):
