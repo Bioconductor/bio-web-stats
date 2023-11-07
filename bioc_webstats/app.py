@@ -6,6 +6,7 @@ import sys
 from flask import Flask, render_template
 
 from bioc_webstats import commands, splash, stats
+
 from bioc_webstats.extensions import (
     cache,
     csrf_protect,
@@ -14,6 +15,8 @@ from bioc_webstats.extensions import (
     flask_static_digest,
     migrate,
 )
+import os
+is_production = os.environ.get('FLASK_ENV') == 'production'
 
 
 def create_app(config_filename="settings.py"):
@@ -46,7 +49,8 @@ def register_extensions(app):
 def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(stats.bp)
-    app.register_blueprint(splash.blueprint)
+    if not is_production:
+        app.register_blueprint(splash.blueprint)
     return None
 
 
