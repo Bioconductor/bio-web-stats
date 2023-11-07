@@ -2,7 +2,7 @@
 """The app module, containing the app factory function."""
 import logging
 import sys
-
+import os
 from flask import Flask, render_template
 
 from bioc_webstats import commands, splash, stats
@@ -15,7 +15,8 @@ from bioc_webstats.extensions import (
     flask_static_digest,
     migrate,
 )
-import os
+
+# Check if the application is in production mode
 is_production = os.environ.get('FLASK_ENV') == 'production'
 
 
