@@ -1,6 +1,3 @@
-import pandas as pd
-from sqlalchemy import create_engine
-
 """utility for converting parquet files to sqlite3.
 
 1. download the parquet files from S3
@@ -8,6 +5,9 @@ from sqlalchemy import create_engine
 for f in  ~/temp/parquet//*; do mv "$f" "$f.parquet"; done
 3. Run this script
 """
+
+import pandas as pd
+from sqlalchemy import create_engine
 
 """
 CREATE TABLE stats (

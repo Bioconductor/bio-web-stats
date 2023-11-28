@@ -12,7 +12,7 @@ from datetime import date
 from flask import Blueprint, Response, abort, render_template
 
 import bioc_webstats.models as db
-from bioc_webstats.models import PackageType
+from bioc_webstats.models import PackageType, WebstatsInfo
 from bioc_webstats.stats_plot import webstats_plot
 
 # TODO @n1khilmane MOVE TO Config /Settings
@@ -208,7 +208,7 @@ def show_package_summary(category="bioc"):
         category=category_enum,
         category_name=selected_category["description"],
         category_url_stem=selected_category["stem"],
-        generated_date=db.db_valid_thru_date(),
+        generated_date=WebstatsInfo.get_valid_thru_date(),
         top=top,
         scores=split_to_dict_list(scores),
     )
@@ -254,6 +254,6 @@ def show_package_details(category, package=None):
         category_name=category_name,
         category_stem=selected_category["stem"],
         package=package,
-        generated_date=db.db_valid_thru_date(),
+        generated_date=WebstatsInfo.get_valid_thru_date(),
         data_list=data_list
     )

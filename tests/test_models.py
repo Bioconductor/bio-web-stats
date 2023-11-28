@@ -4,7 +4,7 @@ import datetime as dt
 import pytest
 from sqlalchemy import select
 
-from bioc_webstats.models import PackageType, Stats, db_valid_thru_date, list_to_dict
+from bioc_webstats.models import PackageType, Stats, WebstatsInfo, list_to_dict
 
 from .conftest import check_hashed_count_list
 
@@ -13,13 +13,13 @@ from .conftest import check_hashed_count_list
 class TestStats:
     """Stats tests."""
 
-    def test_db_valid_thru_date(self, db):
+    def test_db_valid_thru_date(self, webstatsinfo):
         """Verify appropriate last dtabase update date."""
         # Arrange
         expected = dt.date(2023, 10, 4)
 
         # Act
-        result = db_valid_thru_date()
+        result = WebstatsInfo.get_valid_thru_date()
 
         # Assert
         assert result == expected

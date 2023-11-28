@@ -42,10 +42,29 @@ def list_to_dict(u) -> [dict]:
     return [v.as_dict() for v in u]
 
 
-def db_valid_thru_date() -> dt.date:
-    """Retrieve date the database was last upated."""
-    # TODO: Stub--get from DB
-    return dt.date(2023, 10, 4)
+class WebstatsInfo(Model):
+    """Table of state information and application metadata."""
+
+    key: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        comment="Metadata key."
+    )
+    value: Mapped[str] = mapped_column(
+        String,
+        nullable=True,
+        comment="Metadata value."
+    )
+
+    from sqlalchemy.ext.declarative import declarative_base
+
+    @staticmethod
+    def get_valid_thru_date() -> dt.date:
+        """Retrieve date the database was last upated."""
+        x = db.session.scalars(
+            select(WebstatsInfo.value).where(WebstatsInfo.key == "ValidThru")
+        ).fetchall()[0]  # TODO fetch first
+        return dt.datetime.strptime(x, "%Y-%m-%d").date()
 
 
 class Stats(Model):
@@ -156,7 +175,7 @@ class Stats(Model):
 
     @staticmethod
     def get_download_scores(category: PackageType) -> [(str, int, int)]:
-        """Return download a download score for each package.
+        """Return a download score for each package.
 
         The rank is an ordinal that indicates relative activity.
         Rank = 1 is the most downloaded package in the category, Raank=2 is next, etc.
@@ -180,7 +199,7 @@ class Stats(Model):
             A list of tuples (package_name, score, rank) where rank is the
             numerical rank of the the scores. The results are sorted by package name.
         """
-        x = db_valid_thru_date()
+        x = WebstatsInfo.get_valid_thru_date()
         # the first of the current month
         y = dt.date(x.year, x.month, 1)
         # the last day of the prior month

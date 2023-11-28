@@ -6,15 +6,17 @@ from zlib import crc32
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 from webtest import TestApp
 
 from bioc_webstats.app import create_app
 from bioc_webstats.extensions import db as _db
-from bioc_webstats.models import PackageType, db_valid_thru_date
+from bioc_webstats.models import PackageType
 
-from .factories import StatsFactory
+from .factories import StatsFactory, WebstatsInfoFactory
 
 
 @pytest.fixture(scope="session")
@@ -32,13 +34,15 @@ def app():
 
 
 @pytest.fixture(scope="session")
-def db(app):
+def db(app: Flask):
     """Session-wide test database."""
     _db.app = app
     with app.app_context():
         _db.create_all()
         u = generate_small_test_db_stats()
         [StatsFactory(**v) for v in u]
+        u = [{'key': 'ValidThru',  'value': '2023-10-04'}]
+        [WebstatsInfoFactory(**v) for v in u]
         _db.session.commit()
 
     yield _db
@@ -48,13 +52,13 @@ def db(app):
 
 
 @pytest.fixture(scope="session")
-def webapp(app, db):
+def webapp(app: Flask, db: SQLAlchemy):
     """Fixture for app test."""
     return TestApp(app)
 
 
 @pytest.fixture(scope="function")
-def session(db, request):
+def session(db: SQLAlchemy, request: pytest.FixtureRequest):
     """Create isolated transaction."""
     db.session.begin_nested()
 
@@ -81,6 +85,8 @@ database_test_cases = [
     (PackageType.ANNOTATION, "BSgenome.Scerevisiae.UCSC.sacCer3", "2021-01-01"),
 ]
 
+database_test_valid_date = dt.date(2023, 10, 4)
+
 
 def create_hashed_counts(d: dict) -> (int, int):
     """Calculate reproducable hashed ip_count and download_count values for test stats rows.
@@ -104,8 +110,7 @@ def create_hashed_counts(d: dict) -> (int, int):
 
 def generate_small_test_db_stats():
     """Create list of dictionary objects corresponding to Stats columns for small test database."""
-    # TODO Mock EndDate?
-    end_date = db_valid_thru_date()
+    end_date = database_test_valid_date
 
     def months_sequence(start_date: dt.date, end_date: dt.date):
         """Yield the first day of each month from start_date to end_date inclusive."""
@@ -160,6 +165,12 @@ def check_hashed_count_list(d_list: [dict]) -> bool:
 
 
 @pytest.fixture(scope="session")
-def stats(db):
+def webstatsinfo(db: SQLAlchemy):
+    """Create WebstatsInfo for the tests."""
+    return generate_small_test_db_stats()
+
+
+@pytest.fixture(scope="session")
+def stats(db: SQLAlchemy):
     """Create stats for the tests."""
     return generate_small_test_db_stats()

@@ -6,7 +6,7 @@ from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
 from bioc_webstats.database import db
-from bioc_webstats.models import PackageType, Stats
+from bioc_webstats.models import PackageType, Stats, WebstatsInfo
 
 
 class BaseFactory(SQLAlchemyModelFactory):
@@ -17,6 +17,18 @@ class BaseFactory(SQLAlchemyModelFactory):
 
         abstract = True
         sqlalchemy_session = db.session
+
+
+class WebstatsInfoFactory(BaseFactory):
+    """WebstatsInfo factory."""
+
+    key = "ValidThru"
+    value = "2023-10-04"
+
+    class Meta:
+        """Factory configuration."""
+
+        model = WebstatsInfo
 
 
 class StatsFactory(BaseFactory):
