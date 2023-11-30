@@ -136,7 +136,7 @@ def query_result_to_text(source):
 @bp.route("/bioc/bioc_packages.txt")
 def show_packages():
     """_summary_."""
-    payload = db.Stats.get_package_names()
+    payload = db.Packages.get_package_names()
     text = ("\n").join(payload)
     return Response(text, content_type="text/plain")
 

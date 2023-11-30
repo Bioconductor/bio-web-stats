@@ -6,7 +6,7 @@ from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
 from bioc_webstats.database import db
-from bioc_webstats.models import PackageType, Stats, WebstatsInfo
+from bioc_webstats.models import Packages, PackageType, Stats, WebstatsInfo
 
 
 class BaseFactory(SQLAlchemyModelFactory):
@@ -45,3 +45,14 @@ class StatsFactory(BaseFactory):
         """Factory configuration."""
 
         model = Stats
+
+
+class PackagesFactory(BaseFactory):
+    """Stats factory."""
+
+    package = Sequence(lambda n: f"pack{n}")
+
+    class Meta:
+        """Factory configuration."""
+
+        model = Packages

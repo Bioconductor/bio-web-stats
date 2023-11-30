@@ -16,7 +16,7 @@ from bioc_webstats.app import create_app
 from bioc_webstats.extensions import db as _db
 from bioc_webstats.models import PackageType
 
-from .factories import StatsFactory, WebstatsInfoFactory
+from .factories import PackagesFactory, StatsFactory, WebstatsInfoFactory
 
 
 @pytest.fixture(scope="session")
@@ -43,6 +43,8 @@ def db(app: Flask):
         [StatsFactory(**v) for v in u]
         u = [{'key': 'ValidThru',  'value': '2023-10-04'}]
         [WebstatsInfoFactory(**v) for v in u]
+        u = u = [{'package': v} for v in generate_small_test_db_packages()]
+        [PackagesFactory(**v) for v in u]
         _db.session.commit()
 
     yield _db
@@ -108,6 +110,11 @@ def create_hashed_counts(d: dict) -> (int, int):
     return (ip_count, download_count)
 
 
+def generate_small_test_db_packages():
+    """Create list of package names in the small_test database."""
+    return [u for _, u, _ in database_test_cases]
+
+
 def generate_small_test_db_stats():
     """Create list of dictionary objects corresponding to Stats columns for small test database."""
     end_date = database_test_valid_date
@@ -167,10 +174,16 @@ def check_hashed_count_list(d_list: [dict]) -> bool:
 @pytest.fixture(scope="session")
 def webstatsinfo(db: SQLAlchemy):
     """Create WebstatsInfo for the tests."""
-    return generate_small_test_db_stats()
+    return
 
 
 @pytest.fixture(scope="session")
 def stats(db: SQLAlchemy):
     """Create stats for the tests."""
     return generate_small_test_db_stats()
+
+
+@pytest.fixture(scope="session")
+def packages(db: SQLAlchemy):
+    """Create packages for the tests."""
+    return generate_small_test_db_packages()

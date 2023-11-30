@@ -4,7 +4,13 @@ import datetime as dt
 import pytest
 from sqlalchemy import select
 
-from bioc_webstats.models import PackageType, Stats, WebstatsInfo, list_to_dict
+from bioc_webstats.models import (
+    Packages,
+    PackageType,
+    Stats,
+    WebstatsInfo,
+    list_to_dict,
+)
 
 from .conftest import check_hashed_count_list
 
@@ -52,13 +58,13 @@ class TestStats:
         assert check_hashed_count_list(result)
         assert stats == result
 
-    def test_get_package_names(self, stats):
+    def test_get_package_names(self, packages):
         """Get the complete list of package names in collation sequence."""
         # Arrange
-        expected = sorted({u["package"] for u in stats})
+        expected = sorted(packages)
 
         # Act
-        result = Stats.get_package_names()
+        result = Packages.get_package_names()
 
         # Assert
         assert expected == result

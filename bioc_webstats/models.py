@@ -67,6 +67,19 @@ class WebstatsInfo(Model):
         return dt.datetime.strptime(x, "%Y-%m-%d").date()
 
 
+class Packages(Model):
+    """All Package Names from git.bioconductor.org."""
+
+    package: Mapped[str] = mapped_column(String, primary_key=True)
+
+    @staticmethod
+    def get_package_names():
+        """Return all the package names."""
+        return db.session.scalars(
+            select(Packages.package).order_by(Packages.package.asc())
+        ).fetchall()
+
+
 class Stats(Model):
     """Create table of summary statistics."""
 
@@ -98,13 +111,6 @@ class Stats(Model):
             f"date='{self.date}', ip_count={self.ip_count}, "
             f"download_count={self.download_count})"
         )
-
-    @staticmethod
-    def get_package_names():
-        """Return all the package names."""
-        return db.session.scalars(
-            select(Stats.package).distinct().order_by(Stats.package.asc())
-        ).fetchall()
 
     @staticmethod
     def get_download_counts(
