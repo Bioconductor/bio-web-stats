@@ -25,6 +25,7 @@ category_map = {
         "description": "software",
         "package_index_page": "index",
         "stem": "bioc",
+        "tab_page_prefix": "bioc",
         "top": 75,
     },
     "data-annotation": {
@@ -32,6 +33,7 @@ category_map = {
         "description": "annotation",
         "package_index_page": "data-annotation",
         "stem": "data-annotation",
+        "tab_page_prefix": "annotation",
         "top": 30,
     },
     "data-experiment": {
@@ -39,6 +41,7 @@ category_map = {
         "description": "experiment",
         "package_index_page": "data-experiment",
         "stem": "data-experiment",
+        "tab_page_prefix": "experiment",
         "top": 15,
     },
     "workflows": {
@@ -46,6 +49,7 @@ category_map = {
         "description": "workflow",
         "package_index_page": "workflows",
         "stem": "workflows",
+        "tab_page_prefix": "workflows",
         "top": 0,
     },
 }
@@ -146,9 +150,15 @@ def show_package_scores(category, package):
     """_summary_."""
     # We match the legacy system, where both the path and the file_name included the category
 
-    # if for category, in a form like this; /bio/bioc_pkg_scores.tab
-    if category == package and db.package_type_exists(category):
-        payload = db.Stats.get_download_scores(category=PackageType(category))
+    # if for category, in a form like this; /bio/bioc_pkg_scores.tab, or /data-annotation/annotation.pkg_scores.tab
+    # `category_map` is a dictionary that maps the category names to their
+    # corresponding information. Each category has a set of attributes such as the
+    # package type, description, package index page, stem, tab page prefix, and
+    # top count. This mapping is used in various parts of the code to retrieve the
+    # relevant information based on the category name.
+    selected_category = category_map.get(category, None)
+    if selected_category is not None and package == selected_category["tab_page_prefix"]:
+        payload = db.Stats.get_download_scores(category=selected_category["category"])
     else:
         abort(404)
     text = "Package\tDownload_score\n" + "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
@@ -208,6 +218,7 @@ def show_package_summary(category="bioc"):
         category=category_enum,
         category_name=selected_category["description"],
         category_url_stem=selected_category["stem"],
+        tab_page_prefix=selected_category["tab_page_prefix"],
         generated_date=WebstatsInfo.get_valid_thru_date(),
         top=top,
         scores=split_to_dict_list(scores),
