@@ -102,3 +102,7 @@ env/
 
 # Development database
 /instance
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
