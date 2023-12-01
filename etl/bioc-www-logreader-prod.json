@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1701459421763",
+    "Statement": [
+        {
+            "Sid": "Stmt1701459373427",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::931729544676:root"
+            },
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListMultipartUploadParts",
+                "s3:AbortMultipartUpload"
+            ],
+            "Resource": [
+                "arn:aws:s3:::bioc-cloudfront-logs",
+                "arn:aws:s3:::bioc-cloudfront-logs/*"
+            ]
+        }
+    ]
+}

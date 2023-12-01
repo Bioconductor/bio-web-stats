@@ -1,7 +1,6 @@
-/*
-Athena SQL to expose www.biconductor.org web logs as a SQL table
-TODO: Add dynamic partition projection on year and month
-*/
+-- Athena SQL to expose www.biconductor.org web logs as a SQL table
+-- TODO: Add dynamic partition projection on year and month
+
 CREATE EXTERNAL TABLE `bioc_web_logs`(
   `date` date COMMENT '', 
   `time` string COMMENT '', 
@@ -43,7 +42,7 @@ STORED AS INPUTFORMAT
 OUTPUTFORMAT 
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://web-stats-dev/weblogs/'
+  's3://bioc-cloudfront-logs/'
 TBLPROPERTIES (
   'areColumnsQuoted'='false', 
   'classification'='csv', 
