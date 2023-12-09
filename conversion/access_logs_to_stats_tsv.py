@@ -50,6 +50,8 @@ chunk_size = 1000000
 for year in range(2009, 2021):
     source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
     status_colname = 'errorcode' if year < 2019 else 'statuscude'
+    # left(ips) due to cruft in the ip address column
+    # name change as of 2019 errorcode -> statuscode
     sql_select_command = f"""
         select strftime(
                 '%Y-%m-%d',
@@ -69,7 +71,7 @@ for year in range(2009, 2021):
                     when 'Dec' then '12'
                 end || '-' || substr(day_month_year, 1, 2)
             ) AS "date",
-            ips as "c-ip",
+            left(ips, 30) as "c-ip",
             {status_colname} as "sc-status",
             biocrepo as "category",
             "package"
