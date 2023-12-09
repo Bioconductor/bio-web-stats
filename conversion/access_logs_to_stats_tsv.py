@@ -7,11 +7,6 @@ import sqlite3
 from datetime import datetime as dt
 
 from psql_connection import psql_get_connection
-year = "2021"
-source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
-chunk_size = 1000000
-start_at = 0
-output_path = '/home/ubuntu'
 
 sql_select_command = """
 select strftime(
@@ -75,7 +70,11 @@ def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
     target_connection.close()
     return record_count
 
+chunk_size = 1000000
 
-print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
-record_count = export_chunked_tsv(source_db, sql_select_command, chunk_size)
-print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + " Total records=" + str(record_count))
+
+for year in range(2009, 2021):
+    source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
+    print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
+    record_count = export_chunked_tsv(source_db, sql_select_command, chunk_size)
+    print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + " Total records=" + str(record_count))
