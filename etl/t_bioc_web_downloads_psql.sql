@@ -6,3 +6,5 @@ CREATE TABLE "bioc_web_downloads"(
   "sc-status" INTEGER, 
   "category" varchar(16), 
   "package" varchar(64))
+
+CREATE INDEX idx_date ON bioc_web_downloads ("date", "c-ip", "category", "package")

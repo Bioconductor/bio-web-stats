@@ -7,9 +7,10 @@ import sqlite3
 from datetime import datetime as dt
 
 from psql_connection import psql_get_connection
-year = "2022"
+year = "2021"
 source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
 chunk_size = 1000000
+start_at = 0
 output_path = '/home/ubuntu'
 
 sql_select_command = """
@@ -39,7 +40,7 @@ from access_log
 """
 
 
-def export_chunked_tsv(db_path, query, chunk_size, output_path):
+def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
     """Export the table in chunks."""
 
     target_connection = psql_get_connection()
@@ -47,7 +48,8 @@ def export_chunked_tsv(db_path, query, chunk_size, output_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    offset = 0
+    record_count = 0
+    offset = start_at
     while True:
         with io.StringIO() as f:
             writer = csv.writer(f, delimiter='\t')
@@ -62,6 +64,7 @@ def export_chunked_tsv(db_path, query, chunk_size, output_path):
             target_cursor = target_connection.cursor()
             target_cursor.copy_from(f, 'bioc_web_downloads')
             target_connection.commit()
+            record_count += len(rows)
             target_cursor.close()
             # end with
             print(offset)
@@ -70,8 +73,9 @@ def export_chunked_tsv(db_path, query, chunk_size, output_path):
 
     conn.close()
     target_connection.close()
+    return record_count
 
 
 print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
-export_chunked_tsv(source_db, sql_select_command, chunk_size, output_path)
-print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
+record_count = export_chunked_tsv(source_db, sql_select_command, chunk_size)
+print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + " Total records=" + str(record_count))
