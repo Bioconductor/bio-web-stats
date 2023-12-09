@@ -47,7 +47,7 @@ def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
 chunk_size = 1000000
 
 
-for year in range(2009, 2021):
+for year in range(2011, 2021):
     source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
     status_colname = 'errorcode' if year < 2019 else 'statuscude'
     # left(ips) due to cruft in the ip address column
@@ -71,7 +71,7 @@ for year in range(2009, 2021):
                     when 'Dec' then '12'
                 end || '-' || substr(day_month_year, 1, 2)
             ) AS "date",
-            left(ips, 30) as "c-ip",
+            SUBSTR(ips, 1, 30) as "c-ip",
             {status_colname} as "sc-status",
             biocrepo as "category",
             "package"
@@ -79,4 +79,4 @@ for year in range(2009, 2021):
         """
     print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
     record_count = export_chunked_tsv(source_db, sql_select_command, chunk_size)
-    print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + " Total records=" + str(record_count))
+    print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + "Year=" + str(year) + " Total records=" + str(record_count))
