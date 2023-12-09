@@ -1,11 +1,15 @@
 """Export access_log tables from server stats.bioconductor.org."""
 import csv
+import io
 import gzip
+import psycopg2
 import sqlite3
+from datetime import datetime as dt
 
+from psql_connection import psql_get_connection
 year = "2022"
 source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
-chunk_size = 10000
+chunk_size = 1000000
 output_path = '/home/ubuntu'
 
 sql_select_command = """
@@ -29,20 +33,23 @@ select strftime(
     ) AS "date",
     ips as "c-ip",
     statuscode as "sc-status",
-    "url" as "cs-uri-stem"
+    biocrepo as "category",
+    "package"
 from access_log
 """
 
 
 def export_chunked_tsv(db_path, query, chunk_size, output_path):
     """Export the table in chunks."""
+
+    target_connection = psql_get_connection()
+    
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     offset = 0
     while True:
-        output_file = f"{output_path}/stats_{year}_{offset}.tsv.gz"
-        with gzip.open(output_file, 'wt', newline='') as f:
+        with io.StringIO() as f:
             writer = csv.writer(f, delimiter='\t')
             cursor.execute(f"{sql_select_command} LIMIT {chunk_size} OFFSET {offset}")
             rows = cursor.fetchall()
@@ -51,11 +58,20 @@ def export_chunked_tsv(db_path, query, chunk_size, output_path):
                 break
 
             writer.writerows(rows)
-
-        print(f"Exported rows {offset} to {offset + chunk_size} to {output_file}")
+            f.seek(0)
+            target_cursor = target_connection.cursor()
+            target_cursor.copy_from(f, 'bioc_web_downloads')
+            target_connection.commit()
+            target_cursor.close()
+            # end with
+            print(offset)
         offset += chunk_size
+        # end while
 
     conn.close()
+    target_connection.close()
 
 
+print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
 export_chunked_tsv(source_db, sql_select_command, chunk_size, output_path)
+print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
