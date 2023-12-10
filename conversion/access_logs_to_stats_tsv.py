@@ -22,7 +22,7 @@ def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
     while True:
         with io.StringIO() as f:
             writer = csv.writer(f, delimiter='\t')
-            cursor.execute(f"{sql_select_command} LIMIT {chunk_size} OFFSET {offset}")
+            cursor.execute(f"{query} LIMIT {chunk_size} OFFSET {offset}")
             rows = cursor.fetchall()
 
             if not rows:
@@ -44,12 +44,11 @@ def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
     target_connection.close()
     return record_count
 
-chunk_size = 1000000
+chunk_size = 100000
 
-
-for year in range(2011, 2021):
+for year in range(2009, 2021):
     source_db = f'/mnt/data/home/biocadmin/download_dbs/download_db_{year}.sqlite'
-    status_colname = 'errorcode' if year < 2019 else 'statuscude'
+    status_colname = 'errorcode' if year < 2020 else 'statuscode'
     # left(ips) due to cruft in the ip address column
     # name change as of 2019 errorcode -> statuscode
     sql_select_command = f"""
@@ -77,6 +76,6 @@ for year in range(2011, 2021):
             "package"
         from access_log
         """
-    print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print('start at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S" + "  " + str(year)))
     record_count = export_chunked_tsv(source_db, sql_select_command, chunk_size)
     print('end at ' +dt.now().strftime("%Y-%m-%d %H:%M:%S") + "Year=" + str(year) + " Total records=" + str(record_count))
