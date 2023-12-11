@@ -1,28 +1,35 @@
-create view v_stats as
-with T as (select category,
-    package,
-    DATE_TRUNC('year', "date") "yr",
-    count(distinct "c-ip") ip_count,
-    count(*) download_count
-from bioc_web_downloads
-group by category,
-    package,
-    DATE_TRUNC('year', "date")
-)
-select "category", "package", 
-    yr + INTERVAL '1 year' - INTERVAL '1 day' AS "date",
-    cast('false' as BOOLEAN) as is_monthly,
-    "ip_count", 
-    "download_count" 
-from T
+-- View: public.v_stats
+
+-- DROP VIEW public.v_stats;
+
+CREATE OR REPLACE VIEW public.v_stats
+ AS
+ WITH t AS (
+         SELECT UPPER(bioc_web_downloads.category)::varchar(16) as category,
+            bioc_web_downloads.package,
+            date_trunc('year'::text, bioc_web_downloads.date::timestamp with time zone) AS yr,
+            count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
+            count(*) AS download_count
+           FROM bioc_web_downloads
+          GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('year'::text, bioc_web_downloads.date::timestamp with time zone))
+        )
+ SELECT t.category,
+    t.package,
+    t.yr + '1 year'::interval - '1 day'::interval AS date,
+    false AS is_monthly,
+    t.ip_count,
+    t.download_count
+   FROM t
 UNION ALL
-select category,
-    package,
-    date_trunc('MONTH', "date") "date", 
-    cast('true' as BOOLEAN) as is_monthly,
-    count(distinct "c-ip") ip_count,
-    count(*) download_count
-from bioc_web_downloads
-group by category,
-    package,
-    date_trunc('MONTH', "date")
+ SELECT bioc_web_downloads.category,
+    bioc_web_downloads.package,
+    date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp with time zone) AS date,
+    true AS is_monthly,
+    count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
+    count(*) AS download_count
+   FROM bioc_web_downloads
+  GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp with time zone));
+
+ALTER TABLE public.v_stats
+    OWNER TO postgres;
+
