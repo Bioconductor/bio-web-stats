@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
     and_,
     asc,
+    desc,
     extract,
     func,
     select,
@@ -128,7 +129,7 @@ class Stats(Model):
         Returns:
             _description_
         """
-        where_clause = [Stats.category == category]  # TODO
+        where_clause = [Stats.category == category]
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         if package is not None:
             where_clause.append(Stats.package == package)
@@ -143,7 +144,7 @@ class Stats(Model):
         text = (
             select(*select_clause)
             .where(final_where_clause)
-            .order_by(asc(Stats.package), asc(Stats.date))
+            .order_by(asc(Stats.package), desc(extract("year", Stats.date)), asc(Stats.date))
         )
 
         result = db.session.execute(text).fetchall()
@@ -174,7 +175,7 @@ class Stats(Model):
             )
             .where(Stats.category == category)
             .group_by(Stats.date)
-            .order_by(asc(Stats.date))
+            .order_by(desc(extract("year", Stats.date)), asc(Stats.date))
         )
 
         return result.fetchall()
@@ -291,7 +292,7 @@ class CategoryStats(Model):
         text = (
             select(*select_clause)
             .where(final_where_clause)
-            .order_by(asc(CategoryStats.date))
+            .order_by(desc(extract("year", CategoryStats.date)), asc(CategoryStats.date))
         )
 
         result = db.session.execute(text).fetchall()
@@ -321,7 +322,7 @@ class CategoryStats(Model):
             )
             .where(CategoryStats.category == category)
             .group_by(CategoryStats.date)
-            .order_by(asc(CategoryStats.date))
+            .order_by(desc(extract("year", CategoryStats.date)), asc(CategoryStats.date))
         )
 
         return result.fetchall()

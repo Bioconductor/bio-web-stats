@@ -7,11 +7,11 @@ CREATE OR REPLACE VIEW public.v_stats
  WITH t AS (
          SELECT upper(bioc_web_downloads.category::text)::character varying(16) AS category,
             bioc_web_downloads.package,
-            date_trunc('year'::text, bioc_web_downloads.date::timestamp with time zone) AS yr,
+            date_trunc('year'::text, bioc_web_downloads.date::timestamp) AS yr,
             count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
             count(*) AS download_count
            FROM bioc_web_downloads
-          GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('year'::text, bioc_web_downloads.date::timestamp with time zone))
+          GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('year'::text, bioc_web_downloads.date::timestamp))
         )
  SELECT t.category,
     t.package,
@@ -23,12 +23,12 @@ CREATE OR REPLACE VIEW public.v_stats
 UNION ALL
  SELECT UPPER(bioc_web_downloads.category),
     bioc_web_downloads.package,
-    date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp with time zone) AS date,
+    date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp) AS date,
     true AS is_monthly,
     count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
     count(*) AS download_count
    FROM bioc_web_downloads
-  GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp with time zone));
+  GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp));
 
 ALTER TABLE public.v_stats
     OWNER TO postgres;
