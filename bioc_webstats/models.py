@@ -63,7 +63,7 @@ class WebstatsInfo(Model):
         """Retrieve date the database was last upated."""
         x = db.session.scalars(
             select(WebstatsInfo.value).where(WebstatsInfo.key == "ValidThru")
-        ).fetchall()[0]  # TODO fetch first
+        ).first()
         return dt.datetime.strptime(x, "%Y-%m-%d").date()
 
 
@@ -291,7 +291,7 @@ class CategoryStats(Model):
         Returns:
             _description_
         """
-        where_clause = [CategoryStats.category == category]  # TODO
+        where_clause = [CategoryStats.category == category]
         select_clause = [CategoryStats.date, CategoryStats.ip_count, CategoryStats.download_count]
         if year is not None:
             where_clause.append(extract("year", CategoryStats.date) == year)
