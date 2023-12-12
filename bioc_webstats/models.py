@@ -214,8 +214,7 @@ class Stats(Model):
         # the first day of the date 1 year before the end date
         start_date = y - relativedelta(months=12)
 
-        result = db.session.execute(
-            select(
+        query = (select(
                 Stats.package,
                 (func.sum(Stats.ip_count) // 12).label("score"),
                 func.rank()
@@ -226,11 +225,14 @@ class Stats(Model):
                 and_(
                     Stats.category == category,
                     Stats.date.between(start_date, end_date),
+                    Stats.is_monthly == True # noqa E712 -- causes and_ to malfunction
                 )
             )
             .group_by(Stats.package)
             .order_by(asc(Stats.package))
         )
+
+        result = result = db.session.execute(query)
         return result.fetchall()
 
 
