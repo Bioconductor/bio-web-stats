@@ -117,7 +117,7 @@
                     {% for i in range(N) %}
                 <tr class="pkg_index">
                         {% for j in range(3) %}
-                        {% set (package_name, package_rank, package_score)=package_list[i + j * N] %}
+                        {% set (package_name, package_score, package_rank)=package_list[i + j * N] %}
                                         <td style="width:25px; text-align: right"></td>
                                         <td><a href="{{  category_url_stem }}/{{ package_name }}/">{{ package_name }}&nbsp;({{ package_score }})</a></td>
                                         {% endfor %}
