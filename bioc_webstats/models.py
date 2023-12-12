@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Stats models."""
 
 import datetime as dt
@@ -115,7 +114,10 @@ class Stats(Model):
 
     @staticmethod
     def get_download_counts(
-        category: PackageType, package: Optional[str] = None, year: Optional[int] = None
+        category: PackageType,
+        package: Optional[str] = None,
+        year: Optional[int] = None,
+        newest_year_first: Optional[bool] = True,
     ):
         """_summary_.
 
@@ -125,18 +127,24 @@ class Stats(Model):
         Keyword Arguments:
             package -- _description_ (default: {None})
             year -- _description_ (default: {None})
+            newest_year_first -- If True, rows are logically grouped by year in descending order
+                if False, rows are strictly in date order (default: True)
 
         Returns:
             _description_
         """
         where_clause = [Stats.category == category]
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
+        order_clause = [asc(Stats.date)]
+
         if package is not None:
             where_clause.append(Stats.package == package)
         else:
             select_clause = [Stats.package] + select_clause
         if year is not None:
             where_clause.append(extract("year", Stats.date) == year)
+        if newest_year_first:
+            order_clause = [desc(extract("year", Stats.date))] + order_clause
 
         final_where_clause = and_(*where_clause)
 
@@ -144,7 +152,7 @@ class Stats(Model):
         text = (
             select(*select_clause)
             .where(final_where_clause)
-            .order_by(asc(Stats.package), desc(extract("year", Stats.date)), asc(Stats.date))
+            .order_by(asc(Stats.package), *order_clause)
         )
 
         result = db.session.execute(text).fetchall()

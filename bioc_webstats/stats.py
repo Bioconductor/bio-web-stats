@@ -76,7 +76,7 @@ def result_list_to_visual_list(rows):
     holes = (
         set([date(y, m + 1, 1) for y in range(y0, y1 + 1) for m in range(12)]) - dates
     )
-    out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: x[0])
+    out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: (-x[0].year, x[0]))
     return [
         (dt.year, dt.strftime("%b") if dt.day == 1 else "all", ip, dl)
         for dt, ip, dl in out
