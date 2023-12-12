@@ -29,7 +29,7 @@ class PackageType(enum.Enum):
     BIOC = "bioc"
     EXPERIMENT = "experiment"
     ANNOTATION = "annotation"
-    WORKFLOW = "workflows"
+    WORKFLOWS = "workflows"
 
 
 def package_type_exists(value: str) -> bool:

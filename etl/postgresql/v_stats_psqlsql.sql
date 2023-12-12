@@ -5,7 +5,7 @@
 CREATE OR REPLACE VIEW public.v_stats
  AS
  WITH t AS (
-         SELECT UPPER(bioc_web_downloads.category)::varchar(16) as category,
+         SELECT upper(bioc_web_downloads.category::text)::character varying(16) AS category,
             bioc_web_downloads.package,
             date_trunc('year'::text, bioc_web_downloads.date::timestamp with time zone) AS yr,
             count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
@@ -21,7 +21,7 @@ CREATE OR REPLACE VIEW public.v_stats
     t.download_count
    FROM t
 UNION ALL
- SELECT bioc_web_downloads.category,
+ SELECT UPPER(bioc_web_downloads.category),
     bioc_web_downloads.package,
     date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp with time zone) AS date,
     true AS is_monthly,

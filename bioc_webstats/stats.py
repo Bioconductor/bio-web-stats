@@ -45,7 +45,7 @@ category_map = {
         "top": 15,
     },
     "workflows": {
-        "category": PackageType.WORKFLOW,
+        "category": PackageType.WORKFLOWS,
         "description": "workflow",
         "package_index_page": "workflows",
         "stem": "workflows",
