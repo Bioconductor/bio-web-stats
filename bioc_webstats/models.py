@@ -133,7 +133,7 @@ class Stats(Model):
         Returns:
             _description_
         """
-        where_clause = [Stats.category == category]
+        where_clause = [Stats.category == category.value]
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         order_clause = [asc(Stats.date)]
 
@@ -181,7 +181,7 @@ class Stats(Model):
                 func.sum(Stats.ip_count).label("ip_count"),
                 func.sum(Stats.download_count).label("download_count"),
             )
-            .where(Stats.category == category)
+            .where(Stats.category == category.value)
             .group_by(Stats.date)
             .order_by(desc(extract("year", Stats.date)), asc(Stats.date))
         )
@@ -231,7 +231,7 @@ class Stats(Model):
             )
             .where(
                 and_(
-                    Stats.category == category,
+                    Stats.category == category.value,
                     Stats.date.between(start_date, end_date),
                     Stats.is_monthly == True # noqa E712 -- causes and_ to malfunction
                 )
@@ -291,7 +291,7 @@ class CategoryStats(Model):
         Returns:
             _description_
         """
-        where_clause = [CategoryStats.category == category]
+        where_clause = [CategoryStats.category == category.value]
         select_clause = [CategoryStats.date, CategoryStats.ip_count, CategoryStats.download_count]
         if year is not None:
             where_clause.append(extract("year", CategoryStats.date) == year)
@@ -330,7 +330,7 @@ class CategoryStats(Model):
                 func.sum(CategoryStats.ip_count).label("ip_count"),
                 func.sum(CategoryStats.download_count).label("download_count"),
             )
-            .where(CategoryStats.category == category)
+            .where(CategoryStats.category == category.value)
             .group_by(CategoryStats.date)
             .order_by(desc(extract("year", CategoryStats.date)), asc(CategoryStats.date))
         )
@@ -380,7 +380,7 @@ class CategoryStats(Model):
             )
             .where(
                 and_(
-                    CategoryStats.category == category,
+                    CategoryStats.category == category.value,
                     CategoryStats.date.between(start_date, end_date),
                 )
             )
