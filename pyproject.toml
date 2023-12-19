@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "webstats_web"
-version = "0.1.0"
+version = "0.1.1"
 description = "A web application to serve the content under www.bioconductor.org/packages/stats/"
 authors = [{name = "Robert Shear"}, {name = "Nikhil Mane"}]
 dependencies = [
