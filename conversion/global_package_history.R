@@ -2,7 +2,12 @@
 library(glue)
 # create a data frame consisting of release, biocViews category, package for all history
 # Assumes the git.bioconductor.org:admin/manifest project has been cloned to this directory
-setwd("~/Projects/manifest/")
+
+repo_location <- "~/Projects/manifest/"
+outfile_location <- "~/Downloads/manifest_to_packages_table.csv"
+table_data_location <- "~/Downloads/packages_table-data.csv"
+
+setwd(repo_location)
 system2(c("git","fetch","--all"), stdout = TRUE)
 branch_list <- trimws(system2(c("git","branch","-r"), stdout = TRUE))
 branch_list <- branch_list[startsWith(branch_list, "origin/RELEASE_")]
@@ -28,6 +33,7 @@ result <- Reduce(rbind, mapply((\(u, version_id) {
 ))
 
 # write.csv(result, "manifest_matrix.csv")
+result <- read.csv("/Users/rshear/Downloads/manifest_matrix.csv")
 
 p_c <- unique(result[,c("package", "category")])
 x <-split(p_c$category, p_c$package)
@@ -55,5 +61,15 @@ for (i in r3s) {
 }
 
 
-
-  
+# Here is the generation of the database table
+table_data <- Reduce(rbind, lapply(split(result, result$package), (\(i) {
+  u <- i[order(i$version),]
+  first <- u$version[1]
+  last <- u$version[nrow(u)]
+  if (last == "v318") {
+    last <- ""
+  }
+  data.frame(category=u$category[1], package=u$package[1], first, last)
+  }
+)))
+write.csv(table_data, table_data_location, col.names = FALSE)
