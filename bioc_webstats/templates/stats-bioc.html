@@ -60,11 +60,13 @@ Bioconductor {{ category_name }} repository (all packages combined)
     </p>
     <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
         year, from {{ generated_date.year }} back to {{ data_list[0][0] }} (years with no downloads are omitted):</p>
+    {% if package is not none %}
+        <p style="text-align: center;">
+            <b>{{ package }}</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
+                version</a>, <a href="/packages/devel/{{ category }}/html/{{ package }}.html">devel version</a>.
+        </p>
+    {% endif %}
     {% for year, data_table, barplot_data in data_list %}
-    <p style="text-align: center;">
-        <b>{{ package }}</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
-            version</a>, <a href="/packages/devel/{{ category }}/html/{{ package }}.html">devel version</a>.
-    </p>
     <hr>
     <h2 style="text-align: center;">{{ year }}</h2>
     <table width="90%" align="center">
@@ -90,7 +92,8 @@ Bioconductor {{ category_name }} repository (all packages combined)
                         </tr>
                         {% endfor %}
                     </tbody>
-                </table>
+                </
+                    table>
                 <a href="{{ package or category }}_{{ year }}_stats.tab">
                     {{ package or category }}_{{ year }}_stats.tab
                 </a>
