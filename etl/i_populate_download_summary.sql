@@ -5,6 +5,7 @@ with T as (select category,
     count(distinct "c-ip") ip_count,
     count(*) download_count
 from bioc_web_downloads
+where lower(package) IN (select lower(package) from packages)
 group by category,
     package,
     year("date")

@@ -11,6 +11,7 @@ CREATE OR REPLACE VIEW public.v_stats
             count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
             count(*) AS download_count
            FROM bioc_web_downloads
+           where lower(package) in (select lower(package) from packages)
           GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('year'::text, bioc_web_downloads.date::timestamp))
         )
  SELECT t.category,
@@ -28,6 +29,7 @@ UNION ALL
     count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
     count(*) AS download_count
    FROM bioc_web_downloads
+           where lower(package) in (select lower(package) from packages)
   GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp));
 
 ALTER TABLE public.v_stats
