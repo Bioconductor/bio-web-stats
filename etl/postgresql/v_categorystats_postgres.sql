@@ -14,28 +14,28 @@ AS
            FROM bioc_web_downloads
           WHERE (lower(bioc_web_downloads.package::text) IN ( SELECT packages.lower_package
                    FROM packages))
-        ), t AS (
+ ), t AS (
          SELECT s.category,
-            date_trunc('year'::text, s.date::timestamp with time zone) AS yr,
+            date_trunc('YEAR', s.date) AS yr,
             count(DISTINCT s."c-ip") AS ip_count,
             count(*) AS download_count
            FROM s
-          GROUP BY s.category, (date_trunc('year'::text, s.date::timestamp with time zone))
+          GROUP BY s.category, date_trunc('YEAR', s.date)
         )
  SELECT t.category,
-    t.yr + '1 year'::interval - '1 day'::interval AS date,
+    (t.yr + '1 YEAR'::interval - '1 day'::interval)::date AS date,
     false AS is_monthly,
     t.ip_count,
     t.download_count
    FROM t
 UNION ALL
  SELECT s.category,
-    date_trunc('MONTH'::text, s.date::timestamp with time zone) AS date,
+    date_trunc('MONTH', s.date)::date AS date,
     true AS is_monthly,
     count(DISTINCT s."c-ip") AS ip_count,
     count(*) AS download_count
    FROM s
-  GROUP BY s.category, (date_trunc('MONTH'::text, s.date::timestamp with time zone))
+  GROUP BY s.category, (date_trunc('MONTH', s.date))
 WITH NO DATA;
 
 ALTER TABLE IF EXISTS public.categorystats

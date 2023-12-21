@@ -80,7 +80,7 @@ class Packages(Model):
         ).fetchall()
 
 
-class CategoryStats(Model):
+class Categorystats(Model):
     """This is a projection of Stats with the package column removed."""
 
     category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
@@ -105,7 +105,7 @@ class CategoryStats(Model):
             _description_
         """
         return (
-            f"CategoryStats(category={self.category}, "
+            f"Categorystats(category={self.category}, "
             f"date='{self.date}', ip_count={self.ip_count}, "
             f"download_count={self.download_count})"
         )
@@ -123,12 +123,12 @@ class CategoryStats(Model):
         """
         result = db.session.execute(
             select(
-                CategoryStats.date,
-                CategoryStats.ip_count,
-                CategoryStats.download_count,
+                Categorystats.date,
+                Categorystats.ip_count,
+                Categorystats.download_count,
             )
-            .where(CategoryStats.category == category.value)
-            .order_by(desc(extract("year", CategoryStats.date)), asc(CategoryStats.date))
+            .where(Categorystats.category == category.value)
+            .order_by(desc(extract("year", Categorystats.date)), asc(Categorystats.date))
         )
 
         return result.fetchall()

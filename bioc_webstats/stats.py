@@ -237,7 +237,7 @@ def show_package_details(category, package=None):
         abort(404)
 
     if package is None:
-        source = db.CategorystatsStats.get_combined_counts(selected_category["category"])
+        source = db.Categorystats.get_combined_counts(selected_category["category"])
     else:
         source = db.Stats.get_download_counts(selected_category["category"], package)
     if len(source) == 0:
