@@ -61,8 +61,8 @@ def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
     result = defaultdict(list)
 
-    for item in sorted(lst, key=lambda x: x[0].upper()):
-        first_char = item[0][0].upper()  # Extract the first character of the string
+    for item in sorted(lst, key=lambda x: x[0].lower()):
+        first_char = item[0][0].lower()  # Extract the first character of the string
         result[first_char].append(item)
 
     return result
