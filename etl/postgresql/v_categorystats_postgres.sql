@@ -1,23 +1,27 @@
--- View: public.v_categorystats
+-- View: public.categorystats
 
--- DROP VIEW public.v_categorystats;
+-- DROP MATERIALIZED VIEW IF EXISTS public.categorystats;
 
-CREATE OR REPLACE VIEW public.v_categorystats
- AS
-
-WITH s AS (
-	SELECT * 
-		FROM bioc_web_downloads
-		WHERE LOWER(package) in (select lower_package from packages)
-	),
-t AS (
-         SELECT category,
-            date_trunc('year', "date") AS yr,
-            count(DISTINCT "c-ip") AS ip_count,
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.categorystats
+TABLESPACE pg_default
+AS
+ WITH s AS (
+         SELECT bioc_web_downloads.date,
+            bioc_web_downloads."c-ip",
+            bioc_web_downloads."sc-status",
+            bioc_web_downloads.category,
+            bioc_web_downloads.package
+           FROM bioc_web_downloads
+          WHERE (lower(bioc_web_downloads.package::text) IN ( SELECT packages.lower_package
+                   FROM packages))
+        ), t AS (
+         SELECT s.category,
+            date_trunc('year'::text, s.date::timestamp with time zone) AS yr,
+            count(DISTINCT s."c-ip") AS ip_count,
             count(*) AS download_count
            FROM s
-          GROUP BY category, date_trunc('year', "date")
- )
+          GROUP BY s.category, (date_trunc('year'::text, s.date::timestamp with time zone))
+        )
  SELECT t.category,
     t.yr + '1 year'::interval - '1 day'::interval AS date,
     false AS is_monthly,
@@ -25,14 +29,20 @@ t AS (
     t.download_count
    FROM t
 UNION ALL
- SELECT category,
-    date_trunc('MONTH', date) AS date,
+ SELECT s.category,
+    date_trunc('MONTH'::text, s.date::timestamp with time zone) AS date,
     true AS is_monthly,
-    count(DISTINCT "c-ip") AS ip_count,
+    count(DISTINCT s."c-ip") AS ip_count,
     count(*) AS download_count
    FROM s
-  GROUP BY category, (date_trunc('MONTH', "date"))
+  GROUP BY s.category, (date_trunc('MONTH'::text, s.date::timestamp with time zone))
+WITH NO DATA;
 
-ALTER TABLE public.v_categorystats
+ALTER TABLE IF EXISTS public.categorystats
     OWNER TO postgres;
 
+
+CREATE INDEX categorystats_idx_category_date
+    ON public.categorystats USING btree
+    (category COLLATE pg_catalog."default", date)
+    TABLESPACE pg_default;
