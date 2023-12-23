@@ -56,16 +56,16 @@ Bioconductor {{ category_name }} repository (all packages combined)
     </table>
     <h1 style="text-align: center">{{ title_text(package, category) }}</h1>
     <p style="text-align: center;">
-        <i>This page was generated on {{ generated_date }}</i>
+        <i>Data as of {{ generated_date.strftime("%a. %d %b %Y") }}</i>
     </p>
-    <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
-        year, from {{ generated_date.year }} back to {{ data_list[0][0] }} (years with no downloads are omitted):</p>
     {% if package is not none %}
         <p style="text-align: center;">
             <b>{{ package }}</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
                 version</a>, <a href="/packages/devel/{{ category }}/html/{{ package }}.html">devel version</a>.
         </p>
     {% endif %}
+    <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
+        year, from {{ data_list[0][0] }} back to {{ data_list[-1][0] }} (years with no downloads are omitted):</p>
     {% for year, data_table, barplot_data in data_list %}
     <hr>
     <h2 style="text-align: center;">{{ year }}</h2>
@@ -75,7 +75,7 @@ Bioconductor {{ category_name }} repository (all packages combined)
                 <img src="data:image/png;base64,{{ barplot_data }}" width="720px" height="400px">
             </td>
             <td style="text-align: center">
-                <table>
+                <table class="stats" algin="center">
                     <thead>
                         <tr>
                             <th>Month</th>
