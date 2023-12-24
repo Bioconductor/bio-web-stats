@@ -93,8 +93,8 @@ Bioconductor {{ category_name }} repository (all packages combined)
                         {% endfor %}
                     </tbody>
                 </table>
-                <a href="{{ package }}_{{ year }}_stats.tab">
-                    {{ package }}_{{ year }}_stats.tab
+                <a href="{{ package or category }}_{{ year }}_stats.tab">
+                    {{ package or category }}_{{ year }}_stats.tab
                 </a>
             </td>
         </tr>
