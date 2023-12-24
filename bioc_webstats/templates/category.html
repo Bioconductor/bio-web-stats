@@ -53,7 +53,7 @@
     <H1 style="text-align: center;">Download stats for Bioconductor {{ category_name }} packages</H1>
     <p> {{ url_list }} </p>
     <P style="text-align: center;">
-        <I>This page was generated on {{ generated_date }}.</I>
+        <I>Data as of {{ generated_date.strftime("%a. %d %b %Y") }}.</I>
     </P>
     <P>The number reported next to each package name is the <I>download score</I>, that is, the average number of
         distinct IPs that "hit" the package each month for the last 12 months (not counting the current month).</P>
