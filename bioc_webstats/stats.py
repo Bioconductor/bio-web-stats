@@ -23,7 +23,7 @@ category_map = {
     "bioc": {
         "category": PackageType.BIOC,
         "description": "software",
-        "package_index_page": "index",
+        "index_page": "index.html",
         "stem": "bioc",
         "tab_page_prefix": "bioc",
         "top": 75,
@@ -31,7 +31,7 @@ category_map = {
     "data-annotation": {
         "category": PackageType.ANNOTATION,
         "description": "annotation",
-        "package_index_page": "data-annotation",
+        "index_page": "data-annotation.html",
         "stem": "data-annotation",
         "tab_page_prefix": "annotation",
         "top": 30,
@@ -39,7 +39,7 @@ category_map = {
     "data-experiment": {
         "category": PackageType.EXPERIMENT,
         "description": "experiment",
-        "package_index_page": "data-experiment",
+        "index_page": "data-experiment.html",
         "stem": "data-experiment",
         "tab_page_prefix": "experiment",
         "top": 15,
@@ -47,7 +47,7 @@ category_map = {
     "workflows": {
         "category": PackageType.WORKFLOWS,
         "description": "workflow",
-        "package_index_page": "workflows",
+        "index_page": "workflows.html",
         "stem": "workflows",
         "tab_page_prefix": "workflows",
         "top": 0,
@@ -204,7 +204,7 @@ def show_package_summary(category="bioc"):
     category_enum = selected_category["category"]
     scores = db.Stats.get_download_scores(category_enum)
     url_list = [
-        [u["package_index_page"], u["description"]]
+        [u["index_page"], u["description"]]
         for u in category_map.values()
         if selected_category["category"] != u["category"]
     ]
@@ -243,11 +243,6 @@ def show_package_details(category, package=None):
     if len(source) == 0:
         abort(404)
 
-    if category == 'bioc':
-        category_name = "software"
-    else:
-        category_name = category
-
     split = {}
     for t in source:
         split.setdefault(t[0].year, []).append(t)
@@ -264,6 +259,7 @@ def show_package_details(category, package=None):
         category=category,
         category_name=selected_category["description"],
         category_stem=selected_category["stem"],
+        category_index_page=('/').join((bp.url_prefix, selected_category["index_page"])),
         package=package,
         generated_date=WebstatsInfo.get_valid_thru_date(),
         data_list=data_list
