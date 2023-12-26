@@ -6,7 +6,7 @@
 Description=bioc-webstats backend web server
 
 [Service]
-ExecStart=/home/ubuntu/bio-web-stats/start_gunicorn.sh
+ExecStart=/var/www/bio-web-stats/supervisord_programs/start_gunicorn.sh
 
 [Install]
 WantedBy=multi-user.target
