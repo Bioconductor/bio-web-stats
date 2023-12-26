@@ -112,7 +112,7 @@ class Categorystats(Model):
 
     # because distinct IP's is over the category
     @staticmethod
-    def get_combined_counts(category: PackageType):
+    def get_combined_counts(category: PackageType, year: Optional[int] = None):
         """Get counts combined for all packages in a given category.
 
         Arguments:
@@ -121,13 +121,17 @@ class Categorystats(Model):
         Returns:
             _description_
         """
+        where_clause = [Categorystats.category == category.value]
+        if year is not None:
+            where_clause.append(extract("year", Categorystats.date) == year)
+
         result = db.session.execute(
             select(
                 Categorystats.date,
                 Categorystats.ip_count,
                 Categorystats.download_count,
             )
-            .where(Categorystats.category == category.value)
+            .where(and_(*where_clause))
             .order_by(desc(extract("year", Categorystats.date)), asc(Categorystats.date))
         )
 
