@@ -91,3 +91,5 @@ env/
 /blob-report/
 /playwright/.cache/
 bio-web-stats.Rproj
+# charts prototype
+/bioc_webstats/chart
