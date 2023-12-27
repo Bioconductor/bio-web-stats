@@ -60,8 +60,8 @@ Bioconductor {{ category_name }} repository (all packages combined)
     </p>
     {% if package is not none %}
         <p style="text-align: center;">
-            <b>{{ package }}</b> home page: <a href="/packages/release/{{ category }}/html/{{ package }}.html">release
-                version</a>, <a href="/packages/devel/{{ category }}/html/{{ package }}.html">devel version</a>.
+            <b>{{ package }}</b> home page: <a href="/packages/release/{{ category.replace('-', '/') }}/html/{{ package }}.html">release
+                version</a>, <a href="/packages/devel/{{ category.replace('-', '/') }}/html/{{ package }}.html">devel version</a>.
         </p>
     {% endif %}
     <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
