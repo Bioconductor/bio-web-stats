@@ -13,7 +13,6 @@ from flask import Blueprint, Response, abort, render_template
 
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo
-from bioc_webstats.stats_plot import webstats_plot
 
 # TODO @n1khilmane MOVE TO Config /Settings
 URI_PATH_PREFIX = "/packages/stats"
@@ -248,8 +247,6 @@ def show_package_details(category, package=None):
     split = {}
     for t in source:
         split.setdefault(t[0].year, []).append(t)
-
-    plot_topic = package or category
 
     data_by_year = {year: result_list_to_visual_list(data) for year, data in split.items()}
 

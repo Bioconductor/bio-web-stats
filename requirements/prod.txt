@@ -36,5 +36,5 @@ Flask-DebugToolbar==0.13.1
 environs==9.5.0
 
 # App 
-matplotlib
 boto3
+chart.js

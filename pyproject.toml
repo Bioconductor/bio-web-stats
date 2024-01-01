@@ -44,8 +44,8 @@ dependencies = [
     "environs==9.5.0",
 
     # App 
-    "matplotlib",
     "boto3",
+    "chart.js",
 ]
 
 [project.optional-dependencies]
