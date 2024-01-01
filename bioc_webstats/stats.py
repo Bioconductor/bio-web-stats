@@ -254,7 +254,7 @@ def show_package_details(category, package=None):
 
     for year, data in split.items():
         data_table = result_list_to_visual_list(data)
-        data_list.append((year, data_table, webstats_plot(data_table=data_table, plot_title=f"{plot_topic} {year}")))
+        data_list.append((year, data_table))
 
     return render_template(
         "stats-bioc.html",

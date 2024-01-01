@@ -1,11 +1,6 @@
-{% macro title_text(package, category) %}
-Download stats for
-{% if package != None %}
-{{ category_name }} package {{ package }}
-{% else %}
-Bioconductor {{ category_name }} repository (all packages combined)
-{% endif %}
-{% endmacro %}
+{% macro title_text(package, category) %} Download stats for {% if package !=
+None %} {{ category_name }} package {{ package }} {% else %} Bioconductor {{
+category_name }} repository (all packages combined) {% endif %} {% endmacro %}
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -47,32 +42,39 @@ Bioconductor {{ category_name }} repository (all packages combined)
 </head>
 
 <body>
-    <table style="width: 100%; border-spacing: 0px; border-collapse: collapse;">
+    <table style="width: 100%; border-spacing: 0px; border-collapse: collapse">
         <tr>
-            <td style="padding: 0px; text-align: left;">
-                <i><a href="{{ category_index_page }}">Back to the "Download stats for Bioconductor {{ category_name }} packages"</a></i>
+            <td style="padding: 0px; text-align: left">
+                <i><a href="{{ category_index_page }}">Back to the "Download stats for Bioconductor {{ category_name }}
+                        packages"</a></i>
             </td>
         </tr>
     </table>
     <h1 style="text-align: center">{{ title_text(package, category) }}</h1>
-    <p style="text-align: center;">
+    <p style="text-align: center">
         <i>Data as of {{ generated_date.strftime("%a. %d %b %Y") }}</i>
     </p>
     {% if package is not none %}
-        <p style="text-align: center;">
-            <b>{{ package }}</b> home page: <a href="/packages/release/{{ category.replace('-', '/') }}/html/{{ package }}.html">release
-                version</a>, <a href="/packages/devel/{{ category.replace('-', '/') }}/html/{{ package }}.html">devel version</a>.
-        </p>
+    <p style="text-align: center">
+        <b>{{ package }}</b> home page:
+        <a href="/packages/release/{{ category.replace('-', '/') }}/html/{{ package }}.html">release version</a>,
+        <a href="/packages/devel/{{ category.replace('-', '/') }}/html/{{ package }}.html">devel version</a>.
+    </p>
     {% endif %}
-    <p style="text-align: center">Number of package downloads from the Bioconductor software package repository, year by
-        year, from {{ data_list[0][0] }} back to {{ data_list[-1][0] }} (years with no downloads are omitted):</p>
-    {% for year, data_table, barplot_data in data_list %}
-    <hr>
-    <h2 style="text-align: center;">{{ year }}</h2>
+    <p style="text-align: center">
+        Number of package downloads from the Bioconductor software package
+        repository, year by year, from {{ data_list[0][0] }} back to {{
+        data_list[-1][0] }} (years with no downloads are omitted):
+    </p>
+
+    {% for year, data_table in data_list %}
+    <hr />
+    <h2 style="text-align: center">{{ year }}</h2>
+    <!-- TODO aign=center to css -->
     <table width="90%" align="center">
         <tr>
             <td style="text-align: center">
-                <img src="data:image/png;base64,{{ barplot_data }}" width="720px" height="400px">
+                <canvas id="barchart_{{ year }}" class="barchart" width="720" height="400"></canvas>
             </td>
             <td style="text-align: center">
                 <table class="stats" algin="center">
@@ -87,8 +89,12 @@ Bioconductor {{ category_name }} repository (all packages combined)
                         {% for year, month, ips, downloads in data_table %}
                         <tr>
                             <td style="text-align: right">{{month}}/{{ year }}</td>
-                            <td style="text-align: right; background: #aaaaff">{{ ips }}</td>
-                            <td style="text-align: right; background: #ddddff">{{ downloads }}</td>
+                            <td style="text-align: right; background: #aaaaff">
+                                {{ ips }}
+                            </td>
+                            <td style="text-align: right; background: #ddddff">
+                                {{ downloads }}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -99,7 +105,15 @@ Bioconductor {{ category_name }} repository (all packages combined)
             </td>
         </tr>
     </table>
+
     {% endfor %}
-    <hr>
-    <p style="text-align: center">All years in one file:&nbsp;<a href="{{ package or category }}_stats.tab">{{ package or category }}_stats.tab</a></p></body>
+    <hr />
+    <p style="text-align: center">
+        All years in one file:&nbsp;<a href="{{ package or category }}_stats.tab">{{ package or category
+            }}_stats.tab</a>
+    </p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="/static/barchart.js"></script>
+</body>
+
 </html>
