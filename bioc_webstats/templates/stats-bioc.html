@@ -50,6 +50,7 @@ category_name }} repository (all packages combined) {% endif %} {% endmacro %}
             </td>
         </tr>
     </table>
+
     <h1 style="text-align: center">{{ title_text(package, category) }}</h1>
     <p style="text-align: center">
         <i>Data as of {{ generated_date.strftime("%a. %d %b %Y") }}</i>
@@ -63,57 +64,61 @@ category_name }} repository (all packages combined) {% endif %} {% endmacro %}
     {% endif %}
     <p style="text-align: center">
         Number of package downloads from the Bioconductor software package
-        repository, year by year, from {{ data_list[0][0] }} back to {{
-        data_list[-1][0] }} (years with no downloads are omitted):
+        repository, year by year, from {{ data_by_year.keys[0] }} back to {{
+        data_by_year.keys[-1] }} (years with no downloads are omitted):
     </p>
 
-    {% for year, data_table in data_list %}
-    <hr />
-    <h2 style="text-align: center">{{ year }}</h2>
-    <!-- TODO aign=center to css -->
-    <table width="90%" align="center">
-        <tr>
-            <td style="text-align: center">
-                <canvas id="barchart_{{ year }}" class="barchart" width="720" height="400"></canvas>
-            </td>
-            <td style="text-align: center">
-                <table class="stats" algin="center">
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th>Nb of distinct IPs</th>
-                            <th>Nb of downloads</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for year, month, ips, downloads in data_table %}
-                        <tr>
-                            <td style="text-align: right">{{month}}/{{ year }}</td>
-                            <td style="text-align: right; background: #aaaaff">
-                                {{ ips }}
-                            </td>
-                            <td style="text-align: right; background: #ddddff">
-                                {{ downloads }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <a href="{{ package or category }}_{{ year }}_stats.tab">
-                    {{ package or category }}_{{ year }}_stats.tab
-                </a>
-            </td>
-        </tr>
-    </table>
-
+    {% for data_year in data_by_year.keys() %}
+        <hr />
+        <h2 style="text-align: center">{{ data_year }}</h2>
+        <!-- TODO aign=center to css -->
+        <table width="90%" align="center">
+            <tr>
+                <td style="text-align: center">
+                    <canvas id="barchart_{{ data_year }}" class="barchart" width="720" height="400">
+                        Your browser may be too old as it does not support the html canvas element.
+                    </canvas>
+                </td>
+                <td style="text-align: center">
+                    <table class="stats" algin="center">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Nb of distinct IPs</th>
+                                <th>Nb of downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in data_by_year[data_year] %}
+                                <tr>
+                                    <td style="text-align: right">{{line["month"]}}/{{ line["year"] }}</td>
+                                    <td style="text-align: right; background: #aaaaff">
+                                        {{ line["unique_ips"] }}
+                                    </td>
+                                    <td style="text-align: right; background: #ddddff">
+                                        {{ line["downloads"] }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <a href="{{ package or category }}_{{ data_year }}_stats.tab">
+                            {{ package or category }}_{{ data_year }}_stats.tab
+                        </a>
+                    </td>
+                </tr>
+            </table>
     {% endfor %}
     <hr />
     <p style="text-align: center">
         All years in one file:&nbsp;<a href="{{ package or category }}_stats.tab">{{ package or category
             }}_stats.tab</a>
     </p>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="module" src="/static/barchart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript">
+        var data_table = {{ data_by_year | tojson }};
+    </script>
+    <script type="module" src="/static/barchart.js"></script>
 </body>
 
 </html>

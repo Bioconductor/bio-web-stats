@@ -78,10 +78,10 @@ def result_list_to_visual_list(rows):
     )
     out = sorted(rows + [(w, 0, 0) for w in holes], key=lambda x: (-x[0].year, x[0]))
     return [
-        (dt.year, dt.strftime("%b") if dt.day == 1 else "all", ip, dl)
+        {'year': dt.year, 'month': dt.strftime("%b") if dt.day == 1 else "all", 'unique_ips': ip, 'downloads': dl}
         for dt, ip, dl in out
     ]
-
+ 
 
 def query_result_to_text(source):
     """Transform tabular query results to string.
@@ -250,11 +250,8 @@ def show_package_details(category, package=None):
         split.setdefault(t[0].year, []).append(t)
 
     plot_topic = package or category
-    data_list = []
 
-    for year, data in split.items():
-        data_table = result_list_to_visual_list(data)
-        data_list.append((year, data_table))
+    data_by_year = {year: result_list_to_visual_list(data) for year, data in split.items()}
 
     return render_template(
         "stats-bioc.html",
@@ -264,5 +261,5 @@ def show_package_details(category, package=None):
         category_index_page=('/').join((bp.url_prefix, selected_category["index_page"])),
         package=package,
         generated_date=WebstatsInfo.get_valid_thru_date(),
-        data_list=data_list
+        data_by_year=data_by_year
     )
