@@ -1,18 +1,63 @@
 # global_package_history.R
+library(tidyverse)
 library(glue)
-# create a data frame consisting of release, biocViews category, package for all history
-# Assumes the git.bioconductor.org:admin/manifest project has been cloned to this directory
+library(rvest)
+library(xml2)
+library(curl)
 
-repo_location <- "~/Projects/manifest/"
+# create a data frame consisting of release, biocViews category, package for all history
+# the package version are from the admin/manifest Bioc project:
+# git clone git@git.bioconductor.org:admin/manifest
+# The description of the packages will be in 
+# 
+#  https://www.bioconductor.org/packages/3.15/data/annotation/src/contrib/PACKAGES
+
+
+# Get the releases from https://bioconductor.org/about/release-announcements/ by web scraping
+
 outfile_location <- "~/Downloads/manifest_to_packages_table.csv"
 table_data_location <- "~/Downloads/packages_table-data.csv"
 
-setwd(repo_location)
-system2(c("git","fetch","--all"), stdout = TRUE)
-branch_list <- trimws(system2(c("git","branch","-r"), stdout = TRUE))
-branch_list <- branch_list[startsWith(branch_list, "origin/RELEASE_")]
-names(branch_list) <- sapply(strsplit(branch_list, "_"), (\(u) as.numeric(u[2])*100+as.numeric(u[3])))
-branch_list <- branch_list[order(names(branch_list))]
+manifest_template <- "https://www.bioconductor.org/packages/{version}/{category}/src/contrib/PACKAGES"
+
+manifest <- \( major, minor) {
+  categories = c("bioc", "data/annotation", "data/experiment")
+  if (major > 2 || (major == 2 && minor > 11))
+  {
+    
+    categories <- append(categories, "workflows")
+  }
+  mapply(\(category, version) {
+    con <- curl(glue(manifest_template))
+    result <- read.dcf(con)
+    close(con)
+    result
+    },
+         categories, glue("{major}.{minor}"))
+}
+
+file_path <- "conversion/bioc_versions.html"
+html_data <- read_html(file_path)
+df <- html_table(html_data, fill = TRUE, convert = FALSE)[[1]]
+x <- cbind(df, 
+           Reduce(rbind, lapply(strsplit(df$Release, ".", fixed = TRUE), 
+                                (\(u) data.frame(major=u[1], minor=u[2]))))) |>
+  filter(major > 1 | (major = 1 & minor > 7)) |> 
+  mutate(Date = mdy(Date), packages = map2(major, minor, manifest))
+
+
+
+for (i in 1:nrow(df)) {
+  print(df$Release[i])
+  x <- manifest(df$Release[i], "workflows")
+}
+
+version <- x$Release[1]
+category <- "bioc"
+uri <- glue(manifest_template)
+con <- curl(uri)
+y <- read.dcf(glue(manifest_template))
+
 
 result <- Reduce(rbind, mapply((\(u, version_id) {
     system(glue("git checkout {u}"))
