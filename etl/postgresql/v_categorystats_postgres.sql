@@ -6,14 +6,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS public.categorystats
 TABLESPACE pg_default
 AS
  WITH s AS (
-         SELECT bioc_web_downloads.date,
-            bioc_web_downloads."c-ip",
-            bioc_web_downloads."sc-status",
-            bioc_web_downloads.category,
-            bioc_web_downloads.package
-           FROM bioc_web_downloads
-          WHERE (lower(bioc_web_downloads.package::text) IN ( SELECT packages.lower_package
-                   FROM packages))
+         SELECT D.date,
+            D."c-ip",
+            D."sc-status",
+            D.category,
+            D.package
+           FROM bioc_web_downloads as D
+           INNER JOIN packages P 
+            ON D.package = P.package AND D.category = P.category
  ), t AS (
          SELECT s.category,
             date_trunc('YEAR', s.date) AS yr,

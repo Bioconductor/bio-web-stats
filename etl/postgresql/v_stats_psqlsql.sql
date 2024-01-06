@@ -5,14 +5,15 @@
 CREATE OR REPLACE VIEW public.v_stats
  AS
  WITH t AS (
-         SELECT lower(bioc_web_downloads.category::text)::character varying(16) AS category,
-            bioc_web_downloads.package,
-            date_trunc('year'::text, bioc_web_downloads.date::timestamp) AS yr,
-            count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
+         SELECT D.category,
+            D.package,
+            date_trunc('year'::text, D.date::timestamp) AS yr,
+            count(DISTINCT D."c-ip") AS ip_count,
             count(*) AS download_count
-           FROM bioc_web_downloads
-           where lower(package) in (select lower(package) from packages)
-          GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('year'::text, bioc_web_downloads.date::timestamp))
+           FROM bioc_web_downloads as D
+           INNER JOIN packages as P 
+            ON D.package = P.package and D.category = P.category
+          GROUP BY D.category, D.package, (date_trunc('year'::text, D.date::timestamp))
         )
  SELECT t.category,
     t.package,
@@ -22,15 +23,16 @@ CREATE OR REPLACE VIEW public.v_stats
     t.download_count
    FROM t
 UNION ALL
- SELECT lower(bioc_web_downloads.category),
-    bioc_web_downloads.package,
-    date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp) AS date,
+        SELECT D.category,
+            D.package,
+    date_trunc('MONTH'::text, D.date::timestamp) AS date,
     true AS is_monthly,
-    count(DISTINCT bioc_web_downloads."c-ip") AS ip_count,
+    count(DISTINCT D."c-ip") AS ip_count,
     count(*) AS download_count
-   FROM bioc_web_downloads
-           where lower(package) in (select lower(package) from packages)
-  GROUP BY bioc_web_downloads.category, bioc_web_downloads.package, (date_trunc('MONTH'::text, bioc_web_downloads.date::timestamp));
+           FROM bioc_web_downloads as D
+           INNER JOIN packages as P 
+            ON D.package = P.package
+  GROUP BY D.category, D.package, (date_trunc('MONTH'::text, D.date::timestamp));
 
 ALTER TABLE public.v_stats
     OWNER TO postgres;
