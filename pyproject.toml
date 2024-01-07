@@ -45,7 +45,6 @@ dependencies = [
 
     # App 
     "boto3",
-    "chart.js",
 ]
 
 [project.optional-dependencies]
@@ -69,7 +68,10 @@ dev = [
     "pytest-playwright",
 
 # Local db manipulation
-    "fastparquet"
+    "fastparquet",
+
+# DBA Tools # TODO Is this needed in prod?
+    "alembic",
 ]
 [tool.setuptools.packages.find]
 where = ["bioc_webstats"]
