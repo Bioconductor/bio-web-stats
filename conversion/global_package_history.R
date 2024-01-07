@@ -12,8 +12,7 @@ library(curl)
 # The description of the packages will be in 
 # Get the releases from https://bioconductor.org/about/release-announcements/ by web scraping
 
-outfile_location <- "~/Downloads/manifest_to_packages_table.csv"
-table_data_location <- "~/Downloads/packages_table-data.csv"
+outfile_location <- "data/manifest_to_packages_table.csv"
 
 manifest_template <- "https://www.bioconductor.org/packages/{version}/{category}/src/contrib/PACKAGES"
 

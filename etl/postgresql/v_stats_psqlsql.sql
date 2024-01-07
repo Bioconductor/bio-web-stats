@@ -13,6 +13,7 @@ CREATE OR REPLACE VIEW public.v_stats
            FROM bioc_web_downloads as D
            INNER JOIN packages as P 
             ON D.package = P.package and D.category = P.category
+            where "sc-status" in (200, 301, 302, 307, 308)
           GROUP BY D.category, D.package, (date_trunc('year'::text, D.date::timestamp))
         )
  SELECT t.category,
@@ -31,7 +32,8 @@ UNION ALL
     count(*) AS download_count
            FROM bioc_web_downloads as D
            INNER JOIN packages as P 
-            ON D.package = P.package
+            ON D.package = P.package and D.category = P.category
+            where "sc-status" in (200, 301, 302, 307, 308)
   GROUP BY D.category, D.package, (date_trunc('MONTH'::text, D.date::timestamp));
 
 ALTER TABLE public.v_stats
