@@ -8,8 +8,9 @@ Returns:
 """
 from collections import defaultdict
 from datetime import date
+import os
 
-from flask import Blueprint, Response, abort, render_template
+from flask import Blueprint, Response, abort, render_template, send_from_directory
 
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo
@@ -133,6 +134,12 @@ def query_result_to_text(source):
 
         case _:
             raise AssertionError("query_result_to_text expects 4 or 5 columns")
+
+@bp.route('/static/<path:filename>')
+def static_files(filename):
+    """Redirect requests to serve static files from root to the actual root of webstats."""
+    static_folder = os.path.join(os.path.dirname(__file__), 'static')
+    return send_from_directory(static_folder, filename)
 
 
 @bp.route("/bioc/bioc_packages.txt")
