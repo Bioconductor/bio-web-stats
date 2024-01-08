@@ -1,3 +1,14 @@
+# ⚠️ Important Warning ⚠️
+
+**WARNING**: This repository is currently under development.
+
+Please note:
+- It includes experimental code that may be abandoned after evaluation.
+- It has code for tools that may be removed. Some of the tools currently in the repo are mutually exclusive.
+- Many commits include incomplete code. (These are typically, but not necessarily, identified by having "WIP" in the comment.
+- It is a custom application with processsing rules that are specific to the history of the Bioconductor project. We have no intention, and do not recommend, attempting to use this system in other contexts.
+- Much of the text below is a vestige of the original cookiecutter-flask code base. Do not rely on it.
+
 # bioc_webstats
 
 Public accss to Bioconductor package download history
