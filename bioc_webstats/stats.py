@@ -189,10 +189,9 @@ def show_package_stats(category, package, package_path=None, year=None):
         abort(404)
     # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
     if year == "pkg":
-        year = None
-        payload = db.Categorystats.get_combined_counts(selected_category["category"], year)
+        payload = db.Stats.get_download_counts(selected_category["category"])
     else:
-        payload = db.Stats.get_download_counts(selected_category["category"], package, year)
+        payload = db.Categorystats.get_combined_counts(selected_category["category"], year)
 
     if payload == []:
         abort(404)
