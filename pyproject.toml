@@ -45,7 +45,6 @@ dependencies = [
 
     # App 
     "boto3",
-    "chart.js",
 ]
 
 [project.optional-dependencies]
