@@ -8,8 +8,9 @@ Returns:
 """
 from collections import defaultdict
 from datetime import date
+import os
 
-from flask import Blueprint, Response, abort, render_template
+from flask import Blueprint, Response, abort, render_template, send_from_directory
 
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo
@@ -61,7 +62,7 @@ def split_to_dict_list(lst):
     result = defaultdict(list)
 
     for item in sorted(lst, key=lambda x: x[0].lower()):
-        first_char = item[0][0].lower()  # Extract the first character of the string
+        first_char = item[0][0].upper()  # Extract the first character of the string
         result[first_char].append(item)
 
     return result
@@ -111,8 +112,7 @@ def query_result_to_text(source):
 
         out = result_list_to_visual_list(rows)
         return "\n".join(
-            [f"{k}{year}\t{month}\t{ip}\t{dl}" for year, month, ip, dl in out]
-        )
+             [f"{k}{u['year']}\t{u['month']}\t{u['unique_ips']}\t{u['downloads']}" for u in out])
 
     if source == []:
         return ""
@@ -134,6 +134,12 @@ def query_result_to_text(source):
 
         case _:
             raise AssertionError("query_result_to_text expects 4 or 5 columns")
+
+@bp.route('/static/<path:filename>')
+def static_files(filename):
+    """Redirect requests to serve static files from root to the actual root of webstats."""
+    static_folder = os.path.join(os.path.dirname(__file__), 'static')
+    return send_from_directory(static_folder, filename)
 
 
 @bp.route("/bioc/bioc_packages.txt")
@@ -182,11 +188,14 @@ def show_package_stats(category, package, package_path=None, year=None):
     elif package_path is not None and package_path != package:
         abort(404)
     # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
-    if year == "pkg":
-        year = None
-        payload = db.Stats.get_download_counts(selected_category["category"], package)
+    if package is None:
+        if year == "pkg":
+            payload = db.Stats.get_download_counts(selected_category["category"])
+        else:
+            payload = db.Categorystats.get_combined_counts(selected_category["category"], year)
     else:
-        payload = db.Categorystats.get_combined_counts(selected_category["category"], year)
+        payload = db.Stats.get_download_counts(selected_category["category"], package, year)
+        
 
     if payload == []:
         abort(404)

@@ -1,19 +1,16 @@
--- View: public.categorystats
+-- View: public.v_categorystats
 
--- DROP MATERIALIZED VIEW IF EXISTS public.categorystats;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS public.categorystats
-TABLESPACE pg_default
+CREATE OR REPLACE VIEW public.v_categorystats
 AS
  WITH s AS (
-         SELECT bioc_web_downloads.date,
-            bioc_web_downloads."c-ip",
-            bioc_web_downloads."sc-status",
-            bioc_web_downloads.category,
-            bioc_web_downloads.package
-           FROM bioc_web_downloads
-          WHERE (lower(bioc_web_downloads.package::text) IN ( SELECT packages.lower_package
-                   FROM packages))
+         SELECT D.date,
+            D."c-ip",
+            D."sc-status",
+            D.category
+           FROM bioc_web_downloads as D
+           INNER JOIN packages P 
+            ON D.package = P.package AND D.category = P.category
+            where "sc-status" in (200, 301, 302, 307, 308)
  ), t AS (
          SELECT s.category,
             date_trunc('YEAR', s.date) AS yr,
@@ -35,14 +32,4 @@ UNION ALL
     count(DISTINCT s."c-ip") AS ip_count,
     count(*) AS download_count
    FROM s
-  GROUP BY s.category, (date_trunc('MONTH', s.date))
-WITH NO DATA;
-
-ALTER TABLE IF EXISTS public.categorystats
-    OWNER TO postgres;
-
-
-CREATE INDEX categorystats_idx_category_date
-    ON public.categorystats USING btree
-    (category COLLATE pg_catalog."default", date)
-    TABLESPACE pg_default;
+  GROUP BY s.category, (date_trunc('MONTH', s.date));
