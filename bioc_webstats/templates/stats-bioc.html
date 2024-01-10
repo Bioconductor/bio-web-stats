@@ -57,9 +57,13 @@ category_name }} repository (all packages combined) {% endif %} {% endmacro %}
     </p>
     {% if package is not none %}
     <p style="text-align: center">
-        <b>{{ package }}</b> home page:
-        <a href="/packages/release/{{ category.replace('-', '/') }}/html/{{ package }}.html">release version</a>,
-        <a href="/packages/devel/{{ category.replace('-', '/') }}/html/{{ package }}.html">devel version</a>.
+        {% if deprecated_version is not none %}
+            Package {{ package }} is not in the current release of Bioconductor. It was last seen in {{ deprecated_version }}.
+        {% else %}
+            <b>{{ package }}</b> home page:
+            <a href="/packages/release/{{ category.replace('-', '/') }}/html/{{ package }}.html">release version</a>,
+            <a href="/packages/devel/{{ category.replace('-', '/') }}/html/{{ package }}.html">devel version</a>.
+        {% endif %}
     </p>
     {% endif %}
     <p style="text-align: center">

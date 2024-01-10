@@ -13,7 +13,7 @@ import os
 from flask import Blueprint, Response, abort, render_template, send_from_directory
 
 import bioc_webstats.models as db
-from bioc_webstats.models import PackageType, WebstatsInfo
+from bioc_webstats.models import PackageType, WebstatsInfo, Packages
 
 # TODO @n1khilmane MOVE TO Config /Settings
 URI_PATH_PREFIX = "/packages/stats"
@@ -81,7 +81,7 @@ def result_list_to_visual_list(rows):
         {'year': dt.year, 'month': dt.strftime("%b") if dt.day == 1 else "all", 'unique_ips': ip, 'downloads': dl}
         for dt, ip, dl in out
     ]
- 
+
 
 def query_result_to_text(source):
     """Transform tabular query results to string.
@@ -112,7 +112,7 @@ def query_result_to_text(source):
 
         out = result_list_to_visual_list(rows)
         return "\n".join(
-             [f"{k}{u['year']}\t{u['month']}\t{u['unique_ips']}\t{u['downloads']}" for u in out])
+            [f"{k}{u['year']}\t{u['month']}\t{u['unique_ips']}\t{u['downloads']}" for u in out])
 
     if source == []:
         return ""
@@ -248,10 +248,16 @@ def show_package_details(category, package=None):
 
     if package is None:
         source = db.Categorystats.get_combined_counts(selected_category["category"])
+        depver = None
     else:
         source = db.Stats.get_download_counts(selected_category["category"], package)
-    if len(source) == 0:
-        abort(404)
+        if len(source) == 0:
+            abort(404)
+        package_info = db.Packages.get_package_details(package)
+        depver = package_info[3]
+        
+    if depver is not None:
+        depver = depver[0] + "." +str(int(depver[1:3]))
 
     split = {}
     for t in source:
@@ -267,5 +273,6 @@ def show_package_details(category, package=None):
         category_index_page=('/').join((bp.url_prefix, selected_category["index_page"])),
         package=package,
         generated_date=WebstatsInfo.get_valid_thru_date(),
-        data_by_year=data_by_year
+        data_by_year=data_by_year,
+        deprecated_version=depver
     )

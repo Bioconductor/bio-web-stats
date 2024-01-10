@@ -71,13 +71,28 @@ class Packages(Model):
     """All Package Names from git.bioconductor.org."""
 
     package: Mapped[str] = mapped_column(String, primary_key=True)
-
+    category: Mapped[str] = mapped_column(String)
+    first_version: Mapped[str] = mapped_column(String)
+    last_version: Mapped[str] = mapped_column(String)
+    
     @staticmethod
     def get_package_names():
         """Return all the package names."""
         return db.session.scalars(
             select(Packages.package).order_by(Packages.package.asc())
         ).fetchall()
+        
+    @staticmethod
+    def get_package_details(package: str):
+        """Return the summary information about a specific pacakge."""
+        return db.session.execute(
+            select(Packages.package, 
+                Packages.category, 
+                Packages.first_version, 
+                Packages.last_version).
+            where(Packages.package == package)
+        ).fetchone()
+        
 
 
 class Categorystats(Model):
