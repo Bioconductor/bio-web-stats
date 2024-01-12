@@ -38,7 +38,7 @@ function plot_bars(canvas_id, year, data) {
       scales: {
         y: {
           type: "logarithmic",
-          min: 10,
+          min: 0.9,
           ticks: {
             // Generate the labels for each power of ten
             callback: function (value, index, values) {
