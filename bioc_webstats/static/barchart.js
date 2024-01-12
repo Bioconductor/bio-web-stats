@@ -21,7 +21,7 @@ function plot_bars(canvas_id, year, data) {
       labels: monthList,
       datasets: [
         {
-          label: "Unique IPs",
+          label: "Distinct IPs",
           data: uniqueIpsList,
           backgroundColor: '#aaaaff',
           borderWidth: 1,
