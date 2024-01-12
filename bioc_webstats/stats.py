@@ -7,11 +7,10 @@ Returns:
     _description_
 """
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 import os
 
-from flask import Blueprint, Response, abort, render_template, send_from_directory
-
+from flask import Blueprint, Response, abort, render_template, send_from_directory, make_response
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo, Packages
 
@@ -264,15 +263,21 @@ def show_package_details(category, package=None):
         split.setdefault(t[0].year, []).append(t)
 
     data_by_year = {year: result_list_to_visual_list(data) for year, data in split.items()}
-
-    return render_template(
+    generated_date=WebstatsInfo.get_valid_thru_date()
+    
+    content = render_template(
         "stats-bioc.html",
         category=category,
         category_name=selected_category["description"],
         category_stem=selected_category["stem"],
         category_index_page=('/').join((bp.url_prefix, selected_category["index_page"])),
         package=package,
-        generated_date=WebstatsInfo.get_valid_thru_date(),
+        generated_date=generated_date,
         data_by_year=data_by_year,
         deprecated_version=depver
     )
+    response = make_response(content)
+    modified_date = (generated_date + timedelta(days=1))
+    response.headers['Last-Modified'] = modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    return response
+
