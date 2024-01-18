@@ -295,6 +295,8 @@ def show_package_details(category, package=None):
         package=package,
         generated_date=generated_date,
         data_by_year=data_by_year,
+        first_year=list(data_by_year.keys())[-1],
+        last_year=list(data_by_year.keys())[0],
         deprecated_version=depver
     )
     return webstats_response(result)

@@ -68,8 +68,7 @@ category_name }} repository (all packages combined) {% endif %} {% endmacro %}
     {% endif %}
     <p style="text-align: center">
         Number of package downloads from the Bioconductor software package
-        repository, year by year, from {{ data_by_year.keys[0] }} back to {{
-        data_by_year.keys[-1] }} (years with no downloads are omitted):
+        repository, year by year, from {{ first_year }} back to {{ last_year }} (years with no downloads are omitted):
     </p>
 
     {% for data_year in data_by_year.keys() %}
