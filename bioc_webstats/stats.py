@@ -14,7 +14,6 @@ from flask import Blueprint, Response, abort, render_template, send_from_directo
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo, Packages
 
-# TODO @n1khilmane MOVE TO Config /Settings
 URI_PATH_PREFIX = "/packages/stats"
 
 # Map from incoming page name name to PackageType
@@ -55,6 +54,27 @@ category_map = {
 
 bp = Blueprint("stats", __name__, url_prefix=URI_PATH_PREFIX)
 
+def webstats_response(payload, content_type='text/html') -> Response:
+    """Create an http Response including response headers required by consuming systems.
+    
+    Specifically, the Last-Modified header is set to, which is set to midnight GMT, 
+    one second after the "valid through" date.
+
+    Arguments:
+        payload -- The body of the http response, either raw text or html
+
+    Keyword Arguments:
+        content_type -- The value of the Content-Type header (default: {'text/html'})
+
+    Returns:
+        A Response variable, ready to be returned from a route or blueprint decorated function
+    """
+    response = make_response(payload)
+    response.headers['Content-Type'] = content_type
+    generated_date=WebstatsInfo.get_valid_thru_date()
+    modified_date = (generated_date + timedelta(days=1))
+    response.headers['Last-Modified'] = modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    return response
 
 def split_to_dict_list(lst):
     """Transform int a dictionary based on first letter (case insensitive)."""
@@ -146,7 +166,7 @@ def show_packages():
     """_summary_."""
     payload = db.Packages.get_package_names()
     text = ("\n").join(payload)
-    return Response(text, content_type="text/plain")
+    return webstats_response(text, content_type="text/plain")
 
 
 @bp.route("<category>/<package>_pkg_scores.tab")
@@ -166,7 +186,7 @@ def show_package_scores(category, package):
     else:
         abort(404)
     text = "Package\tDownload_score\n" + "\n".join([f"{x[0]}\t{x[1]}" for x in payload])
-    return Response(text, content_type="text/plain")
+    return webstats_response(text, content_type="text/plain")
 
 
 @bp.route("<category>/<package>_stats.tab")
@@ -199,7 +219,7 @@ def show_package_stats(category, package, package_path=None, year=None):
     if payload == []:
         abort(404)
 
-    return Response(query_result_to_text(payload), content_type="text/plain")
+    return webstats_response(query_result_to_text(payload), content_type="text/plain")
 
 
 @bp.route("/")
@@ -220,7 +240,7 @@ def show_package_summary(category="bioc"):
     top_count = selected_category["top"]
     top = sorted(scores, key=lambda x: x[-1])[:top_count]
 
-    return render_template(
+    result = render_template(
         "category.html",
         top_count=top_count,
         category_links=url_list,
@@ -232,6 +252,7 @@ def show_package_summary(category="bioc"):
         top=top,
         scores=split_to_dict_list(scores),
     )
+    return webstats_response(result)
 
 
 @bp.route("<category>/")
@@ -265,7 +286,7 @@ def show_package_details(category, package=None):
     data_by_year = {year: result_list_to_visual_list(data) for year, data in split.items()}
     generated_date=WebstatsInfo.get_valid_thru_date()
     
-    content = render_template(
+    result = render_template(
         "stats-bioc.html",
         category=category,
         category_name=selected_category["description"],
@@ -276,8 +297,5 @@ def show_package_details(category, package=None):
         data_by_year=data_by_year,
         deprecated_version=depver
     )
-    response = make_response(content)
-    modified_date = (generated_date + timedelta(days=1))
-    response.headers['Last-Modified'] = modified_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    return response
+    return webstats_response(result)
 
