@@ -1,12 +1,17 @@
 [build-system]
-requires = ["flit_core >= 3.4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "bioc_webstats"
+version = "0.1.1"
 description = "A web application to serve the content under www.bioconductor.org/packages/stats/"
 authors = [{name = "Robert Shear", email = "rshear@ds.dfck.harvard.edu"}]
 requires-python = ">=3.9"
+classifiers = [
+    "Framework :: Flask",
+    "Programming Language :: Python :: 3",
+]
 dynamic = ["version"]
 
 dependencies = [
