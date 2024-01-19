@@ -23,6 +23,9 @@ if not is_production:
             "/bioc/affy/",
             "/bioc/affy/affy_stats.tab",
             "/bioc/affy/affy_2023_stats.tab",
+            "/data-experiment/experiment_pkg_scores.tab",
+            "/data-experiment/experiment_pkg_stats.tab",
+            "/data-experiment/experiment_stats.tab",
         ]
 
         return render_template("home.html", targets=targets)

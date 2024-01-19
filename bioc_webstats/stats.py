@@ -202,7 +202,7 @@ def show_package_stats(category, package, package_path=None, year=None):
     # and that name must match the package name at the leaf
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
-    if package_path is None and package == "bioc" or category == package:
+    if package_path is None and package == "bioc" or category == selected_category["stem"]:
         package = None
     elif package_path is not None and package_path != package:
         abort(404)
