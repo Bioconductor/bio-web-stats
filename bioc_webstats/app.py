@@ -16,10 +16,6 @@ from bioc_webstats.extensions import (
     migrate,
 )
 
-# Check if the application is in production mode
-is_production = os.environ.get('FLASK_ENV') == 'production'
-
-
 def create_app(config_filename="settings.py"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
@@ -46,11 +42,11 @@ def register_extensions(app):
     flask_static_digest.init_app(app)
     return None
 
-
 def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(stats.bp)
-    if not is_production:
+    # Exclude debuging tools if this is a production environment
+    if app.config['ENV'] != 'production':
         app.register_blueprint(splash.blueprint)
     return None
 
