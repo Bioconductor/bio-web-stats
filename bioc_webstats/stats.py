@@ -202,11 +202,13 @@ def show_package_stats(category, package, package_path=None, year=None):
     # and that name must match the package name at the leaf
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
-    if package_path is None and package == "bioc" or category == selected_category["stem"]:
-        package = None
-    elif package_path is not None and package_path != package:
-        abort(404)
-    # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here
+
+    if package_path is None:
+        if package == "bioc":
+            package = None
+    elif package_path != package:
+            abort(404)
+    # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here    
     if package is None:
         if year == "pkg":
             payload = db.Stats.get_download_counts(selected_category["category"])

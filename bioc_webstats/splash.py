@@ -26,6 +26,9 @@ if not is_production:
             "/data-experiment/experiment_pkg_scores.tab",
             "/data-experiment/experiment_pkg_stats.tab",
             "/data-experiment/experiment_stats.tab",
-        ]
+            "/data-experiment/ABAData/",
+            "/data-experiment/ABAData/ABAData_2024_stats.tab",
+            "/data-experiment/ABAData/ABAData_stats.tab",
+            ]
 
         return render_template("home.html", targets=targets)
