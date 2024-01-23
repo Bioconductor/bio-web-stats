@@ -203,20 +203,22 @@ def show_package_stats(category, package, package_path=None, year=None):
     # If the url is for all the packages in the repo,
     # it will be in the form /bio/bio_pkg_stats.tab and the year parameter will be 'pkg'
 
-    if package_path is None:
-        if package == "bioc":
-            package = None
-    elif package_path != package:
-            abort(404)
-    # due to route spec, bioc_pkg_stats.tab and bioc_2023_stats.tab both end up here    
-    if package is None:
-        if year == "pkg":
-            payload = db.Stats.get_download_counts(selected_category["category"])
+    # Helpful to keep the nested conditionals reasonably simple
+    payload = None
+    
+    if package_path is None and selected_category["stem"] == category:
+        # Here the package is actually the name of the category
+        package = None
+        if year == 'pkg':
+            # Here are /bioc/bioc_stats.tab and /data_exepriment/experiment_pkg.tab
+            # In this case we will report all packages in the category
+            year = None
         else:
+            # Here we report combined data, either for a year or for all years
             payload = db.Categorystats.get_combined_counts(selected_category["category"], year)
-    else:
+
+    if payload is None:
         payload = db.Stats.get_download_counts(selected_category["category"], package, year)
-        
 
     if payload == []:
         abort(404)

@@ -20,14 +20,16 @@ if not is_production:
             "/bioc/bioc_2023_stats.tab",
             "/bioc/bioc_pkg_scores.tab",
             "/bioc/bioc_pkg_stats.tab",
+            "/bioc/bioc_stats.tab",
             "/bioc/affy/",
             "/bioc/affy/affy_stats.tab",
             "/bioc/affy/affy_2023_stats.tab",
+            "/data-experiment/experiment_2023_stats.tab",
             "/data-experiment/experiment_pkg_scores.tab",
             "/data-experiment/experiment_pkg_stats.tab",
             "/data-experiment/experiment_stats.tab",
             "/data-experiment/ABAData/",
-            "/data-experiment/ABAData/ABAData_2024_stats.tab",
+            "/data-experiment/ABAData/ABAData_2023_stats.tab",
             "/data-experiment/ABAData/ABAData_stats.tab",
             ]
 
