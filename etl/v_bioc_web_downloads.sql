@@ -15,30 +15,23 @@ Note: The RE string is repeated multiple times becasue Athena does not have reas
 to handle manifest constants (as of Oct-2023) 
 */
 
-CREATE OR REPLACE VIEW "v_bioc_web_downloads" AS
-with T as (
-SELECT "date",
-    request_ip as "c-ip",
-    "status" as "sc-status",
-    replace(regexp_extract(
-        "uri",
-        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$',
-        1
-    ), 'data/', '') category,
-    regexp_extract(
-        "uri",
-        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$',
-        2
-    ) package
-FROM "cloudfront_logs"
-WHERE (
-        (
-            "status" BETWEEN 200 AND 399
-        )
-        AND regexp_like(
-            "uri",
-        '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'
-        )
-    )
-)
-select * from T where package <> ''
+CREATE OR REPLACE VIEW "v_bioc_web_downloads" AS 
+WITH
+  T AS (
+   SELECT
+     "date"
+   , request_ip "c-ip"
+   , "status" "sc-status"
+   , replace(regexp_extract("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$', 1), 'data/', '') category
+   , regexp_extract("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$', 2) package
+   , LPAD(CAST(year("date") AS VARCHAR), 4, '0') "year"
+   , LPAD(CAST(month("date") AS VARCHAR), 2, '0') "month"
+   , LPAD(CAST(day("date") AS VARCHAR), 2, '0') "day"
+   FROM
+     "cloudfront_logs"
+   WHERE (("status" BETWEEN 200 AND 399) AND regexp_like("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'))
+) 
+SELECT *
+FROM
+  T
+WHERE (package <> '')
