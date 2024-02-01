@@ -25,6 +25,12 @@ dependencies = [
     "psycopg2-binary==2.9.9",
     "SQLAlchemy==2.0.22",
 
+    # aurora to SQL
+    "pandas",
+    "pyarrow",
+    "s3fs",
+    "awswrangler",
+
     # Migrations
     "Flask-Migrate==4.0.5",
 

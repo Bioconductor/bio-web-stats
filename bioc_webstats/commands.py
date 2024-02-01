@@ -84,3 +84,20 @@ def gendb():
     click.echo("Creating small test database")
     generate_small_test_db_stats()
     db.session.commit()
+    
+
+@click.command('ingest')
+@click.argument('db_connection_string')
+@click.argument('source_connection_string')
+def ingest(db_connection_string: chr, source_connection_string: chr):
+    """Ingest download logs from Athena.
+    See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html
+    """
+    from sqlalchemy import create_engine
+    import pandas as pd
+    import awswrangler as wr
+    
+    df = wr.s3.read_parquet(source_connection_string, dataset=True)
+    engine = create_engine(db_connection_string)
+    foo = df.to_sql('bioc_web_downloads1', engine)
+

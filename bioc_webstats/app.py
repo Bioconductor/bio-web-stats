@@ -80,10 +80,15 @@ def register_commands(app):
     app.cli.add_command(commands.test)
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.gendb)
+    app.cli.add_command(commands.ingest, 
+                        app.config["SQLALCHEMY_DATABASE_URI"],
+                        's3://bioc-webstats-download-logs/data/'  # TODO parameterize
+                        )
 
 
 def configure_logger(app):
     """Configure loggers."""
+    # TODO PARAMETERIZE
     handler = logging.StreamHandler(sys.stdout)
     if not app.logger.handlers:
         app.logger.addHandler(handler)
