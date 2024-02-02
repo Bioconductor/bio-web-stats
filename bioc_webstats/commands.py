@@ -3,6 +3,7 @@
 import os
 from glob import glob
 from subprocess import call
+from flask import current_app
 
 import click
 
@@ -87,17 +88,17 @@ def gendb():
     
 
 @click.command('ingest')
-@click.argument('db_connection_string')
-@click.argument('source_connection_string')
-def ingest(db_connection_string: chr, source_connection_string: chr):
+def ingest():
     """Ingest download logs from Athena.
     See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html
     """
     from sqlalchemy import create_engine
     import pandas as pd
     import awswrangler as wr
-    
+    db_connection_string = current_app.config["SQLALCHEMY_DATABASE_URI"]
+    source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     df = wr.s3.read_parquet(source_connection_string, dataset=True)
     engine = create_engine(db_connection_string)
     foo = df.to_sql('bioc_web_downloads1', engine)
+    pass
 
