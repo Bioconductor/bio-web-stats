@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.categorystats
     is_monthly boolean NOT NULL,
     ip_count integer,
     download_count integer,
-    CONSTRAINT categorystats_pkey PRIMARY KEY (category, "date", is_monthly)
+    CONSTRAINT categorystats_pkey PRIMARY KEY (category, date)
 )
 
 TABLESPACE pg_default;

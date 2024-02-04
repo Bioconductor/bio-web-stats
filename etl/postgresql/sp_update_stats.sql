@@ -15,7 +15,7 @@ BEGIN
     WHERE key = 'ValidThru';
     RAISE NOTICE 'Start Date %', start_date;
 
-	 INSERT INTO stats (category, package, date, is_monthly, ip_count, download_count)
+	INSERT INTO stats (category, package, date, is_monthly, ip_count, download_count)
 		select category, package, date, is_monthly, ip_count, download_count
 			from f_stats(start_date, false, true)
 		union all
@@ -31,12 +31,12 @@ BEGIN
 		download_count = EXCLUDED.download_count;
 		
 
-	 INSERT INTO categorystats (category, date, is_monthly, ip_count, download_count)
+	INSERT INTO categorystats (category, date, is_monthly, ip_count, download_count)
 		select category, date, is_monthly, ip_count, download_count
-			from f_stats(start_date, false, true)
+			from f_stats(start_date, false, false)
 		union all
 			select category, date, is_monthly, ip_count, download_count
-			from f_stats(start_date, true, true)
+			from f_stats(start_date, true, false)
 		ON CONFLICT (category, "date")
 		DO UPDATE SET
 		category  = EXCLUDED.category,

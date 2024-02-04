@@ -80,10 +80,7 @@ def register_commands(app):
     app.cli.add_command(commands.test)
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.gendb)
-    app.cli.add_command(commands.ingest, 
-                        app.config["SQLALCHEMY_DATABASE_URI"],
-                        's3://bioc-webstats-download-logs/data/'  # TODO parameterize
-                        )
+    app.cli.add_command(commands.ingest)
 
 
 def configure_logger(app):
