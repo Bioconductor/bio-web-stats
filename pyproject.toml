@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "bioc_webstats"
-version = "0.1.2"
+version = "0.1.3"
 description = "A web application to serve the content under www.bioconductor.org/packages/stats/"
 authors = [{name = "Robert Shear", email = "rshear@ds.dfck.harvard.edu"}]
 requires-python = ">=3.9"
