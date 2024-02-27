@@ -9,7 +9,6 @@ environment variables.
 from environs import Env
 import boto3
 
-
 env = Env()
 env.read_env()
 # TODO Raise a FATAL error if no .env file is found.
