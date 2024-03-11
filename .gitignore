@@ -25,7 +25,13 @@ pip-delete-this-directory.txt
 *.swn
 *.code-workspace
 .vscode/
+
+# RStudio files
 .Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
 # SQL
 *.sql.sqlite3
 # AWS

@@ -105,6 +105,7 @@ def ingest():
 #    df = wr.s3.read_parquet(source_connection_string, dataset=True)
     engine = create_engine(db_connection_string)
     with engine.connect() as conn:
+        # TODO Detect and report error here --- DB not available
         start_date = WebstatsInfo.get_valid_thru_date()
     query_str = f"""
     WITH
