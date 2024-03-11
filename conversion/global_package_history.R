@@ -4,15 +4,14 @@ library(glue)
 library(rvest)
 library(xml2)
 library(curl)
+library(yaml)
+library(kableExtra)
 # TODO CLeanup and operationalize
 
 # create a data frame consisting of release, biocViews category, package for all history
-# the package version are from the admin/manifest Bioc project:
-# git clone git@git.bioconductor.org:admin/manifest
-# The description of the packages will be in 
-# Get the releases from https://bioconductor.org/about/release-announcements/ by web scraping
+# the package version are from http://bioconductor.org/config.yaml, element r_ver_for_bioc_ver
 
-outfile_location <- "data/manifest_to_packages_table.csv"
+outfile_location <- "conversion/manifest_to_packages_table.csv"
 
 manifest_template <- "https://www.bioconductor.org/packages/{version}/{category}/src/contrib/PACKAGES"
 
@@ -28,7 +27,7 @@ manifest <- \( major, minor) {
   
     print(glue("{category} / {version}"))
 
-      con <- curl(glue(manifest_template))
+    con <- curl(glue(manifest_template))
     result <- read.dcf(con)
     close(con)
     tibble(category, package = result[,1])
@@ -36,27 +35,26 @@ manifest <- \( major, minor) {
          categories, glue("{major}.{minor}"), SIMPLIFY = FALSE))
 }
 
-file_path <- "conversion/bioc_versions.html"
-html_data <- read_html(file_path)
-df <- html_table(html_data, fill = TRUE, convert = FALSE)[[1]]
-df <- cbind(df, 
-         list_rbind(lapply(strsplit(df$Release, ".", fixed = TRUE), 
+file_path <- 'http://bioconductor.org/config.yaml'
+bioc_ver <- yaml.load_file(file_path)
+bioc_ver <- data.frame(Release = names(bioc_ver$r_ver_for_bioc_ver))
+df <- cbind(bioc_ver, 
+         list_rbind(lapply(strsplit(bioc_ver$Release, ".", fixed = TRUE), 
                               (\(u) data.frame(major = as.integer(u[1]), 
                                                minor = as.integer(u[2])))))) |>
   filter(major > 1 | (major == 1 & minor > 7)) |>
-mutate(Date = mdy(Date), packages = map2(major, minor, manifest)) -> z
-  
-# saveRDS(df, "~/Downloads/globalpackages.rds")
-df <- readRDS("~/Downloads/globalpackages.rds")
+  mutate(packages = map2(major, minor, manifest))
+
+
 z <- df |> unnest_longer(packages) |> 
   mutate(version = major * 100 + minor, category = packages$category, package = packages$package, .keep = "none")
 
 # Are there any duplicate entries by category
-# z |> group_by(category, package, version) |> summarize(N = n()) |> filter(N > 1)
+z |> group_by(category, package, version) |> summarize(N = n()) |> filter(N > 1)
 # nrow is zero. All okay
 
 # the packages that have switched versions
-# z |> select(-version) |> distinct() |> group_by(package) |> summarize(N = n()) |> filter(N > 1) |> kable(format = 'pipe')
+z |> select(-version) |> distinct() |> group_by(package) |> summarize(N = n()) |> filter(N > 1) |> kable(format = 'pipe')
 
 current_version <- max(z$version)
 z |> 
@@ -66,4 +64,4 @@ z |>
             last_version = max(version)) |>
   arrange(package) -> w
 
-write.csv(w, outfile_location)
+write.csv(w, outfile_location, quote=FALSE, row.names = FALSE)
