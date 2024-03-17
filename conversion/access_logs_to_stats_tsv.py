@@ -8,11 +8,17 @@ from datetime import datetime as dt
 
 from psql_connection import psql_get_connection
 
+# TODO Use AWS paraemter store
+secret_name = "rds-db-credentials/cluster-BFK2EVT2EFIRT4B5XVC6PDOXIQ/postgres/1701682809099"
+region_name = "us-east-1"
+database_name = 'webstats'
+
 
 def export_chunked_tsv(db_path, query, chunk_size, start_at=0):
     """Export the table in chunks."""
 
-    target_connection = psql_get_connection()
+
+    target_connection = psql_get_connection(secret_name, region_name, database_name)
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

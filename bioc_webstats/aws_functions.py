@@ -1,4 +1,4 @@
-''' aws_functions TODO rename this.'''
+""" aws_functions TODO rename this. """
 import boto3
 from botocore.exceptions import ClientError
 
@@ -46,16 +46,3 @@ def get_parameter_store_values(parameter_path: str) -> dict:
         result = {item["Name"][len(parameter_path)+1:] : item["Value"] for item in plist["Parameters"]}
     return result
     
-
-if __name__ == "__main__":
-    # result = aws_assume_sts_role(
-    #     'arn:aws:iam::931729544676:role/bioc-webstats-webrunner',
-    #     'webstats.tester')
-    # pass
-    
-    t = get_parameter_store_values("/bioc/webstats/dev")
-    pass
-    print("| Path | Value  |")
-    print("| -----| ------ |")
-    for k,v in t.items():
-        print("|", k, "|", v , "|") 

@@ -5,6 +5,8 @@ import json
 import psycopg2
 
 # TODO Role/Credentials
+# TODO Move to aws_functions.py
+
 def get_secret(secret_name, region_name):
 
 
@@ -28,13 +30,8 @@ def get_secret(secret_name, region_name):
     secret = get_secret_value_response['SecretString']
     return secret
 
-# TODO REFACTOR
-secret_name = "rds-db-credentials/cluster-BFK2EVT2EFIRT4B5XVC6PDOXIQ/postgres/1701682809099"
-region_name = "us-east-1"
-database_name = 'webstats'
-
     
-def psql_get_connection(secret_name=secret_name, region_name=region_name, database_name=database_name):
+def psql_get_connection(secret_name, region_name, database_name):
     """TODO."""
     secret = get_secret(secret_name, region_name)
     db_credentials = json.loads(secret)
@@ -48,3 +45,5 @@ def psql_get_connection(secret_name=secret_name, region_name=region_name, databa
     # Example: using psycopg2
     conn = psycopg2.connect(connection_string)
     return conn
+
+
