@@ -11,6 +11,7 @@ See https://pypi.org/project/environs/ for more information.
 import os
 from environs import Env
 import boto3
+import aws_functions
 
 def get_str(target, default):
     """Get parameter from SSM parameter store if present, otherwise from Env()"""
@@ -27,17 +28,10 @@ if env.str('AWS_PARAMETER_PATH', None) is  None:
     param_dict = {}
 else:
     # Yes Add the values to the parameter set
-    ssm_client = boto3.client('ssm')
-    plist = ssm_client.get_parameters_by_path(Path = AWS_PARAMETER_PATH, Recursive=True)
-    # HACK Start from the top with SSM paramater store included
-    for item in plist["Parameters"]:
-        plist = ssm_client.get_parameters_by_path(Path = AWS_PARAMETER_PATH, Recursive=True)
-        param_dict = {item["Name"][len(AWS_PARAMETER_PATH)+1:] : item["Value"] for item in plist["Parameters"]}
-
-# TODO Refactor Parameter store config variables to match local
-# TODO Complete parameters
-# TODO Secret manager for database values
-
+    param_dict = aws_functions.get_parameter_store_values(AWS_PARAMETER_PATH)
+    # TODO Transform leaf names to upper case and match .env idnetifiers
+    # TODO database connection from db/creentoials viz. DATABASE_URL
+    
 ENV = get_str("FLASK_ENV", default="production")
 DEBUG = get_str('DEBUG', ENV == "development")
 SQLALCHEMY_DATABASE_URI = get_str("DATABASE_URL")

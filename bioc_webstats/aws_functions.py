@@ -27,9 +27,35 @@ def aws_assume_sts_role(role_arn, role_session_name):
 
     # Now you can use the s3_resource object to interact with S3
     
-if __name__ == "__main__":
-    result = aws_assume_sts_role(
-        'arn:aws:iam::931729544676:role/bioc-webstats-webrunner',
-        'webstats.tester')
-    pass
+def get_parameter_store_values(parameter_path: str) -> dict:
+    """Get all SSM parameter store values for a specific configuration.
+
+    Arguments:
+        parameter_path -- The prefix for the configure. Example: "/bioc/webstats/dev"
+
+    Returns:
+        A dictionary of parameter names (excluding the prefix) and their values.
+    """
+ 
+ 
+    ssm_client = boto3.client('ssm')
+    plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
+    # HACK Start from the top with SSM paramater store included
+    for item in plist["Parameters"]:
+        plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
+        result = {item["Name"][len(parameter_path)+1:] : item["Value"] for item in plist["Parameters"]}
+    return result
     
+
+if __name__ == "__main__":
+    # result = aws_assume_sts_role(
+    #     'arn:aws:iam::931729544676:role/bioc-webstats-webrunner',
+    #     'webstats.tester')
+    # pass
+    
+    t = get_parameter_store_values("/bioc/webstats/dev")
+    pass
+    print("| Path | Value  |")
+    print("| -----| ------ |")
+    for k,v in t.items():
+        print("|", k, "|", v , "|") 
