@@ -1,6 +1,8 @@
 """ aws_functions TODO rename this. """
 import boto3
 from botocore.exceptions import ClientError
+import json
+import psycopg2
 
 def aws_assume_sts_role(role_arn, role_session_name):
 
@@ -45,4 +47,45 @@ def get_parameter_store_values(parameter_path: str) -> dict:
         plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
         result = {item["Name"][len(parameter_path)+1:] : item["Value"] for item in plist["Parameters"]}
     return result
-    
+
+
+def get_secret(secret_name, region_name):
+
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    # Decrypts secret using the associated KMS key.
+    secret = get_secret_value_response['SecretString']
+    return secret
+
+def psql_get_connection(secret_name, region_name, database_name):
+    """TODO."""
+    connection_string = aws_secret_to_psql_url(secret_name, region_name, database_name)
+    conn = psycopg2.connect(connection_string)
+    return conn
+
+def aws_secret_to_psql_url(secret_name, region_name, database_name):
+    secret = get_secret(secret_name, region_name)
+    db_credentials = json.loads(secret)
+    # TODO: add database name to secret in Secrets Manager
+    db_credentials['dbname'] = database_name
+
+    # Create the PostgreSQL connection string
+    connection_string = f"postgresql://{db_credentials['username']}:{db_credentials['password']}@{db_credentials['host']}:{db_credentials['port']}/{db_credentials['dbname']}"
+    return connection_string
+
+

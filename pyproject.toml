@@ -67,6 +67,7 @@ dev = [
     "pytest==7.4.2",
     "pytest-cov==4.1.0",
     "WebTest==3.0.0",
+    "decouple",
 
 # Lint and code style
     "flake8",

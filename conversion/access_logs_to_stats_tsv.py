@@ -6,7 +6,7 @@ import psycopg2
 import sqlite3
 from datetime import datetime as dt
 
-from psql_connection import psql_get_connection
+from bioc_webstats.aws_functions import psql_get_connection
 
 # TODO Use AWS paraemter store
 secret_name = "rds-db-credentials/cluster-BFK2EVT2EFIRT4B5XVC6PDOXIQ/postgres/1701682809099"
