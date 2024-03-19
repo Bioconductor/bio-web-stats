@@ -11,6 +11,7 @@ from datetime import date, timedelta
 import os
 
 from flask import Blueprint, Response, abort, render_template, send_from_directory, make_response
+# TODO mixed pattern! should either import all the models (e.g. Packages) or make everything qualified e.g. db.WebstatsInfo...
 import bioc_webstats.models as db
 from bioc_webstats.models import PackageType, WebstatsInfo, Packages
 

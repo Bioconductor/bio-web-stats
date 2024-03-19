@@ -1,24 +1,24 @@
 """Ingest download logs from Athena."""
 
 from datetime import date, timedelta
-from sqlalchemy import create_engine, text
-from bioc_webstats.models import WebstatsInfo
 import pandas as pd
 import awswrangler as wr
 from flask import current_app
 import logging
 
+import bioc_webstats.models as db
+from bioc_webstats.models import PackageType, WebstatsInfo, Packages
+
 def ingest_logs():
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
 
     
-    db_connection_string = current_app.config["SQLALCHEMY_DATABASE_URI"]
-    current_app.logger.log(logging.INFO, 'Preparing to open <%s> database', db_connection_string)
+    current_app.logger.log(logging.INFO, 'Starting ingest')
 #    source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
 #    df = wr.s3.read_parquet(source_connection_string, dataset=True)
-    engine = create_engine(db_connection_string)
-    with engine.connect() as conn:
-        start_date = WebstatsInfo.get_valid_thru_date()
+    # Access to model data
+    start_date = WebstatsInfo.get_valid_thru_date()
+    raise Exception("DEBUG TO HERE!")
     query_str = f"""
     WITH
   T AS (
