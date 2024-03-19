@@ -4,8 +4,9 @@ import logging
 import sys
 import os
 from flask import Flask, render_template
-
+from werkzeug.utils import import_string
 from bioc_webstats import commands, splash, stats
+import bioc_webstats.aws_functions as aws
 
 from bioc_webstats.extensions import (
     cache,
@@ -16,13 +17,31 @@ from bioc_webstats.extensions import (
     migrate,
 )
 
-def create_app(config_filename="settings.py"):
+def create_app(config_object_name="bioc_webstats.configmodule.ProdConfig"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
-    :param config_object: The configuration object to use.
+    :param config_object_name: The configuration object to use.
     """
     app = Flask(__name__.split(".")[0])
-    app.config.from_pyfile(config_filename)
+    
+
+    # Populate the configuration from config and its sublcasses
+    cfg = import_string(config_object_name)()
+    app.config.from_object(cfg)
+    # Override with environment variables with FLASK_ prefix
+    app.config.from_prefixed_env()
+
+    if 'AWS_PARAMETER_PATH' not in app.config:
+        param_dict = {}
+    else:
+        param_dict = aws.get_parameter_store_values(app.config['AWS_PARAMETER_PATH'])
+    if 'db/credentials' in param_dict:
+        app.config["DATABASE_URL"] = aws.aws_secret_to_psql_url(param_dict['db/credentials'], "us-east-1", "webstats")
+
+    # TODO Issue: how to override db/credentials with DATABASE_URL. Answer use "special arn-to-url scheme"
+    app.config["SQLALCHEMY_DATABASE_URI"] = app.config["DATABASE_URL"]
+    # TODO SECRET_KEY from paraemter store
+
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)

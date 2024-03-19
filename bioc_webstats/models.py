@@ -283,5 +283,5 @@ class Stats(Model):
             .order_by(asc(Stats.package))
         )
 
-        result = result = db.session.execute(query)
+        result = db.session.execute(query)
         return result.fetchall()

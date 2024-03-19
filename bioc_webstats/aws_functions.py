@@ -72,6 +72,7 @@ def get_secret(secret_name, region_name):
     secret = get_secret_value_response['SecretString']
     return secret
 
+# TODO Do we need region_name?
 def psql_get_connection(secret_name, region_name, database_name):
     """TODO."""
     connection_string = aws_secret_to_psql_url(secret_name, region_name, database_name)
@@ -89,3 +90,42 @@ def aws_secret_to_psql_url(secret_name, region_name, database_name):
     return connection_string
 
 
+def uri_to_arn(uri):
+    # Parse the URI to extract the components
+    scheme, path = uri.split("://", 1)
+    if scheme != "awsarn":
+        raise ValueError("Invalid scheme in URI: expected 'awsarn'")
+    
+    # Split the path into its components
+    service_region, account_id, resource_type_path = path.split("/", 2)
+    service, region = service_region.split(".", 1)
+    
+    # Construct the ARN
+    arn = f"arn:aws:{service}:{region}:{account_id}:{resource_type_path}"
+    
+    return arn
+
+# Example usage
+# uri = "awsarn://secretsmanager.us-east-1.amazonaws.com/931729544676/secret/bioc/rdb/login/webstats_runner-fQFuUn"
+# arn = uri_to_arn(uri)
+# print(arn)
+
+
+def arn_to_uri(arn):
+    # Validate and parse the ARN
+    parts = arn.split(':')
+    if len(parts) != 6 or parts[0] != 'arn' or parts[1] != 'aws':
+        raise ValueError("Invalid ARN format")
+
+    # Extract the ARN components
+    _, _, service, region, account_id, resource_path = parts
+
+    # Construct the URI
+    uri = f"awsarn://{service}.{region}.amazonaws.com/{account_id}/{resource_path}"
+    
+    return uri
+
+# Example usage
+# arn = "arn:aws:secretsmanager:us-east-1:931729544676:secret:/bioc/rdb/login/webstats_runner-fQFuUn"
+# uri = arn_to_uri(arn)
+# print(uri)
