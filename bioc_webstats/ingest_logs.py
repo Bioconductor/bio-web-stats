@@ -7,18 +7,16 @@ from flask import current_app
 import logging
 
 import bioc_webstats.models as db
-from bioc_webstats.models import PackageType, WebstatsInfo, Packages
 
 def ingest_logs():
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
 
     
-    current_app.logger.log(logging.INFO, 'Starting ingest')
-#    source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
-#    df = wr.s3.read_parquet(source_connection_string, dataset=True)
+    # current_app.logger.log(logging.INFO, 'Starting ingest')
+    # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
+    # df = wr.s3.read_parquet(source_connection_string, dataset=True)
     # Access to model data
-    start_date = WebstatsInfo.get_valid_thru_date()
-    raise Exception("DEBUG TO HERE!")
+    start_date = db.WebstatsInfo.get_valid_thru_date()
     query_str = f"""
     WITH
   T AS (
