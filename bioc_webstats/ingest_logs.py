@@ -17,26 +17,10 @@ def ingest_logs():
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
     # Access to model data
     start_date = db.WebstatsInfo.get_valid_thru_date()
+    end_date = start_date # should be max date - 1day
     query_str = f"""
-    WITH
-  T AS (
-   SELECT
-     "date"
-   , request_ip "c-ip"
-   , "status" "sc-status"
-   , replace(regexp_extract("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\\.(?:tar|gz|zip|tgz)$', 1), 'data/', '') category
-   , regexp_extract("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\\.(?:tar|gz|zip|tgz)$', 2) package
-   , LPAD(CAST(year("date") AS VARCHAR), 4, '0') "year"
-   , LPAD(CAST(month("date") AS VARCHAR), 2, '0') "month"
-   , LPAD(CAST(day("date") AS VARCHAR), 2, '0') "day"
-   FROM
-     "cloudfront_logs"
-   WHERE
-    "date" > DATE '{start_date}' AND
-    "status" in (200, 301, 302, 307, 308) AND 
-    regexp_like("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\\.(?:tar|gz|zip|tgz)$'))
-    SELECT * FROM T WHERE (package <> '')
-    LIMIT 10;
+select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downloads
+where "date" between DATE '{start_date}' and DATE '{end_date}'
 """
     database = "glue-sup-db"
     output = "s3://perf-anal-2022-12-06-rds/"
@@ -45,4 +29,38 @@ def ingest_logs():
     pass
     # foo = df.to_sql('bioc_web_downloads', engine)
     pass
+# \copy public.bioc_web_downloads (date, "c-ip", "sc-status", category, "package") 
+# 	FROM '47451b6a-96d7-4003-844d-56875d89b53c.csv'
+# DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '"' ESCAPE '''';
 
+# CHECK THE COUNTS
+
+#####################
+# BEGIN; -- Start a transaction
+
+# DELETE FROM stats WHERE "date" >= date '2024-03-01';
+
+# INSERT INTO stats
+# SELECT * FROM v_stats WHERE "date" >= date '2024-03-01';
+
+# DELETE FROM categorystats WHERE "date" >= date '2024-03-01';
+
+# INSERT INTO categorystats
+# SELECT * FROM v_categorystats WHERE "date" >= date '2024-03-01';
+
+# update webstats_info 
+#         set value = (select max(date) from bioc_web_downloads)
+#         where key = 'ValidThru';
+        
+# COMMIT;
+
+# -- If there are any issues, you can rollback the transaction
+# -- ROLLBACK;
+
+#####################
+
+# REPORT THE UPDATE
+
+# aws cloudfront create-invalidation --distribution-id E1TVLJONPTUXV3 --paths '/packages/stats/*'
+
+# REPORT THE INVALIDATION
