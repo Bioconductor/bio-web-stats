@@ -17,13 +17,17 @@ def ingest_logs():
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
     # Access to model data
     start_date = db.WebstatsInfo.get_valid_thru_date()
+    start_date = date(2024, 2, 27)
+    #modified_date = (start_date + timedelta(days=1))
     end_date = start_date # should be max date - 1day
+
+    start_date = date.strftime(start_date, "%Y-%m-%d")
+    end_date = date.strftime(end_date, "%Y-%m-%d")
     query_str = f"""
 select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downloads
 where "date" between DATE '{start_date}' and DATE '{end_date}'
 """
     database = "glue-sup-db"
-    output = "s3://perf-anal-2022-12-06-rds/"
     result = wr.athena.read_sql_query(sql=query_str, database=database, ctas_approach=True)
     # TODO do I need to move it to parquet first?
     pass
