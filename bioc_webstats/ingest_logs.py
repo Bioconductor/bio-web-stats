@@ -1,45 +1,73 @@
 """Ingest download logs from Athena."""
 
-from datetime import date, timedelta
+from typing import Optional
+from datetime import date, timedelta, datetime
 import pandas as pd
+import boto3
 import awswrangler as wr
 from flask import current_app
 import logging
 
 import bioc_webstats.models as db
 
-def ingest_logs():
+def ingest_logs(
+    start_date: Optional[date] = None, 
+    end_date: Optional[date] = None,
+    aws_profile: Optional[chr] = "bioc",
+    source_database: Optional[chr] = "default",
+    result_filename: Optional[chr] = "~/Downloads/df.scv") -> None:
+
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
 
-    
-    # current_app.logger.log(logging.INFO, 'Starting ingest')
+    boto3.setup_default_session(profile_name = aws_profile)
+
+    logger = current_app.logger,
+    logger.log(logging.INFO, 'Starting ingest_logs at {datetime.utcnow}')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
-    # Access to model data
-    start_date = db.WebstatsInfo.get_valid_thru_date()
-    start_date = date(2024, 2, 27)
-    #modified_date = (start_date + timedelta(days=1))
-    end_date = start_date # should be max date - 1day
 
-    start_date = date.strftime(start_date, "%Y-%m-%d")
-    end_date = date.strftime(end_date, "%Y-%m-%d")
+    if start_date is None:
+        start_date = db.WebstatsInfo.get_valid_thru_date() + timedelta(days=1)
+
+    if end_date is None:
+        end_date = (datetime.utcnow() - timedelta(days=1)).date()
+        
+    if start_date > end_date:
+        logger.error("Start date ({start_date}) greater than end date ({end_date}). No log records ingested", 
+                    start_date,
+                    end_date)
+        return
+    if start_date == end_date:
+        logger.warn("Start and End dates are both {start_date}. No log records ingested", 
+                    start_date)
+        return
+
+    logger.info("Ingesting logs from ({start_date}) to ({end_date})",
+                    start_date,
+                    end_date)
+        
     query_str = f"""
 select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downloads
-where "date" between DATE '{start_date}' and DATE '{end_date}'
+    where "date" between DATE '{strftime(start_date, "%Y-%m-%d")}' 
+        and DATE '{strftime(end_date, "%Y-%m-%d")}'
 """
-    database = "glue-sup-db"
-    result = wr.athena.read_sql_query(sql=query_str, database=database, ctas_approach=True)
-    # TODO do I need to move it to parquet first?
-    pass
-    # foo = df.to_sql('bioc_web_downloads', engine)
-    pass
-# \copy public.bioc_web_downloads (date, "c-ip", "sc-status", category, "package") 
-# 	FROM '47451b6a-96d7-4003-844d-56875d89b53c.csv'
-# DELIMITER ',' CSV HEADER ENCODING 'UTF8' QUOTE '"' ESCAPE '''';
+    result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
+    logger.info("{len(result)} records read")
 
-# CHECK THE COUNTS
+    # Dump records to csv file if requested
+    if result_filename is not None:
+    # Write output to csv file
+        result.to_csv(result_filename, index = False)
+        logger.info("All records written to {result_filename}")
+        return
+    
+    # Write out put to database table
+    raise NotImplementedError
+    # TODO DEBUG 
+    result.to_sql('bioc_web_downloads', con=engine, if_exists='append', index=False)
 
 #####################
+# TODO Make this a SPROC ... get the start date from last update date.
 # BEGIN; -- Start a transaction
 
 # DELETE FROM stats WHERE "date" >= date '2024-03-01';

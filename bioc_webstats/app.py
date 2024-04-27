@@ -41,6 +41,7 @@ def create_app(config_object_name="bioc_webstats.configmodule.ProdConfig"):
     # TODO Issue: how to override db/credentials with DATABASE_URL. Answer use "special arn-to-url scheme"
     app.config["SQLALCHEMY_DATABASE_URI"] = app.config["DATABASE_URL"]
     # TODO SECRET_KEY from paraemter store
+    app.config["SECRET_KEY"]="1849cb85026145adc5164b9568d6afbde65351264f87c25aebdadc576ae662f5"
 
     register_extensions(app)
     register_blueprints(app)

@@ -354,10 +354,10 @@ CNORode,bioc,211,319
 CNPBayes,bioc,302,309
 CNTools,bioc,205,319
 CNVMetrics,bioc,315,319
-CNVPanelizer,bioc,302,318
+CNVPanelizer,bioc,302,319
 CNVRanger,bioc,309,319
 CNVfilteR,bioc,310,319
-CNVgears,bioc,313,317
+CNVgears,bioc,313,318
 CNViz,bioc,313,319
 CNVrd2,bioc,213,319
 CNVtools,bioc,205,311
@@ -389,6 +389,7 @@ CTdata,bioc,317,319
 CTexploreR,bioc,319,319
 CVE,bioc,304,310
 CaDrA,bioc,318,319
+CaMutQC,bioc,319,319
 CancerInSilico,bioc,304,316
 CancerMutationAnalysis,bioc,210,312
 CancerSubtypes,bioc,304,319
@@ -442,6 +443,7 @@ Clomial,bioc,214,319
 Clonality,bioc,208,317
 CluMSID,bioc,309,319
 CluMSIDdata,data/experiment,309,319
+ClustAll,bioc,319,319
 ClustIRR,bioc,318,319
 ClusterFoldSimilarity,bioc,319,319
 ClusterJudge,bioc,306,319
@@ -476,7 +478,9 @@ CuratedAtlasQueryR,bioc,318,319
 CyTOFpower,bioc,314,319
 CytoDx,bioc,307,319
 CytoGLMM,bioc,313,319
+CytoMDS,bioc,319,319
 CytoML,bioc,304,319
+CytoMethIC,data/experiment,319,319
 CytoPipeline,bioc,317,319
 CytoPipelineGUI,bioc,318,319
 CytoTree,bioc,312,315
@@ -542,6 +546,7 @@ DeSousa2013,data/experiment,213,319
 DeconRNASeq,bioc,211,319
 DeepBlueR,bioc,304,318
 DeepPINCS,bioc,313,319
+DegCre,bioc,319,319
 DegNorm,bioc,312,319
 DelayedArray,bioc,305,319
 DelayedDataFrame,bioc,309,319
@@ -810,6 +815,7 @@ GloScope,bioc,318,319
 GlobalAncova,bioc,108,319
 GmicR,bioc,310,319
 GoogleGenomics,bioc,301,308
+GrafGen,bioc,319,319
 GraphAT,bioc,108,319
 GraphAlignment,bioc,202,319
 GraphPAC,bioc,212,319
@@ -890,6 +896,7 @@ HuO22.db,data/annotation,201,319
 HubPub,bioc,313,319
 HumanAffyData,data/experiment,304,319
 HumanTranscriptomeCompendium,bioc,309,319
+HybridExpress,bioc,319,319
 HybridMTest,bioc,210,319
 IFAA,bioc,317,319
 IHW,bioc,303,319
@@ -933,6 +940,8 @@ IlluminaHumanMethylationEPICanno.ilm10b2.hg19,data/annotation,302,319
 IlluminaHumanMethylationEPICanno.ilm10b3.hg19,data/annotation,305,319
 IlluminaHumanMethylationEPICanno.ilm10b4.hg19,data/annotation,306,319
 IlluminaHumanMethylationEPICmanifest,data/annotation,302,319
+IlluminaHumanMethylationEPICv2anno.20a1.hg38,data/annotation,319,319
+IlluminaHumanMethylationEPICv2manifest,data/annotation,319,319
 Imetagene,bioc,302,312
 ImmuneSpaceR,bioc,303,319
 ImpulseDE,bioc,304,311
@@ -963,6 +972,7 @@ JASPAR2024,data/annotation,318,319
 JazaeriMetaData,data/annotation,200,202
 JazaeriMetaData.db,data/annotation,201,319
 JctSeqData,data/experiment,303,312
+JohnsonKinaseData,data/experiment,319,319
 JunctionSeq,bioc,303,311
 KBoost,bioc,313,319
 KCsmart,bioc,203,319
@@ -1055,9 +1065,10 @@ MEDIPS,bioc,207,319
 MEDIPSData,data/experiment,211,319
 MEDME,bioc,203,319
 MEEBOdata,data/experiment,109,319
-MEIGOR,bioc,300,317
+MEIGOR,bioc,300,319
 MGFM,bioc,300,319
 MGFR,bioc,304,319
+MGnifyR,bioc,319,319
 MICSQTL,bioc,318,319
 MIGSA,bioc,305,316
 MIGSAdata,data/experiment,305,317
@@ -1145,6 +1156,7 @@ MafDb.gnomADex.r2.1.hs37d5,data/annotation,308,319
 MafH5.gnomAD.r3.0.GRCh38,data/annotation,311,313
 MafH5.gnomAD.v3.1.1.GRCh38,data/annotation,313,317
 MafH5.gnomAD.v3.1.2.GRCh38,data/annotation,315,319
+MafH5.gnomAD.v4.0.GRCh38,data/annotation,319,319
 MantelCorr,bioc,108,319
 Masks.Dmelanogaster.UCSC.dm3,data/annotation,203,206
 MassArray,bioc,206,319
@@ -1298,6 +1310,7 @@ MoonlightR,bioc,304,319
 MotIV,bioc,206,311
 Motif2Site,bioc,315,319
 MotifDb,bioc,211,319
+MouseAgingData,data/experiment,319,319
 MouseFM,bioc,312,319
 MouseGastrulationData,data/experiment,310,319
 MouseThymusAgeing,data/experiment,313,319
@@ -1326,7 +1339,7 @@ MultiRNAflow,bioc,318,319
 MultimodalExperiment,bioc,317,319
 MungeSumstats,bioc,313,319
 Mus.musculus,data/annotation,211,319
-MutationalPatterns,bioc,304,318
+MutationalPatterns,bioc,304,319
 NADfinder,bioc,305,319
 NBAMSeq,bioc,309,319
 NBSplice,bioc,308,316
@@ -1397,7 +1410,7 @@ Organism.dplyr,bioc,305,319
 OrganismDbi,bioc,211,319
 Orthology.eg.db,data/annotation,313,319
 Oscope,bioc,302,319
-OutSplice,bioc,317,318
+OutSplice,bioc,317,319
 OutlierD,bioc,201,312
 PAA,bioc,300,319
 PADOG,bioc,211,319
@@ -1426,7 +1439,7 @@ PIPETS,bioc,319,319
 PLPE,bioc,203,319
 PLSDAbatch,bioc,319,319
 POCRCannotation.db,data/annotation,201,319
-POMA,bioc,312,318
+POMA,bioc,312,319
 POST,bioc,305,312
 POWSC,bioc,313,319
 PPInfer,bioc,305,319
@@ -1524,7 +1537,7 @@ RDRToolbox,bioc,207,319
 REBET,bioc,308,319
 REDseq,bioc,209,319
 REMP,bioc,305,319
-RESOLVE,bioc,316,318
+RESOLVE,bioc,316,319
 RGMQL,bioc,307,319
 RGMQLlib,data/experiment,307,319
 RGSEA,bioc,300,319
@@ -1551,7 +1564,7 @@ RNASeqDataSubset,data/experiment,211,212
 RNASeqPower,bioc,212,319
 RNASeqR,bioc,308,316
 RNASeqRData,data/experiment,308,316
-RNAdecay,bioc,307,318
+RNAdecay,bioc,307,319
 RNAinteract,bioc,208,319
 RNAinteractMAPK,data/experiment,208,319
 RNAither,bioc,203,312
@@ -1644,7 +1657,7 @@ RegEnrich,bioc,312,319
 RegParallel,data/experiment,308,319
 RegionalST,bioc,318,319
 RepViz,bioc,309,319
-Repitools,bioc,209,318
+Repitools,bioc,209,319
 ReportingTools,bioc,211,319
 ResidualMatrix,bioc,312,319
 Resourcerer,bioc,108,214
@@ -1706,8 +1719,8 @@ SBMLR,bioc,108,319
 SC3,bioc,303,319
 SCAN.UPC,bioc,211,319
 SCANVIS,bioc,310,319
-SCATE,bioc,312,317
-SCATEData,data/experiment,312,317
+SCATE,bioc,312,318
+SCATEData,data/experiment,312,318
 SCArray,bioc,313,319
 SCArray.sat,bioc,317,319
 SCBN,bioc,308,319
@@ -1718,7 +1731,7 @@ SCnorm,bioc,306,319
 SDAMS,bioc,307,319
 SELEX,bioc,301,319
 SEPA,bioc,302,309
-SEPIRA,bioc,307,317
+SEPIRA,bioc,307,318
 SEtools,bioc,310,319
 SFEData,data/experiment,316,319
 SGCP,bioc,317,319
@@ -1802,7 +1815,7 @@ SemSim,bioc,200,202
 SeqArray,bioc,212,319
 SeqGSEA,bioc,212,319
 SeqGate,bioc,312,319
-SeqSQC,bioc,306,318
+SeqSQC,bioc,306,319
 SeqVarTools,bioc,213,319
 SharedObject,bioc,310,319
 ShortRead,bioc,203,319
@@ -1827,6 +1840,7 @@ SomatiCA,bioc,212,303
 SomatiCAData,data/experiment,212,319
 SomaticCancerAlterations,data/experiment,213,319
 SomaticSignatures,bioc,214,319
+SpaceMarkers,bioc,319,319
 SpacePAC,bioc,213,319
 Spaniel,bioc,310,319
 SparseArray,bioc,317,319
@@ -1854,6 +1868,7 @@ Streamer,bioc,209,319
 Structstrings,bioc,309,319
 StructuralVariantAnnotation,bioc,309,319
 SubCellBarCode,bioc,309,319
+SubcellularSpatialData,data/experiment,319,319
 SummarizedBenchmark,bioc,307,319
 SummarizedExperiment,bioc,302,319
 Summix,bioc,313,319
@@ -1995,6 +2010,7 @@ TxDb.Sscrofa.UCSC.susScr11.refGene,data/annotation,307,319
 TxDb.Sscrofa.UCSC.susScr3.refGene,data/annotation,303,319
 TxRegInfra,bioc,307,312
 TypeInfo,bioc,109,319
+UCSC.utils,bioc,319,319
 UCSCRepeatMasker,data/annotation,315,319
 UCell,bioc,315,319
 UMI4Cats,bioc,312,319
@@ -2149,6 +2165,7 @@ atgenomeattigrprobe,data/annotation,109,109
 ath1121501,data/annotation,108,202
 ath1121501.db,data/annotation,201,319
 ath1121501cdf,data/annotation,108,319
+ath1121501frmavecs,data/annotation,319,319
 ath1121501probe,data/annotation,108,319
 ath1atrefseq,data/annotation,109,201
 ath1atrefseq7cdf,data/annotation,108,108
@@ -2181,7 +2198,7 @@ basilisk,bioc,311,319
 basilisk.utils,bioc,311,319
 batchelor,bioc,309,319
 bayNorm,bioc,308,319
-baySeq,bioc,205,318
+baySeq,bioc,205,319
 bcSeq,bioc,307,319
 bcellViper,data/experiment,214,319
 beachmat,bioc,306,319
@@ -2195,6 +2212,7 @@ benchmarkfdrData2019,data/experiment,310,319
 beta7,data/experiment,109,319
 betaHMM,bioc,319,319
 betr,bioc,204,304
+bettr,bioc,319,319
 bgafun,bioc,201,311
 bgx,bioc,200,319
 bigPint,bioc,309,317
@@ -2434,7 +2452,7 @@ clstutils,bioc,208,319
 clustComp,bioc,303,319
 clusterExperiment,bioc,304,319
 clusterProfiler,bioc,208,319
-clusterSeq,bioc,305,318
+clusterSeq,bioc,305,319
 clusterStab,bioc,108,319
 clustifyr,bioc,311,319
 clustifyrdatahub,data/experiment,312,319
@@ -2519,11 +2537,12 @@ curatedPCaData,data/experiment,319,319
 curatedTBData,data/experiment,314,319
 curatedTCGAData,data/experiment,306,319
 customCMPdb,bioc,312,319
-customProDB,bioc,213,318
+customProDB,bioc,213,319
 cyanoFilter,bioc,313,319
 cycle,bioc,205,319
 cydar,bioc,305,319
 cyp450cdf,data/annotation,108,319
+cypress,bioc,319,319
 cytoKernel,bioc,314,319
 cytoMEM,bioc,315,319
 cytofQC,bioc,317,319
@@ -2580,6 +2599,7 @@ diffloopdata,data/experiment,303,319
 diffuStats,bioc,306,319
 diggit,bioc,301,319
 diggitdata,data/experiment,301,319
+dinoR,bioc,319,319
 dir.expiry,bioc,313,319
 discordant,bioc,305,319
 distinct,bioc,311,319
@@ -2990,6 +3010,7 @@ ggtree,bioc,301,319
 ggtreeDendro,bioc,316,319
 ggtreeExtra,bioc,312,319
 ggtut,data/experiment,209,302
+ginmappeR,bioc,319,319
 girafe,bioc,206,319
 glmGamPoi,bioc,311,319
 glmSparseNet,bioc,308,319
@@ -3726,6 +3747,7 @@ iPAC,bioc,211,319
 iPath,bioc,314,319
 iSEE,bioc,307,319
 iSEEde,bioc,318,319
+iSEEfier,bioc,319,319
 iSEEhex,bioc,316,319
 iSEEhub,bioc,316,319
 iSEEindex,bioc,318,319
@@ -3819,6 +3841,7 @@ kidpack,data/experiment,109,319
 kimod,bioc,303,311
 kissDE,bioc,307,319
 klahomology,data/annotation,108,202
+knowYourCG,bioc,319,319
 lapmix,bioc,109,319
 ldblock,bioc,302,319
 leeBamViews,data/experiment,206,319
@@ -3963,6 +3986,7 @@ methimpute,bioc,306,319
 methodical,bioc,319,319
 methrix,bioc,310,319
 methyAnalysis,bioc,211,313
+methyLImp2,bioc,319,319
 methylCC,bioc,310,319
 methylGSA,bioc,308,319
 methylInheritance,bioc,305,319
@@ -4490,6 +4514,7 @@ mosaicsExample,data/experiment,207,319
 mosbi,bioc,314,319
 motifRG,bioc,210,311
 motifStack,bioc,211,319
+motifTestR,bioc,319,319
 motifbreakR,bioc,302,319
 motifcounter,bioc,305,319
 motifmatchr,bioc,306,319
@@ -4549,6 +4574,7 @@ mu6500subacdf,data/annotation,108,319
 mu6500subbcdf,data/annotation,108,319
 mu6500subccdf,data/annotation,108,319
 mu6500subdcdf,data/annotation,108,319
+muleaData,data/experiment,319,319
 multiClust,bioc,303,319
 multiGSEA,bioc,312,319
 multiHiCcompare,bioc,308,319
@@ -4556,7 +4582,7 @@ multiMiR,bioc,306,319
 multiOmicsViz,bioc,305,319
 multiSight,bioc,313,317
 multiWGCNA,bioc,318,319
-multiWGCNAdata,data/experiment,319,319
+multiWGCNAdata,data/experiment,318,319
 multicrispr,bioc,312,319
 multiscan,bioc,203,319
 multtest,bioc,108,319
@@ -4797,7 +4823,7 @@ org.Mm.ref.db,data/annotation,204,205
 org.Mm.sp.db,data/annotation,204,205
 org.Mmu.eg.db,data/annotation,205,319
 org.Mxanthus.db,data/annotation,310,319
-org.Pf.plasmo.db,data/annotation,202,314
+org.Pf.plasmo.db,data/annotation,202,319
 org.Pt.eg.db,data/annotation,205,319
 org.Rn.cross.db,data/annotation,204,205
 org.Rn.eg.db,data/annotation,201,319
@@ -5233,6 +5259,7 @@ ratCHRLOC,data/annotation,108,319
 ratLLMappings,data/annotation,108,202
 rattoxfxcdf,data/annotation,205,319
 rattoxfxprobe,data/annotation,205,319
+rawDiag,bioc,319,319
 rawrr,bioc,313,319
 rbsurv,bioc,200,319
 rcellminer,bioc,301,319
@@ -5293,7 +5320,7 @@ rhesusprobe,data/annotation,108,319
 rheumaticConditionWOLLBOLD,data/experiment,209,319
 ri16cod,data/annotation,109,202
 ri16cod.db,data/annotation,202,319
-riboSeqR,bioc,300,318
+riboSeqR,bioc,300,319
 ribor,bioc,311,319
 ribosomaldatabaseproject11.5MgDb,data/annotation,308,313
 ribosomeProfilingQC,bioc,311,319
@@ -5570,7 +5597,7 @@ scsR,bioc,214,311
 scuttle,bioc,312,319
 scviR,bioc,317,319
 sechm,bioc,313,319
-segmentSeq,bioc,206,318
+segmentSeq,bioc,206,319
 segmenter,bioc,314,319
 selectKSigs,bioc,311,319
 semisup,bioc,305,319
@@ -5616,6 +5643,7 @@ signet,bioc,307,311
 signifinder,bioc,316,319
 sigsquared,bioc,301,319
 silva128.1MgDb,data/annotation,308,313
+simPIC,bioc,319,319
 similaRpeak,bioc,301,319
 simona,bioc,318,319
 simpIntLists,data/experiment,208,319
@@ -5637,7 +5665,9 @@ skewr,bioc,301,319
 slalom,bioc,306,319
 slingshot,bioc,308,319
 slinky,bioc,308,314
+smartid,bioc,319,319
 smokingMouse,data/experiment,318,319
+smoothclust,bioc,319,319
 snapCGH,bioc,108,318
 snapcount,bioc,311,319
 snifter,bioc,312,319
@@ -5786,9 +5816,10 @@ transmogR,bioc,319,319
 transomics2cytoscape,bioc,312,319
 traseR,bioc,302,319
 traviz,bioc,314,319
+treeclimbR,bioc,319,319
 treeio,bioc,305,319
 treekoR,bioc,313,319
-trena,bioc,306,317
+trena,bioc,306,318
 tricycle,bioc,313,319
 triform,bioc,211,311
 trigger,bioc,209,319
@@ -5804,6 +5835,7 @@ tweeDEseqCountData,data/experiment,209,319
 twilight,bioc,108,319
 twoddpcr,bioc,305,319
 txcutr,bioc,314,319
+txdbmaker,bioc,319,319
 tximeta,bioc,308,319
 tximport,bioc,303,319
 tximportData,data/experiment,303,319
