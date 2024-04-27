@@ -2,9 +2,8 @@
 """Click commands."""
 import os
 from glob import glob
+from datetime import date
 from subprocess import call
-from flask import current_app
-import logging
 from bioc_webstats.ingest_logs import ingest_logs
 
 import click
@@ -86,9 +85,23 @@ def gendb():
 
     click.echo("Creating small test database")
     generate_small_test_db_stats()
-    db.session.commit()
     
 
 @click.command()
-def ingest():
-    ingest_logs()
+@click.option("-s", "--start", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
+            help="Beginning date for upload")
+@click.option("-e", "--end", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
+            help="Ending date for upload")
+@click.option("-d", "--database", required=False, type=chr,
+            help="Name of the source database")
+@click.option("-f", "--filename", required=False, type=chr,
+            help="Specifies the name of a local file to receive the csv results instead of sending them to the database")
+def ingest(start, 
+            end, 
+            database,
+            filename):
+    """Ingest the logs"""
+    ingest_logs(start_date=start.date(),
+            end_date=end.date(),
+            source_database=database,
+            result_filename=filename)

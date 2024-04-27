@@ -1,6 +1,7 @@
 """Ingest download logs from Athena."""
 
 from typing import Optional
+import click
 from datetime import date, timedelta, datetime
 import pandas as pd
 import boto3
@@ -9,20 +10,23 @@ from flask import current_app
 import logging
 
 import bioc_webstats.models as db
+from flask.cli import with_appcontext
 
 def ingest_logs(
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None,
     aws_profile: Optional[chr] = "bioc",
-    source_database: Optional[chr] = "default",
+    source_database: Optional[chr] = "default",  # TODO either not enough info or too  much
     result_filename: Optional[chr] = "~/Downloads/df.scv") -> None:
+    """Process download access logs"""
 
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
 
+    # TODO -is this necessary
     boto3.setup_default_session(profile_name = aws_profile)
 
-    logger = current_app.logger,
-    logger.log(logging.INFO, 'Starting ingest_logs at {datetime.utcnow}')
+    log = current_app.logger
+    log.log(logging.INFO, f'Starting ingest_logs at {datetime.utcnow}')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
 
@@ -30,35 +34,33 @@ def ingest_logs(
         start_date = db.WebstatsInfo.get_valid_thru_date() + timedelta(days=1)
 
     if end_date is None:
-        end_date = (datetime.utcnow() - timedelta(days=1)).date()
+        end_date = datetime.utcnow().date() - timedelta(days=1)
         
     if start_date > end_date:
-        logger.error("Start date ({start_date}) greater than end date ({end_date}). No log records ingested", 
+        log.error(f"Start date {start_date} greater than end date {end_date}. No log records ingested", 
                     start_date,
                     end_date)
         return
     if start_date == end_date:
-        logger.warn("Start and End dates are both {start_date}. No log records ingested", 
+        log.warn(f"Start and End dates are both {start_date}. No log records ingested", 
                     start_date)
         return
 
-    logger.info("Ingesting logs from ({start_date}) to ({end_date})",
-                    start_date,
-                    end_date)
+    log.info(f"Ingesting logs from {start_date} to {end_date}")
         
     query_str = f"""
 select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downloads
-    where "date" between DATE '{strftime(start_date, "%Y-%m-%d")}' 
-        and DATE '{strftime(end_date, "%Y-%m-%d")}'
+    where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
+        and DATE '{end_date.strftime("%Y-%m-%d")}'
 """
     result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
-    logger.info("{len(result)} records read")
+    log.info(f"{len(result)} records read")
 
     # Dump records to csv file if requested
     if result_filename is not None:
     # Write output to csv file
         result.to_csv(result_filename, index = False)
-        logger.info("All records written to {result_filename}")
+        log.info(f"All records written to {result_filename}")
         return
     
     # Write out put to database table

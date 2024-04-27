@@ -17,13 +17,14 @@ from bioc_webstats.extensions import (
     migrate,
 )
 
-def create_app(config_object_name="bioc_webstats.configmodule.ProdConfig"):
+def create_app(config_type="Development"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
     :param config_object_name: The configuration object to use.
     """
     app = Flask(__name__.split(".")[0])
     
+    config_object_name = f"bioc_webstats.configmodule.{config_type}Config"
 
     # Populate the configuration from config and its sublcasses
     cfg = import_string(config_object_name)()
@@ -101,7 +102,6 @@ def register_commands(app):
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.gendb)
     app.cli.add_command(commands.ingest)
-
 
 def configure_logger(app):
     """Configure loggers."""
