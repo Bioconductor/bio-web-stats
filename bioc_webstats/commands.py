@@ -89,18 +89,18 @@ def gendb():
 
 @click.command()
 @click.option("-s", "--start", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
-            help="Beginning date for upload")
+            help="Beginning date for upload. Default: first date not already proceessed.")
 @click.option("-e", "--end", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
-            help="Ending date for upload")
+            help="Ending date for upload. Default: yesterday (UTC)")
 @click.option("-d", "--database", required=False, type=chr,
-            help="Name of the source database")
+            help="Name of the source database. DefaUlt")
 @click.option("-f", "--filename", required=False, type=chr,
             help="Specifies the name of a local file to receive the csv results instead of sending them to the database")
 def ingest(start, 
             end, 
             database,
             filename):
-    """Ingest the logs"""
+    """Read raw weblogs, select valid package downlads, update webstats database"""
     ingest_logs(start_date=start.date(),
             end_date=end.date(),
             source_database=database,

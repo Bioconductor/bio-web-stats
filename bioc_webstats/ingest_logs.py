@@ -17,7 +17,7 @@ def ingest_logs(
     end_date: Optional[date] = None,
     aws_profile: Optional[chr] = "bioc",
     source_database: Optional[chr] = "default",  # TODO either not enough info or too  much
-    result_filename: Optional[chr] = "~/Downloads/df.scv") -> None:
+    result_filename: Optional[chr] = None) -> None:
     """Process download access logs"""
 
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
