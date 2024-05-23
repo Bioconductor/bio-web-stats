@@ -74,8 +74,9 @@ select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downl
         return
     
     # Write out put to database table
-    result.to_sql('bioc_web_downloads', con=engine, if_exists='append', index=False)
-
+#    result.to_sql('bioc_web_downloads', con=engine, if_exists='append', index=False)
+    foo = db.BiocWebDownloads.test()
+    raise NotImplementedError
 #####################
 # TODO Make this a SPROC ... get the start date from last update date.
 # BEGIN; -- Start a transaction

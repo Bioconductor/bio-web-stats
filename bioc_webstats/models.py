@@ -2,7 +2,7 @@
 
 import datetime as dt
 import enum
-from typing import Optional
+from typing import List, Optional
 
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (
@@ -10,6 +10,7 @@ from sqlalchemy import (
     Boolean,
     Date,
     Enum,
+    Integer,
     String,
     and_,
     asc,
@@ -37,7 +38,7 @@ def package_type_exists(value: str) -> bool:
     return value in [e.value for e in PackageType]
 
 
-def list_to_dict(u) -> [dict]:
+def list_to_dict(u) -> List[dict]:
     """Transform list of sqlalchemy results to list of dictionaries."""
     return [v.as_dict() for v in u]
 
@@ -232,7 +233,7 @@ class Stats(Model):
         return result
 
     @staticmethod
-    def get_download_scores(category: PackageType) -> [(str, int, int)]:
+    def get_download_scores(category: PackageType):  # TODO was -> (str, int, int):
         """Return a download score for each package.
 
         The rank is an ordinal that indicates relative activity.
@@ -285,3 +286,39 @@ class Stats(Model):
 
         result = db.session.execute(query)
         return result.fetchall()
+
+
+class    v(Model):
+    """Source records for downloads table bioc_web_downloads"""
+
+    __tablename__ = 'bioc_web_downloads'
+    date: Mapped[str] = mapped_column(
+        Date, primary_key=True
+    )
+    c_ip: Mapped[str] = mapped_column(
+        'c-ip', String(40), primary_key=True
+    )
+    sc_status: Mapped[int] = mapped_column(
+        'sc_status',
+        Integer
+    )
+    category: Mapped[str] = mapped_column(
+        'category',
+        String(16)
+    )
+    package: Mapped[str] = mapped_column(
+        'package',
+        String(64)
+    )
+
+    def test():
+        return db.session.execute(
+            select(BiocWebDownloads.date,
+                   BiocWebDownloads.c_ip,
+                   BiocWebDownloads.sc_status,
+                   BiocWebDownloads.category,
+                   BiocWebDownloads.package)
+        ).fetchone()
+
+    def __repr__(self):
+        return f"<BiocWebDownloads(date={self.date}, c_ip={self.c_ip}, sc_status={self.sc_status}, category={self.category}, package={self.package})>"
