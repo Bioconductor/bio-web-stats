@@ -2,7 +2,7 @@
 """Click commands."""
 import os
 from glob import glob
-from datetime import date
+from datetime import datetime, date
 from subprocess import call
 from bioc_webstats.ingest_logs import ingest_logs
 
@@ -11,6 +11,15 @@ import click
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)
 TEST_PATH = os.path.join(PROJECT_ROOT, "tests")
+
+def parse_date(ctx, param, value):
+    """Helper for parsing click.option dates"""
+    if value is None:
+        return value
+    try:
+        return datetime.strptime(value, '%Y-%m-%d').date()
+    except ValueError:
+        raise click.BadParameter('Date should be in YYYY-MM-DD format.')
 
 
 @click.command()
@@ -88,9 +97,11 @@ def gendb():
     
 
 @click.command()
-@click.option("-s", "--start", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
+@click.option("-s", "--start", required=False, 
+            callback=parse_date,
             help="Beginning date for upload. Default: first date not already proceessed.")
-@click.option("-e", "--end", required=False, type=click.DateTime(formats=["%Y-%m-%d"]),
+@click.option("-e", "--end", required=False, 
+            callback=parse_date,
             help="Ending date for upload. Default: yesterday (UTC)")
 @click.option("-d", "--database", required=False, type=chr,
             help="Name of the source database. DefaUlt")
@@ -101,7 +112,8 @@ def ingest(start,
             database,
             filename):
     """Read raw weblogs, select valid package downlads, update webstats database"""
-    ingest_logs(start_date=start.date(),
-            end_date=end.date(),
+    
+    ingest_logs(start_date=start,
+            end_date=end,
             source_database=database,
             result_filename=filename)

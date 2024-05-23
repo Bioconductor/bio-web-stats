@@ -16,17 +16,23 @@ def ingest_logs(
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None,
     aws_profile: Optional[chr] = "bioc",
-    source_database: Optional[chr] = "default",  # TODO either not enough info or too  much
+    source_database: Optional[chr] = None,
     result_filename: Optional[chr] = None) -> None:
     """Process download access logs"""
 
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
 
-    # TODO -is this necessary
-    boto3.setup_default_session(profile_name = aws_profile)
+    def datetime2str(dt: datetime) -> chr:
+        """Conveninece function transform datetime into precise date and time string for logs"""
+        return dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+    # If an aws_profile value is specified, assume that we need to setup
+    # the session
+    if aws_profile is not None:
+        boto3.setup_default_session(profile_name = aws_profile)
 
     log = current_app.logger
-    log.log(logging.INFO, f'Starting ingest_logs at {datetime.utcnow}')
+    log.log(logging.INFO, f'Starting ingest_logs at {datetime2str(datetime.utcnow())}')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
 
@@ -53,6 +59,10 @@ select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downl
     where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
         and DATE '{end_date.strftime("%Y-%m-%d")}'
 """
+    if source_database is None:
+        source_database = "default"
+
+    # TODO try/except protection
     result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
     log.info(f"{len(result)} records read")
 
@@ -64,8 +74,6 @@ select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downl
         return
     
     # Write out put to database table
-    raise NotImplementedError
-    # TODO DEBUG 
     result.to_sql('bioc_web_downloads', con=engine, if_exists='append', index=False)
 
 #####################
