@@ -288,7 +288,7 @@ class Stats(Model):
         return result.fetchall()
 
 
-class    v(Model):
+class    BiocWebDownloads(Model):
     """Source records for downloads table bioc_web_downloads"""
 
     __tablename__ = 'bioc_web_downloads'

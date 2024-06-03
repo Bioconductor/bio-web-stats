@@ -47,15 +47,11 @@ def ingest_logs(
                     start_date,
                     end_date)
         return
-    if start_date == end_date:
-        log.warn(f"Start and End dates are both {start_date}. No log records ingested", 
-                    start_date)
-        return
 
     log.info(f"Ingesting logs from {start_date} to {end_date}")
         
     query_str = f"""
-select  "date", "c-ip", "sc-status", "category", "package" from v_bioc_web_downloads
+select  "date", "c-ip", "sc-status", "category", "package" from bioc_web_downloads
     where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
         and DATE '{end_date.strftime("%Y-%m-%d")}'
 """
