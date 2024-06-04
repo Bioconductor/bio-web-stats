@@ -129,3 +129,31 @@ def arn_to_uri(arn):
 # arn = "arn:aws:secretsmanager:us-east-1:931729544676:secret:/bioc/rdb/login/webstats_runner-fQFuUn"
 # uri = arn_to_uri(arn)
 # print(uri)
+
+def cloudfront_invalidation(distribution_id = 'E1TVLJONPTUXV3', paths = ['/packages/stats/*']):
+    """Invalidate Cloudfront Cache
+
+    Keyword Arguments:
+        distribution_id -- _description_ (default: {'E1TVLJONPTUXV3'})
+        paths -- _description_ (default: {['/packages/stats/*']})
+    """
+
+
+    # TODO move distribution_id and paths defaults to flask dispatcher
+    client = boto3.client('cloudfront')
+
+    # Distribution ID and the paths you want to invalidate
+
+    # Create the invalidation
+    response = client.create_invalidation(
+        DistributionId=distribution_id,
+        InvalidationBatch={
+            'Paths': {
+                'Quantity': len(paths),
+                'Items': paths
+            },
+            'CallerReference': str(hash(frozenset(paths)))  # Unique reference
+        }
+    )
+
+    # TODO  from response, log error if needed, otherwise report timestamp for invalidation

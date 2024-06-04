@@ -21,6 +21,7 @@ from sqlalchemy import (
     func,
     insert,
     select,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -299,10 +300,10 @@ class    BiocWebDownloads(Model):
         Date, primary_key=True
     )
     c_ip: Mapped[str] = mapped_column(
-        'c-ip', String(40), primary_key=True
+        'c-ip', String(40)
     )
     sc_status: Mapped[int] = mapped_column(
-        'sc_status',
+        'sc-status',
         Integer
     )
     category: Mapped[str] = mapped_column(
@@ -325,7 +326,11 @@ class    BiocWebDownloads(Model):
         db.session.execute(insert(BiocWebDownloads), dataframe.to_dict(orient='records'))
         db.session.commit()
 
-
+    @staticmethod
+    def update_stats_from_downloads(start_date: Date):
+        chr_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
+        # TODO verify sproc distribution
+        db.session.execute(text(f"CALL public.update_stats(DATE '{chr_date}');"))
 
     def __repr__(self):
         return f"<BiocWebDownloads(date={self.date}, c_ip={self.c_ip}, sc_status={self.sc_status}, category={self.category}, package={self.package})>"

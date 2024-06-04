@@ -9,6 +9,7 @@ import awswrangler as wr
 from flask import current_app
 import logging
 
+import aws_functions
 import bioc_webstats.models as db
 
 def ingest_logs(
@@ -50,7 +51,7 @@ def ingest_logs(
     log.info(f"Ingesting logs from {start_date} to {end_date}")
         
     query_str = f"""
-select  "date", "c-ip", "sc-status", "category", "package" from bioc_web_downloads
+select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" from bioc_web_downloads
     where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
         and DATE '{end_date.strftime("%Y-%m-%d")}'
 """
@@ -70,34 +71,9 @@ select  "date", "c-ip", "sc-status", "category", "package" from bioc_web_downloa
     
     # Write out put to database table
     db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
-    pass
-
-# TODO Make this a SPROC ... get the start date from last update date.
-# BEGIN; -- Start a transaction
-
-# DELETE FROM stats WHERE "date" >= date '2024-03-01';
-
-# INSERT INTO stats
-# SELECT * FROM v_stats WHERE "date" >= date '2024-03-01';
-
-# DELETE FROM categorystats WHERE "date" >= date '2024-03-01';
-
-# INSERT INTO categorystats
-# SELECT * FROM v_categorystats WHERE "date" >= date '2024-03-01';
-
-# update webstats_info 
-#         set value = (select max(date) from bioc_web_downloads)
-#         where key = 'ValidThru';
-        
-# COMMIT;
-
-# -- If there are any issues, you can rollback the transaction
-# -- ROLLBACK;
-
-#####################
-
-# REPORT THE UPDATE
-
-# aws cloudfront create-invalidation --distribution-id E1TVLJONPTUXV3 --paths '/packages/stats/*'
-
-# REPORT THE INVALIDATION
+    # TODO Report upload complete and give record count
+    db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
+    # TODO reuport update_stats complete
+    
+    aws_functions.cloudfront_invalidation()
+    log.info("Log ingestion complete")
