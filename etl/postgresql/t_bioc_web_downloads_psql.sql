@@ -15,14 +15,39 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.bioc_web_downloads
     OWNER to postgres;
--- Index: idx_date
 
--- DROP INDEX IF EXISTS public.idx_date;
+GRANT ALL ON TABLE public.bioc_web_downloads TO postgres;
 
-CREATE INDEX IF NOT EXISTS idx_date
+GRANT ALL ON TABLE public.bioc_web_downloads TO webstats_runner;
+-- Index: idx_bioc_web_downloads_category_package
+
+-- DROP INDEX IF EXISTS public.idx_bioc_web_downloads_category_package;
+
+CREATE INDEX IF NOT EXISTS idx_bioc_web_downloads_category_package
     ON public.bioc_web_downloads USING btree
-    (date ASC NULLS LAST, "c-ip" COLLATE pg_catalog."default" ASC NULLS LAST, category COLLATE pg_catalog."default" ASC NULLS LAST, package COLLATE pg_catalog."default" ASC NULLS LAST)
+    (category COLLATE pg_catalog."default" ASC NULLS LAST, package COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
+-- Index: idx_bioc_web_downloads_cip
 
-ALTER TABLE IF EXISTS public.bioc_web_downloads
-    CLUSTER ON idx_date;
+-- DROP INDEX IF EXISTS public.idx_bioc_web_downloads_cip;
+
+CREATE INDEX IF NOT EXISTS idx_bioc_web_downloads_cip
+    ON public.bioc_web_downloads USING btree
+    ("c-ip" COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_bioc_web_downloads_date
+
+-- DROP INDEX IF EXISTS public.idx_bioc_web_downloads_date;
+
+CREATE INDEX IF NOT EXISTS idx_bioc_web_downloads_date
+    ON public.bioc_web_downloads USING btree
+    (date ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_bioc_web_downloads_scstatus
+
+-- DROP INDEX IF EXISTS public.idx_bioc_web_downloads_scstatus;
+
+CREATE INDEX IF NOT EXISTS idx_bioc_web_downloads_scstatus
+    ON public.bioc_web_downloads USING btree
+    ("sc-status" ASC NULLS LAST)
+    TABLESPACE pg_default;
