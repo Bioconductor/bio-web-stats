@@ -10,7 +10,6 @@ from flask import current_app
 import logging
 
 import bioc_webstats.models as db
-from flask.cli import with_appcontext
 
 def ingest_logs(
     start_date: Optional[date] = None, 
@@ -70,10 +69,9 @@ select  "date", "c-ip", "sc-status", "category", "package" from bioc_web_downloa
         return
     
     # Write out put to database table
-#    result.to_sql('bioc_web_downloads', con=engine, if_exists='append', index=False)
-    foo = db.BiocWebDownloads.test()
-    raise NotImplementedError
-#####################
+    db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
+    pass
+
 # TODO Make this a SPROC ... get the start date from last update date.
 # BEGIN; -- Start a transaction
 

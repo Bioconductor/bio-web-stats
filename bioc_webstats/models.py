@@ -4,6 +4,8 @@ import datetime as dt
 import enum
 from typing import List, Optional
 
+import pandas as pd
+
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (
     BigInteger,
@@ -17,6 +19,7 @@ from sqlalchemy import (
     desc,
     extract,
     func,
+    insert,
     select,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -310,15 +313,19 @@ class    BiocWebDownloads(Model):
         'package',
         String(64)
     )
+    
+    @staticmethod
+    def insert_from_dataframe(dataframe: pd.DataFrame):
+        """Move a dataframe of download records to web_bioc_download
 
-    def test():
-        return db.session.execute(
-            select(BiocWebDownloads.date,
-                   BiocWebDownloads.c_ip,
-                   BiocWebDownloads.sc_status,
-                   BiocWebDownloads.category,
-                   BiocWebDownloads.package)
-        ).fetchone()
+        Arguments:
+            dataframe -- A pandas dataframe that matches the format of this class
+        """
+
+        db.session.execute(insert(BiocWebDownloads), dataframe.to_dict(orient='records'))
+        db.session.commit()
+
+
 
     def __repr__(self):
         return f"<BiocWebDownloads(date={self.date}, c_ip={self.c_ip}, sc_status={self.sc_status}, category={self.category}, package={self.package})>"
