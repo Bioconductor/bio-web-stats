@@ -328,7 +328,7 @@ class    BiocWebDownloads(Model):
 
     @staticmethod
     def update_stats_from_downloads(start_date: Date):
-        chr_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
+        chr_date = start_date.strftime('%Y-%m-%d')
         # TODO verify sproc distribution
         db.session.execute(text(f"CALL public.update_stats(DATE '{chr_date}');"))
 

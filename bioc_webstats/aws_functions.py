@@ -130,7 +130,7 @@ def arn_to_uri(arn):
 # uri = arn_to_uri(arn)
 # print(uri)
 
-def cloudfront_invalidation(distribution_id = 'E1TVLJONPTUXV3', paths = ['/packages/stats/*']):
+def cloudfront_invalidation(distribution_id, paths):
     """Invalidate Cloudfront Cache
 
     Keyword Arguments:

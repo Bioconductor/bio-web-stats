@@ -35,6 +35,7 @@ def create_app(config_type="Development"):
     if 'AWS_PARAMETER_PATH' not in app.config:
         param_dict = {}
     else:
+        # TODO try/except/raise for ToekenRetrievalError
         param_dict = aws.get_parameter_store_values(app.config['AWS_PARAMETER_PATH'])
     if 'db/credentials' in param_dict:
         app.config["DATABASE_URL"] = aws.aws_secret_to_psql_url(param_dict['db/credentials'], "us-east-1", "webstats")

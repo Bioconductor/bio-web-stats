@@ -9,7 +9,7 @@ import awswrangler as wr
 from flask import current_app
 import logging
 
-import aws_functions
+import bioc_webstats.aws_functions as aws_functions
 import bioc_webstats.models as db
 
 def ingest_logs(
@@ -17,7 +17,10 @@ def ingest_logs(
     end_date: Optional[date] = None,
     aws_profile: Optional[chr] = "bioc",
     source_database: Optional[chr] = None,
-    result_filename: Optional[chr] = None) -> None:
+    result_filename: Optional[chr] = None,
+    cloudfront_id: Optional[chr] = None,
+    cloudfront_path: Optional[chr] = None
+    ) -> None:
     """Process download access logs"""
 
     """See https://aws-sdk-pandas.readthedocs.io/en/latest/index.html"""
@@ -35,6 +38,8 @@ def ingest_logs(
     log.log(logging.INFO, f'Starting ingest_logs at {datetime2str(datetime.utcnow())}')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
+
+    # TODO verify that we are not re-inserting existing dates
 
     if start_date is None:
         start_date = db.WebstatsInfo.get_valid_thru_date() + timedelta(days=1)
@@ -75,5 +80,11 @@ select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" 
     db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
     # TODO reuport update_stats complete
     
-    aws_functions.cloudfront_invalidation()
+    if cloudfront_id is None:
+        log.info("Cache invalidation skipped")
+    else:
+        log.info(f"CloudFront ditribution {cloudfront_id}/{cloudfront_path} invalidation started")
+        aws_functions.cloudfront_invalidation(cloudfront_id, [cloudfront_path])
+        # TODO report invalidation result
+
     log.info("Log ingestion complete")

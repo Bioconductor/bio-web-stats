@@ -104,16 +104,28 @@ def gendb():
             callback=parse_date,
             help="Ending date for upload. Default: yesterday (UTC)")
 @click.option("-d", "--database", required=False, type=chr,
-            help="Name of the source database. DefaUlt")
+            help="Name of the source database. DefaUlt: default")
 @click.option("-f", "--filename", required=False, type=chr,
             help="Specifies the name of a local file to receive the csv results instead of sending them to the database")
+@click.option("-c", "--cloudfront", required=False,
+            help="If present, the distribution ID of the CloudFront cachce to refresh. If absent, no refresh")
+@click.option("--path", required=False, type=chr,
+            help="The CloudFront path to refresh. Default: '/packages/stats/*'")
+
 def ingest(start, 
             end, 
             database,
-            filename):
+            filename,
+            cloudfront,
+            path):
     """Read raw weblogs, select valid package downlads, update webstats database"""
     
+    if path is None:
+        path = '/packages/stats/*'
+
     ingest_logs(start_date=start,
             end_date=end,
             source_database=database,
-            result_filename=filename)
+            result_filename=filename,
+            cloudfront_id=cloudfront,
+            cloudfront_path=path)
