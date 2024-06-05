@@ -103,13 +103,13 @@ def gendb():
 @click.option("-e", "--end", required=False, 
             callback=parse_date,
             help="Ending date for upload. Default: yesterday (UTC)")
-@click.option("-d", "--database", required=False, type=chr,
+@click.option("-d", "--database", required=False, 
             help="Name of the source database. DefaUlt: default")
-@click.option("-f", "--filename", required=False, type=chr,
+@click.option("-f", "--filename", required=False, 
             help="Specifies the name of a local file to receive the csv results instead of sending them to the database")
 @click.option("-c", "--cloudfront", required=False,
             help="If present, the distribution ID of the CloudFront cachce to refresh. If absent, no refresh")
-@click.option("--path", required=False, type=chr,
+@click.option("--path", required=False, 
             help="The CloudFront path to refresh. Default: '/packages/stats/*'")
 
 def ingest(start, 

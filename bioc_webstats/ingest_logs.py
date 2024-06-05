@@ -56,7 +56,7 @@ def ingest_logs(
     log.info(f"Ingesting logs from {start_date} to {end_date}")
         
     query_str = f"""
-select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" from bioc_web_downloads
+select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" from v_bioc_web_downloads
     where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
         and DATE '{end_date.strftime("%Y-%m-%d")}'
 """
