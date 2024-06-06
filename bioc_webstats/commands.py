@@ -179,6 +179,12 @@ def configp(namespace, profile, region):
             "Description": "Postgres database name, default 'webstats'",
         },
         {
+            "Name": "db/credentials",
+            "Type": "String",
+            "Value": "arn:aws:secretsmanager:reference-to-database-credentials-secret",
+            "Description": "arn tof secrets manager secret",
+        },
+        {
             "Name": "db/dbuser",
             "Type": "String",
             "Value": "webstats_runner",
