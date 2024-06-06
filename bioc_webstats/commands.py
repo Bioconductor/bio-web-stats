@@ -12,14 +12,15 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)
 TEST_PATH = os.path.join(PROJECT_ROOT, "tests")
 
+
 def parse_date(ctx, param, value):
     """Helper for parsing click.option dates"""
     if value is None:
         return value
     try:
-        return datetime.strptime(value, '%Y-%m-%d').date()
+        return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
-        raise click.BadParameter('Date should be in YYYY-MM-DD format.')
+        raise click.BadParameter("Date should be in YYYY-MM-DD format.")
 
 
 @click.command()
@@ -94,38 +95,166 @@ def gendb():
 
     click.echo("Creating small test database")
     generate_small_test_db_stats()
-    
+
 
 @click.command()
-@click.option("-s", "--start", required=False, 
-            callback=parse_date,
-            help="Beginning date for upload. Default: first date not already proceessed.")
-@click.option("-e", "--end", required=False, 
-            callback=parse_date,
-            help="Ending date for upload. Default: yesterday (UTC)")
-@click.option("-d", "--database", required=False, 
-            help="Name of the source database. DefaUlt: default")
-@click.option("-f", "--filename", required=False, 
-            help="Specifies the name of a local file to receive the csv results instead of sending them to the database")
-@click.option("-c", "--cloudfront", required=False,
-            help="If present, the distribution ID of the CloudFront cachce to refresh. If absent, no refresh")
-@click.option("--path", required=False, 
-            help="The CloudFront path to refresh. Default: '/packages/stats/*'")
-
-def ingest(start, 
-            end, 
-            database,
-            filename,
-            cloudfront,
-            path):
+@click.option(
+    "-s",
+    "--start",
+    required=False,
+    callback=parse_date,
+    help="Beginning date for upload. Default: first date not already proceessed.",
+)
+@click.option(
+    "-e",
+    "--end",
+    required=False,
+    callback=parse_date,
+    help="Ending date for upload. Default: yesterday (UTC)",
+)
+@click.option(
+    "-d",
+    "--database",
+    required=False,
+    help="Name of the source database. DefaUlt: default",
+)
+@click.option(
+    "-f",
+    "--filename",
+    required=False,
+    help="Specifies the name of a local file to receive the csv results instead of sending them to the database",
+)
+@click.option(
+    "-c",
+    "--cloudfront",
+    required=False,
+    help="If present, the distribution ID of the CloudFront cachce to refresh. If absent, no refresh",
+)
+@click.option(
+    "--path",
+    required=False,
+    help="The CloudFront path to refresh. Default: '/packages/stats/*'",
+)
+def ingest(start, end, database, filename, cloudfront, path):
     """Read raw weblogs, select valid package downlads, update webstats database"""
-    
-    if path is None:
-        path = '/packages/stats/*'
 
-    ingest_logs(start_date=start,
-            end_date=end,
-            source_database=database,
-            result_filename=filename,
-            cloudfront_id=cloudfront,
-            cloudfront_path=path)
+    if path is None:
+        path = "/packages/stats/*"
+
+    ingest_logs(
+        start_date=start,
+        end_date=end,
+        source_database=database,
+        result_filename=filename,
+        cloudfront_id=cloudfront,
+        cloudfront_path=path,
+    )
+
+
+# TODO split into seperate file with directory for commands
+import boto3
+
+
+@click.command()
+@click.option(
+    "-n", "--namespace", required=False, help="Namespace (parameter path prefix)"
+)
+@click.option("-p", "--profile", required=False, help="AWS SSO profile for target")
+@click.option("-r", "--region", required=False, help="AWS target region")
+def configp(namespace, profile, region):
+    """Initialize AWS parameter set"""
+
+    if namespace is None:
+        namespace = '/bioc/webstats/prod/'
+    if region is None:
+        region = 'us-east-1'
+    if profile is None:
+        profile = 'bioc'
+
+    template = [
+        {
+            "Name": "db/dbname",
+            "Type": "String",
+            "Value": "webstats",
+            "Description": "Postgres database name, default 'webstats'",
+        },
+        {
+            "Name": "db/dbuser",
+            "Type": "String",
+            "Value": "webstats_runner",
+            "Description": "PostgrSQL user name, default 'webstats_runner'",
+        },
+        {
+            "Name": "db/port",
+            "Type": "String",
+            "Value": "5432",
+            "Description": "Server endpoint port number",
+        },
+        {
+            "Name": "db/server",
+            "Type": "String",
+            "Value": "TBD",
+            "Description": "The symbolic address of the endpoint for the Postgres server",
+        },
+        {
+            "Name": "flask/flask_app",
+            "Type": "String",
+            "Value": "autoapp.py",
+            "Description": "autoapp.py",
+        },
+        {
+            "Name": "flask/flask_debug",
+            "Type": "String",
+            "Value": "FALSE",
+            "Description": "False' Caution: Do not enable in production",
+        },
+        {
+            "Name": "flask/log_level",
+            "Type": "String",
+            "Value": "INFO",
+            "Description": "Standard log levels, default 'INFO'",
+        },
+        {
+            "Name": "flask/secret_key",
+            "Type": "String",
+            "Value": "TBD",
+            "Description": "Secret key for activating web client flask debugging tools",
+        },
+        {
+            "Name": "gunicorn/bind_port",
+            "Type": "String",
+            "Value": "0.0.0.0:8000",
+            "Description": "Default: '0.0.0.0:8000'",
+        },
+        {
+            "Name": "gunicorn/error_log",
+            "Type": "String",
+            "Value": "/var/log/bioc-webstats/error.log",
+            "Description": "Default: '/var/log/bioc-webstats/error.log'",
+        },
+        {
+            "Name": "gunicorn/access_log",
+            "Type": "String",
+            "Value": "/var/log/bioc-webstats/access.log",
+            "Description": "Default: '/var/log/bioc-webstats/access.log'",
+        },
+    ]
+
+
+    session = boto3.Session(
+        profile_name=profile,
+        region_name=region
+    )
+
+    ssm_client = session.client('ssm')
+
+    # TODO Test for previously existing. Create --force parameter
+    # TODO Add tages
+    
+    for p in template:
+        q = p
+        q["Name"] = namespace + p["Name"]
+        response = ssm_client.put_parameter(**q)
+        # TODO check response for errors
+        
+    # TODO log the event

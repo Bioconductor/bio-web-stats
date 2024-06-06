@@ -103,6 +103,7 @@ def register_commands(app):
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.gendb)
     app.cli.add_command(commands.ingest)
+    app.cli.add_command(commands.configp)
 
 def configure_logger(app):
     """Configure loggers."""
