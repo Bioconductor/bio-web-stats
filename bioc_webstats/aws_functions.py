@@ -19,15 +19,6 @@ def aws_assume_sts_role(role_arn, role_session_name):
     credentials = assumed_role_object['Credentials']
     return credentials
 
-    # # Use the temporary credentials that AssumeRole returns to make a connection to Amazon S3
-    # s3_resource = boto3.resource(
-    #     's3',
-    #     aws_access_key_id=credentials['AccessKeyId'],
-    #     aws_secret_access_key=credentials['SecretAccessKey'],
-    #     aws_session_token=credentials['SessionToken'],
-    # )
-
-    # Now you can use the s3_resource object to interact with S3
     
 def get_parameter_store_values(parameter_path: str) -> dict:
     """Get all SSM parameter store values for a specific configuration.
