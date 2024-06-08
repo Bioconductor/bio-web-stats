@@ -13,7 +13,7 @@ class Config(object):
 class ProductionConfig(Config):
     ENV="Production"
     DATABASE_URL=""
-    AWS_PARAMETER_PATH='/bioc/webstats/dev'
+    AWS_PARAMETER_PATH='/bioc/webstats/prod'
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=0
 
@@ -22,5 +22,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT=True
     TESTING=True
     LOG_LEVEL="debug"
+    AWS_PARAMETER_PATH='/bioc/webstats/dev'
+    # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL="sqlite:///dev.db"
