@@ -30,7 +30,8 @@ def get_parameter_store_values(parameter_path: str) -> dict:
         A dictionary of parameter names (excluding the prefix) and their values.
     """
  
- 
+    # TODO replace with call that does not assume a default region
+    # TODO wrap bot calls with trys
     ssm_client = boto3.client('ssm')
     plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
     # HACK Start from the top with SSM paramater store included
