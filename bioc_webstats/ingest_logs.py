@@ -15,7 +15,7 @@ import bioc_webstats.models as db
 def ingest_logs(
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None,
-    aws_profile: Optional[chr] = "bioc",
+    aws_profile: Optional[chr] = None,
     source_database: Optional[chr] = None,
     result_filename: Optional[chr] = None,
     cloudfront_id: Optional[chr] = None,
@@ -33,7 +33,8 @@ def ingest_logs(
     # the session
     if aws_profile is not None:
         boto3.setup_default_session(profile_name = aws_profile)
-
+    # TODO this is a patch
+    boto3.setup_default_session(region_name = 'us-east-1')
     log = current_app.logger
     log.log(logging.INFO, f'Starting ingest_logs at {datetime2str(datetime.utcnow())}')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]

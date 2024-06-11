@@ -17,7 +17,7 @@ from bioc_webstats.extensions import (
     migrate,
 )
 
-def create_app(config_type="Development"):
+def create_app(config_type="Production"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
     :param config_object_name: The configuration object to use.

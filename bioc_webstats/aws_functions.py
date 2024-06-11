@@ -32,7 +32,7 @@ def get_parameter_store_values(parameter_path: str) -> dict:
  
     # TODO replace with call that does not assume a default region
     # TODO wrap bot calls with trys
-    ssm_client = boto3.client('ssm')
+    ssm_client = boto3.client('ssm', region_name = 'us-east-1')
     plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
     # HACK Start from the top with SSM paramater store included
     for item in plist["Parameters"]:
