@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """The app module, containing the app factory function."""
 import logging
+import logging.handlers
 import sys
 import os
 from flask import Flask, render_template
@@ -115,7 +116,15 @@ def register_commands(app):
 
 def configure_logger(app):
     """Configure loggers."""
-    # TODO PARAMETERIZE
-    handler = logging.StreamHandler(sys.stdout)
-    if not app.logger.handlers:
-        app.logger.addHandler(handler)
+
+    logger = logging.getLogger('webstats')
+    logger.setLevel(app.config['LOG_LEVEL']) 
+    log_file = app.config['LOG_FILEPATH']
+    file_handler = logging.handlers.TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=7, utc=True)
+    file_handler.setLevel(app.config['LOG_LEVEL'])
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    app.logger.handlers = logger.handlers
+    app.logger.setLevel(logger.level)
