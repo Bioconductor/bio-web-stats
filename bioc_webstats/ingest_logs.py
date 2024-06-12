@@ -15,7 +15,7 @@ import bioc_webstats.models as db
 def ingest_logs(
     start_date: Optional[date] = None, 
     end_date: Optional[date] = None,
-    aws_profile: Optional[chr] = None,
+    aws_profile: Optional[chr] = None, 
     source_database: Optional[chr] = None,
     result_filename: Optional[chr] = None,
     cloudfront_id: Optional[chr] = None,

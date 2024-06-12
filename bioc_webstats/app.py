@@ -8,6 +8,7 @@ from werkzeug.utils import import_string
 from bioc_webstats import commands, splash, stats
 import bioc_webstats.aws_functions as aws
 
+
 from bioc_webstats.extensions import (
     cache,
     csrf_protect,
@@ -22,6 +23,13 @@ def create_app(config_type="Production"):
 
     :param config_object_name: The configuration object to use.
     """
+   # TODO special code fo remote debugging
+   # import ptvsd
+   # ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
+   # print("Waiting for debugger to attach...")
+   # ptvsd.wait_for_attach()
+   # Your existing code here
+
     app = Flask(__name__.split(".")[0])
     
     config_object_name = f"bioc_webstats.configmodule.{config_type}Config"
