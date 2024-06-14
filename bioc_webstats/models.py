@@ -326,11 +326,25 @@ class    BiocWebDownloads(Model):
         db.session.execute(insert(BiocWebDownloads), dataframe.to_dict(orient='records'))
         db.session.commit()
 
+    # @staticmethod
+    # def update_stats_from_downloads(start_date: Date):
+    #     chr_date = start_date.strftime('%Y-%m-%d')
+    #     # TODO verify sproc distribution
+    #     db.session.execute(text(f"CALL public.update_stats(DATE '{chr_date}');"))
+
+
     @staticmethod
     def update_stats_from_downloads(start_date: Date):
         chr_date = start_date.strftime('%Y-%m-%d')
-        # TODO verify sproc distribution
-        db.session.execute(text(f"CALL public.update_stats(DATE '{chr_date}');"))
+        try:
+            db.session.execute(text(f"CALL public.update_stats(DATE '{chr_date}');"))
+            db.session.commit()  # Explicitly commit the transaction
+        except Exception as e:
+            db.session.rollback()  # Rollback the transaction in case of error
+            # TODO Log rollback
+            raise e  # Re-raise the exception after rollback
+        finally:
+            db.session.close()  # Ensure the session is closed
 
     def __repr__(self):
         return f"<BiocWebDownloads(date={self.date}, c_ip={self.c_ip}, sc_status={self.sc_status}, category={self.category}, package={self.package})>"

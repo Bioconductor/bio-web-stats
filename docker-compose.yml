@@ -35,7 +35,7 @@ services:
     environment:
       FLASK_ENV: production
       FLASK_DEBUG: 0
-      LOG_LEVEL: info
+      LOG_LEVEL: INFO
       GUNICORN_WORKERS: 4
     <<: *default_volumes
 
