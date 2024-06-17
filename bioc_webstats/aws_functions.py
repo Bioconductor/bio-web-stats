@@ -1,8 +1,10 @@
 """ aws_functions TODO rename this. """
-import boto3
-from botocore.exceptions import ClientError
 import json
+
+import boto3
 import psycopg2
+from botocore.exceptions import ClientError
+
 
 def aws_assume_sts_role(role_arn, role_session_name):
 

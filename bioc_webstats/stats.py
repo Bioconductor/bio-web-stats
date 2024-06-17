@@ -6,14 +6,22 @@ Raises:
 Returns:
     _description_
 """
+import os
 from collections import defaultdict
 from datetime import date, timedelta
-import os
 
-from flask import Blueprint, Response, abort, render_template, send_from_directory, make_response
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    make_response,
+    render_template,
+    send_from_directory,
+)
+
 # TODO mixed pattern! should either import all the models (e.g. Packages) or make everything qualified e.g. db.WebstatsInfo...
 import bioc_webstats.models as db
-from bioc_webstats.models import PackageType, WebstatsInfo, Packages
+from bioc_webstats.models import Packages, PackageType, WebstatsInfo
 
 URI_PATH_PREFIX = "/packages/stats"
 

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
 import os
+from datetime import date, datetime
 from glob import glob
-from datetime import datetime, date
 from subprocess import call
-from bioc_webstats.ingest_logs import ingest_logs
 
 import click
+
+from bioc_webstats.ingest_logs import ingest_logs
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)

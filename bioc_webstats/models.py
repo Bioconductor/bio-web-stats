@@ -5,7 +5,6 @@ import enum
 from typing import List, Optional
 
 import pandas as pd
-
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (
     BigInteger,

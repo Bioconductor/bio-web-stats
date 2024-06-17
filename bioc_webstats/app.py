@@ -2,14 +2,14 @@
 """The app module, containing the app factory function."""
 import logging
 import logging.handlers
-import sys
 import os
+import sys
+
 from flask import Flask, render_template
 from werkzeug.utils import import_string
-from bioc_webstats import commands, splash, stats
+
 import bioc_webstats.aws_functions as aws
-
-
+from bioc_webstats import commands, splash, stats
 from bioc_webstats.extensions import (
     cache,
     csrf_protect,
@@ -18,6 +18,7 @@ from bioc_webstats.extensions import (
     flask_static_digest,
     migrate,
 )
+
 
 def create_app(config_type="Production"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.

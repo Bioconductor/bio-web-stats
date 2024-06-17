@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """User views."""
-from flask import Blueprint, render_template
 import os
+
+from flask import Blueprint, render_template
 
 is_production = os.environ.get('FLASK_ENV') == 'production'
 

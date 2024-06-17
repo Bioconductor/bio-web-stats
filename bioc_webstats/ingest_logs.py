@@ -1,16 +1,18 @@
 """Ingest download logs from Athena."""
 
-from typing import Optional
-import click
-from datetime import date, timedelta, datetime
-import pandas as pd
-import boto3
-import awswrangler as wr
-from flask import current_app
 import logging
+from datetime import date, datetime, timedelta
+from typing import Optional
+
+import awswrangler as wr
+import boto3
+import click
+import pandas as pd
+from flask import current_app
 
 import bioc_webstats.aws_functions as aws_functions
 import bioc_webstats.models as db
+
 
 def ingest_logs(
     start_date: Optional[date] = None, 

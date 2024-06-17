@@ -1,5 +1,6 @@
 import os
 
+
 class Config(object):
     CSRF_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False

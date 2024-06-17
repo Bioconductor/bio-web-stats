@@ -1,10 +1,11 @@
 """Export access_log tables from server stats.bioconductor.org."""
 import csv
-import io
 import gzip
-import psycopg2
+import io
 import sqlite3
 from datetime import datetime as dt
+
+import psycopg2
 
 from bioc_webstats.aws_functions import psql_get_connection
 

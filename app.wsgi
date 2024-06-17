@@ -1,18 +1,21 @@
 #!/usr/bin/python3
-import sys
 import logging
+import sys
+
 logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0, '/var/www/test4/bio-web-stats')
 
 from bioc_webstats import app
+
 application = app.create_app()
+
+import logging
+import site
 
 #!/usr/bin/python3
 import sys
-import logging
-import site
 from os import environ
-from os.path import join, dirname, realpath
+from os.path import dirname, join, realpath
 
 logging.basicConfig(stream=sys.stderr)
 
@@ -30,4 +33,3 @@ with open(activate_this) as f:
     exec(f.read(), dict(__file__=activate_this))
 
 from bioc_webstats import app
-
