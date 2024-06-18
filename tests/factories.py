@@ -33,8 +33,7 @@ class WebstatsInfoFactory(BaseFactory):
 
 class StatsFactory(BaseFactory):
     """Stats factory."""
-
-    category = PackageType.BIOC
+    
     package = Sequence(lambda n: f"pack{n}")
     date = Sequence(lambda n: dt.date(2015, 1, 1) + dt.timedelta(days=n))
     is_monthly = True
@@ -49,8 +48,6 @@ class StatsFactory(BaseFactory):
 
 class PackagesFactory(BaseFactory):
     """Stats factory."""
-
-    package = Sequence(lambda n: f"pack{n}")
 
     class Meta:
         """Factory configuration."""

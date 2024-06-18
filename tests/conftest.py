@@ -22,8 +22,12 @@ from .factories import PackagesFactory, StatsFactory, WebstatsInfoFactory
 @pytest.fixture(scope="session")
 def app():
     """Create application for the tests."""
-    _app = create_app("../tests/settings.py")
-    create_engine('sqlite:///:memory:', connect_args={'check_same_thread': False}, poolclass=StaticPool)
+    _app = create_app("Debug")
+    create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     _app.logger.setLevel(logging.DEBUG)
     ctx = _app.test_request_context()
     ctx.push()
@@ -41,10 +45,9 @@ def db(app: Flask):
         _db.create_all()
         u = generate_small_test_db_stats()
         [StatsFactory(**v) for v in u]
-        u = [{'key': 'ValidThru',  'value': '2023-10-04'}]
+        u = [{"key": "ValidThru", "value": "2023-10-04"}]
         [WebstatsInfoFactory(**v) for v in u]
-        u = u = [{'package': v} for v in generate_small_test_db_packages()]
-        [PackagesFactory(**v) for v in u]
+        [PackagesFactory(**v) for v in generate_small_test_db_packages()]
         _db.session.commit()
 
     yield _db
@@ -103,16 +106,27 @@ def create_hashed_counts(d: dict) -> (int, int):
     Returns:
         an ordered pair, the hashed ip_count and the hashed download_count
     """
-    s = '|'.join([str(d.get(tag, "")) for tag in ["category", "package", "date", "is_monthly"]])
+    s = "|".join(
+        [str(d.get(tag, "")) for tag in ["category", "package", "date", "is_monthly"]]
+    )
     # 9007 is a prime number of a size to give a reasonable hash for test purposes
-    download_count = crc32(s.encode('utf-8')) % 9007
+    download_count = crc32(s.encode("utf-8")) % 9007
     ip_count = int(math.ceil(math.sqrt(download_count)))
     return (ip_count, download_count)
 
 
 def generate_small_test_db_packages():
     """Create list of package names in the small_test database."""
-    return [u for _, u, _ in database_test_cases]
+    packages_dict = []
+    for category, package, _ in database_test_cases:
+        u = {
+            "category": category.value,
+            "package": package,
+            "first_version": 201,
+            "last_version": None,
+        }
+        packages_dict.append(u)
+    return packages_dict
 
 
 def generate_small_test_db_stats():
@@ -129,12 +143,14 @@ def generate_small_test_db_stats():
 
     stats_dict = []
     for category, package, start_date in database_test_cases:
-        for d in months_sequence(dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date):
+        for d in months_sequence(
+            dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date
+        ):
             u = {
-                'category': category,
-                'package': package,
-                'date': d,
-                'is_monthly': True
+                "category": category,
+                "package": package,
+                "date": d,
+                "is_monthly": True,
             }
             u["ip_count"], u["download_count"] = create_hashed_counts(u)
             stats_dict.append(u)
@@ -152,7 +168,10 @@ def check_hashed_counts(d: dict) -> bool:
         True ==> The ip_count and download_count matches the calcuated hash
     """
     ip_count, download_count = create_hashed_counts(d)
-    return d.get("ip_count", -1) == ip_count and d.get("download_count", -1) == download_count
+    return (
+        d.get("ip_count", -1) == ip_count
+        and d.get("download_count", -1) == download_count
+    )
 
 
 def check_hashed_count_list(d_list: [dict]) -> bool:
@@ -186,4 +205,4 @@ def stats(db: SQLAlchemy):
 @pytest.fixture(scope="session")
 def packages(db: SQLAlchemy):
     """Create packages for the tests."""
-    return generate_small_test_db_packages()
+    return [u['package'] for u in generate_small_test_db_packages()]

@@ -77,7 +77,7 @@ class Packages(Model):
     package: Mapped[str] = mapped_column(String, primary_key=True)
     category: Mapped[str] = mapped_column(String)
     first_version: Mapped[str] = mapped_column(String)
-    last_version: Mapped[str] = mapped_column(String)
+    last_version: Mapped[str] = mapped_column(String, nullable=True)
     
     @staticmethod
     def get_package_names():

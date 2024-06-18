@@ -67,7 +67,7 @@ def create_app(
     app.config.from_object(cfg)
 
     # Next, load parameters from the SSM Parameter store.
-    if "AWS_PARAMETER_PATH" is None:
+    if aws_parameeter_path is None:
         param_dict = {}
     else:
         # TODO try/except/raise for ToekenRetrievalError

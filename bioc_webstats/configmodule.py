@@ -29,3 +29,14 @@ class DevelopmentConfig(Config):
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL="sqlite:///dev.db"
+
+class DebugConfig(Config):
+    # TODO Create a Debug ENV value
+    ENV = "Development"
+    TESTING = True
+    DEBUG = True
+    DATABASE_URL = 'sqlite:///:memory:'
+    DEBUG_TB_ENABLED = False
+    CACHE_TYPE = "simple"  # Can be "memcached", "redis", etc.
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False  # Allows form testing
