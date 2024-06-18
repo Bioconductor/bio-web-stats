@@ -14,7 +14,7 @@ services:
   flask-dev:
     build:
       context: .
-      target: development
+      target: Development
       args:
         <<: *build_args
     image: "bioc_webstats-development"
@@ -26,14 +26,14 @@ services:
   flask-prod:
     build:
       context: .
-      target: production
+      target: Production
       args:
         <<: *build_args
     image: "bioc_webstats-production"
     ports:
       - "8080:5000"
     environment:
-      FLASK_ENV: production
+      FLASK_ENV: Production
       FLASK_DEBUG: 0
       LOG_LEVEL: INFO
       GUNICORN_WORKERS: 4
@@ -42,12 +42,12 @@ services:
   manage:
     build:
       context: .
-      target: development
+      target: Development
       args:
         <<: *build_args
     entrypoint: flask
     environment:
-      FLASK_ENV: production
+      FLASK_ENV: Production
       FLASK_DEBUG: 0
     image: "bioc_webstats-manage"
     stdin_open: true
