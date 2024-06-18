@@ -23,6 +23,8 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import TypeDecorator
+
 
 from bioc_webstats.database import Model, db
 
@@ -34,6 +36,19 @@ class PackageType(enum.Enum):
     EXPERIMENT = "experiment"
     ANNOTATION = "annotation"
     WORKFLOWS = "workflows"
+
+class PackageTypeDecorator(TypeDecorator):
+    impl = String
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        return value.value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        return PackageType(value)
 
 
 def package_type_exists(value: str) -> bool:
@@ -74,8 +89,8 @@ class WebstatsInfo(Model):
 class Packages(Model):
     """All Package Names from git.bioconductor.org."""
 
+    category: Mapped[PackageType] = mapped_column(PackageTypeDecorator, primary_key=True)
     package: Mapped[str] = mapped_column(String, primary_key=True)
-    category: Mapped[str] = mapped_column(String)
     first_version: Mapped[str] = mapped_column(String)
     last_version: Mapped[str] = mapped_column(String, nullable=True)
     
@@ -102,7 +117,7 @@ class Packages(Model):
 class Categorystats(Model):
     """This is a projection of Stats with the package column removed."""
 
-    category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
+    category: Mapped[PackageType] = mapped_column(PackageTypeDecorator, primary_key=True)
     date: Mapped[dt.date] = mapped_column(
         Date,
         comment="Dates repesenting months always have day=1, while years have month=12 and day=31",
@@ -140,7 +155,7 @@ class Categorystats(Model):
         Returns:
             _description_
         """
-        where_clause = [Categorystats.category == category.value]
+        where_clause = [Categorystats.category == category]
         if year is not None:
             where_clause.append(extract("year", Categorystats.date) == year)
 
@@ -160,7 +175,7 @@ class Categorystats(Model):
 class Stats(Model):
     """Create table of summary statistics."""
 
-    category: Mapped[PackageType] = mapped_column(Enum(PackageType), primary_key=True)
+    category: Mapped[PackageType] = mapped_column(PackageTypeDecorator, primary_key=True)
     package: Mapped[str] = mapped_column(String, primary_key=True)
     date: Mapped[dt.date] = mapped_column(
         Date,
@@ -210,7 +225,7 @@ class Stats(Model):
         Returns:
             _description_
         """
-        where_clause = [Stats.category == category.value]
+        where_clause = [Stats.category == category]
         select_clause = [Stats.date, Stats.ip_count, Stats.download_count]
         order_clause = [asc(Stats.date)]
 
@@ -278,7 +293,7 @@ class Stats(Model):
             )
             .where(
                 and_(
-                    Stats.category == category.value,
+                    Stats.category == category,
                     Stats.date.between(start_date, end_date),
                     Stats.is_monthly == True # noqa E712 -- causes and_ to malfunction
                 )

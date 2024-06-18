@@ -110,10 +110,16 @@ class TestStats:
         expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats
                     if d["category"] == category and d["package"] == package]
 
-        result = Stats.get_download_counts(category=category, package=package)
+
+        result_hi_first = Stats.get_download_counts(category=category, package=package, newest_year_first=True)
+        result_lo_first = Stats.get_download_counts(category=category, package=package, newest_year_first=False)
 
         # Assert
-        assert result == expected
+        expected_hi = sorted(expected, key=lambda x: x[0], reverse=True)
+        assert result_hi_first == expected_hi
+
+        expected_lo = sorted(expected, key=lambda x: x[0], reverse=False)
+        assert result_lo_first == expected_lo
 
     def test_get_download_counts_category(self, stats):
         """Select all the download counts for a given category."""

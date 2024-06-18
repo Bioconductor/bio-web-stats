@@ -120,7 +120,7 @@ def generate_small_test_db_packages():
     packages_dict = []
     for category, package, _ in database_test_cases:
         u = {
-            "category": category.value,
+            "category": category,
             "package": package,
             "first_version": 201,
             "last_version": None,
@@ -147,7 +147,7 @@ def generate_small_test_db_stats():
             dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date
         ):
             u = {
-                "category": category.value,
+                "category": category,
                 "package": package,
                 "date": d,
                 "is_monthly": True,
