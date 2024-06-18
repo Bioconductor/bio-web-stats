@@ -27,6 +27,7 @@ class DevelopmentConfig(Config):
     LOG_LEVEL="DEBUG"
     AWS_PARAMETER_PATH='/bioc/webstats/dev'
     # TODO Temporarily harrd-coded to sandbox rds cluster
+    LOG_FILEPATH = './instance/webstats.log'
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL="sqlite:///dev.db"
 
@@ -36,6 +37,7 @@ class DebugConfig(Config):
     TESTING = True
     DEBUG = True
     DATABASE_URL = 'sqlite:///:memory:'
+    LOG_FILEPATH = './instance/webstats.log'
     DEBUG_TB_ENABLED = False
     CACHE_TYPE = "simple"  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False

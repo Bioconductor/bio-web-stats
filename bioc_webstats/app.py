@@ -160,8 +160,8 @@ def configure_logger(app):
     logger = logging.getLogger("webstats")
     logger.setLevel(app.config["LOG_LEVEL"])
     log_file = app.config["LOG_FILEPATH"]
-    file_handler = logging.handlers.TimedRotatingFileHandler(
-        log_file, when="midnight", interval=1, backupCount=7, utc=True
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_file, maxBytes=100000000, backupCount=5
     )
     file_handler.setLevel(app.config["LOG_LEVEL"])
     formatter = logging.Formatter(

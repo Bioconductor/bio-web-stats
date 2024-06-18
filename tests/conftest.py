@@ -93,7 +93,7 @@ database_test_cases = [
 database_test_valid_date = dt.date(2023, 10, 4)
 
 
-def create_hashed_counts(d: dict) -> (int, int):
+def create_hashed_counts(d: dict) -> tuple[int, int]:
     """Calculate reproducable hashed ip_count and download_count values for test stats rows.
 
     For small database tests, create ip_count and downlooad count values that are a function of the
@@ -147,7 +147,7 @@ def generate_small_test_db_stats():
             dt.datetime.strptime(start_date, "%Y-%m-%d").date(), end_date
         ):
             u = {
-                "category": category,
+                "category": category.value,
                 "package": package,
                 "date": d,
                 "is_monthly": True,
@@ -174,7 +174,16 @@ def check_hashed_counts(d: dict) -> bool:
     )
 
 
-def check_hashed_count_list(d_list: [dict]) -> bool:
+def check_hashed_count_list(d_list: list[dict]) -> bool:
+    """
+    This function checks if all stats rows in a list have the expected hash counts.
+    
+    :param d_list: A list of dictionaries derived from Stats Rows
+    :type d_list: [dict]
+    :return: The function `check_hashed_hashed_count_list` returns a boolean value. It returns `True` if
+    all the rows in the input list have the expected count values, and it returns `False` if at least
+    one row has an incorrect count value.
+    """
     """Check that all stats rows in this list have expected hash counts.
 
     Arguments:
