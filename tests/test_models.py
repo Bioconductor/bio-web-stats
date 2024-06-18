@@ -110,15 +110,17 @@ class TestStats:
         expected = [(d["date"], d["ip_count"], d["download_count"]) for d in stats
                     if d["category"] == category and d["package"] == package]
 
-
+        # Check the legacy sort order (increasing or decreasing year, but always increasing month and day)
         result_hi_first = Stats.get_download_counts(category=category, package=package, newest_year_first=True)
         result_lo_first = Stats.get_download_counts(category=category, package=package, newest_year_first=False)
 
         # Assert
         expected_hi = sorted(expected, key=lambda x: x[0], reverse=True)
+        expected_hi = sorted(expected, key=lambda x: (-x[0].year, x[0].month, x[0].day))
+
         assert result_hi_first == expected_hi
 
-        expected_lo = sorted(expected, key=lambda x: x[0], reverse=False)
+        expected_lo = sorted(expected, key=lambda x: (x[0].year, x[0].month, x[0].day))
         assert result_lo_first == expected_lo
 
     def test_get_download_counts_category(self, stats):
