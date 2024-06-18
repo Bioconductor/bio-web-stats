@@ -1,8 +1,8 @@
 from decouple import config
 
 # Flask configuration
-ENV = config('FLASK_ENV', default='production')
-DEBUG = ENV == 'development'
+ENV = config('FLASK_ENV', default='Production')
+DEBUG = ENV == 'Development'
 SEND_FILE_MAX_AGE_DEFAULT = 0
 DEBUG_TB_ENABLED = DEBUG
 DEBUG_TB_INTERCEPT_REDIRECTS = False

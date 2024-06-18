@@ -1,5 +1,5 @@
 """Settings module for test app."""
-ENV = "development"
+ENV = "Development"
 TESTING = True
 DEBUG = True
 SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
