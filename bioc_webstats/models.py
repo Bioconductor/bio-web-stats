@@ -40,6 +40,8 @@ class PackageType(enum.Enum):
 class PackageTypeDecorator(TypeDecorator):
     impl = String
 
+    cache_ok = True # Allow SQLAlchemy to cache this type decorator
+
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
