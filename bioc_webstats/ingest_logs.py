@@ -38,7 +38,7 @@ def ingest_logs(
     # TODO this is a patch
     boto3.setup_default_session(region_name = 'us-east-1')
     log = current_app.logger
-    log.log(logging.INFO, f'Starting ingest_logs at {datetime2str(datetime.utcnow())}')
+    log.log(logging.INFO, f'Starting ingest_logs')
     # source_connection_string = "s3://bioc-webstats-download-logs/data/year=2024/month=01/day=10/"  # TODO current_app.config["SOURCE LOCATION"]
     # df = wr.s3.read_parquet(source_connection_string, dataset=True)
 
@@ -79,15 +79,15 @@ select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" 
     
     # Write out put to database table
     db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
-    # TODO Report upload complete and give record count
+    log.info("Upload to database complete")
     db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
-    # TODO reuport update_stats complete
+    log.info("Update of stats complete")
     
     if cloudfront_id is None:
         log.info("Cache invalidation skipped")
     else:
         log.info(f"CloudFront ditribution {cloudfront_id}/{cloudfront_path} invalidation started")
         aws_functions.cloudfront_invalidation(cloudfront_id, [cloudfront_path])
-        # TODO report invalidation result
+        log.info("Cache invalidation complete")
 
     log.info("Log ingestion complete")
