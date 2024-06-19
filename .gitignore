@@ -99,3 +99,7 @@ env/
 bio-web-stats.Rproj
 # charts prototype
 /bioc_webstats/chart
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
