@@ -42,6 +42,9 @@ pip-delete-this-directory.txt
 *.tfvars
 terraform.tfstate.d/
 secrets.yml
+# leave whl files out will development is active
+/dist
+/spitball
 # OS-specific
 .DS_Store
 Thumbs.db

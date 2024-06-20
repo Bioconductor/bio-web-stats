@@ -43,8 +43,8 @@ configuration_dictionary = [
         "Name": "flask/flask_app",
         "FlaskName": "APP",
         "Type": "String",
-        "Value": "autoapp.py",
-        "Description": "autoapp.py",
+        "Value": "bioc_webstats.app:create_app('Development')",
+        "Description": "Default initiation call for Flask",
     },
     {
         "Name": "flask/flask_debug",

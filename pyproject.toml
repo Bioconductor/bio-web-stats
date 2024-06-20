@@ -15,6 +15,11 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
+[tool.poetry.include]
+files = [
+    "pyproject.toml",
+]
+
 [tool.poetry.dependencies]
 python = ">=3.9,<4"
 click = ">=7.0"
