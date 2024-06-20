@@ -31,6 +31,7 @@ from werkzeug.utils import import_string
 
 import bioc_webstats.aws_functions as aws
 from bioc_webstats import commands, splash, stats
+from bioc_webstats.configmodule import configuration_dictionary
 from bioc_webstats.extensions import (
     cache,
     csrf_protect,
@@ -67,25 +68,26 @@ def create_app(
     app.config.from_object(cfg)
 
     # Next, load parameters from the SSM Parameter store.
-    if aws_parameeter_path is None:
-        param_dict = {}
-    else:
-        # TODO try/except/raise for ToekenRetrievalError
+    if aws_parameeter_path is not None:
         param_dict = aws.get_parameter_store_values(app.config["AWS_PARAMETER_PATH"])
-        
+        xref = {}
+        for u in configuration_dictionary:
+            xref[u["Name"]] = u["FlaskName"]
+        # TODO protect name not found with try block
+        for k, v in param_dict.items():
+            app.config[xref[k]] = v
 
     # Override with environment variables with FLASK_ prefix
     app.config.from_prefixed_env()
 
-    # TODO need to flatten all the paremters.
-    if "db/credentials" in param_dict:
+    # Exract database credentials from Secrets Manager
+    if "DBCREDENTIALS" in app.config:
         app.config["DATABASE_URL"] = aws.aws_secret_to_psql_url(
             param_dict["db/credentials"], "us-east-1", "webstats"
         )
 
 
 
-    # TODO Issue: how to override db/credentials with DATABASE_URL. Answer use "special arn-to-url scheme"
     app.config["SQLALCHEMY_DATABASE_URI"] = app.config["DATABASE_URL"]
     # TODO SECRET_KEY from paraemter store
     app.config[

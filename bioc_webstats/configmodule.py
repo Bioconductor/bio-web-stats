@@ -1,5 +1,95 @@
 import os
 
+"""The configuration dictionary establishes application specific configuration parameters
+and nmaps hierarchical names to flask names
+"""
+configuration_dictionary = [
+    {
+        "Name": "db/dbname",
+        "FlaskName": "DBNAME",
+        "Type": "String",
+        "Value": "webstats",
+        "Description": "Postgres database name, default 'webstats'",
+    },
+    {
+        "Name": "db/credentials",
+        "FlaskName": "DBCREDENTIALS",
+        "Type": "String",
+        "Value": "arn:aws:secretsmanager:reference-to-database-credentials-secret",
+        "Description": "arn tof secrets manager secret",
+    },
+    {
+        "Name": "db/dbuser",
+        "FlaskName": "DBUSER",
+        "Type": "String",
+        "Value": "webstats_runner",
+        "Description": "PostgrSQL user name, default 'webstats_runner'",
+    },
+    {
+        "Name": "db/port",
+        "FlaskName": "DBPORT",
+        "Type": "String",
+        "Value": "5432",
+        "Description": "Server endpoint port number",
+    },
+    {
+        "Name": "db/server",
+        "FlaskName": "DBSERVER",
+        "Type": "String",
+        "Value": "TBD",
+        "Description": "The symbolic address of the endpoint for the Postgres server",
+    },
+    {
+        "Name": "flask/flask_app",
+        "FlaskName": "APP",
+        "Type": "String",
+        "Value": "autoapp.py",
+        "Description": "autoapp.py",
+    },
+    {
+        "Name": "flask/flask_debug",
+        "FlaskName": "DEBUG",
+        "Type": "String",
+        "Value": "FALSE",
+        "Description": "False' Caution: Do not enable in production",
+    },
+    {
+        "Name": "flask/log_level",
+        "FlaskName": "LOG_LEVEL",
+        "Type": "String",
+        "Value": "INFO",
+        "Description": "Standard log levels, default 'INFO'",
+    },
+    {
+        "Name": "flask/secret_key",
+        "FlaskName": "SECRET_KEY",
+        "Type": "String",
+        "Value": "TBD",
+        "Description": "Secret key for activating web client flask debugging tools",
+    },
+    {
+        "Name": "gunicorn/bind_port",
+        "FlaskName": "BIND_PORT",
+        "Type": "String",
+        "Value": "0.0.0.0:8000",
+        "Description": "Default: '0.0.0.0:8000'",
+    },
+    {
+        "Name": "gunicorn/error_log",
+        "FlaskName": "ERROR_LOG",
+        "Type": "String",
+        "Value": "/var/log/bioc-webstats/error.log",
+        "Description": "Default: '/var/log/bioc-webstats/error.log'",
+    },
+    {
+        "Name": "gunicorn/access_log",
+        "FlaskName": "ACCESS_LOG",
+        "Type": "String",
+        "Value": "/var/log/bioc-webstats/access.log",
+        "Description": "Default: '/var/log/bioc-webstats/access.log'",
+    },
+]
+
 
 class Config(object):
     CSRF_ENABLED = True

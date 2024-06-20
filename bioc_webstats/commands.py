@@ -8,6 +8,7 @@ from subprocess import call
 import click
 
 from bioc_webstats.ingest_logs import ingest_logs
+from bioc_webstats.configmodule import configuration_dictionary
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)
@@ -172,82 +173,6 @@ def configp(namespace, profile, region):
     if profile is None:
         profile = 'bioc'
 
-    template = [
-        {
-            "Name": "db/dbname",
-            "Type": "String",
-            "Value": "webstats",
-            "Description": "Postgres database name, default 'webstats'",
-        },
-        {
-            "Name": "db/credentials",
-            "Type": "String",
-            "Value": "arn:aws:secretsmanager:reference-to-database-credentials-secret",
-            "Description": "arn tof secrets manager secret",
-        },
-        {
-            "Name": "db/dbuser",
-            "Type": "String",
-            "Value": "webstats_runner",
-            "Description": "PostgrSQL user name, default 'webstats_runner'",
-        },
-        {
-            "Name": "db/port",
-            "Type": "String",
-            "Value": "5432",
-            "Description": "Server endpoint port number",
-        },
-        {
-            "Name": "db/server",
-            "Type": "String",
-            "Value": "TBD",
-            "Description": "The symbolic address of the endpoint for the Postgres server",
-        },
-        {
-            "Name": "flask/flask_app",
-            "Type": "String",
-            "Value": "autoapp.py",
-            "Description": "autoapp.py",
-        },
-        {
-            "Name": "flask/flask_debug",
-            "Type": "String",
-            "Value": "FALSE",
-            "Description": "False' Caution: Do not enable in production",
-        },
-        {
-            "Name": "flask/log_level",
-            "Type": "String",
-            "Value": "INFO",
-            "Description": "Standard log levels, default 'INFO'",
-        },
-        {
-            "Name": "flask/secret_key",
-            "Type": "String",
-            "Value": "TBD",
-            "Description": "Secret key for activating web client flask debugging tools",
-        },
-        {
-            "Name": "gunicorn/bind_port",
-            "Type": "String",
-            "Value": "0.0.0.0:8000",
-            "Description": "Default: '0.0.0.0:8000'",
-        },
-        {
-            "Name": "gunicorn/error_log",
-            "Type": "String",
-            "Value": "/var/log/bioc-webstats/error.log",
-            "Description": "Default: '/var/log/bioc-webstats/error.log'",
-        },
-        {
-            "Name": "gunicorn/access_log",
-            "Type": "String",
-            "Value": "/var/log/bioc-webstats/access.log",
-            "Description": "Default: '/var/log/bioc-webstats/access.log'",
-        },
-    ]
-
-
     session = boto3.Session(
         profile_name=profile,
         region_name=region
@@ -258,7 +183,7 @@ def configp(namespace, profile, region):
     # TODO Test for previously existing. Create --force parameter
     # TODO Add tages
     
-    for p in template:
+    for p in configuration_dictionary:
         q = p
         q["Name"] = namespace + p["Name"]
         response = ssm_client.put_parameter(**q)
