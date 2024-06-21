@@ -4,9 +4,14 @@
 #     sudo systemctl start bioc-webstats.service
 [Unit]
 Description=bioc-webstats backend web server
+After=network.target
 
 [Service]
-ExecStart=/var/www/bio-web-stats/supervisord_programs/start_gunicorn.sh
+ExecStart=/home/ubuntu/bio-web-stats/supervisord_programs/start_gunicorn.sh
+Restart=always
+User=ubuntu
+Group=ubuntu
+Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target
