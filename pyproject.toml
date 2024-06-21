@@ -15,9 +15,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
-[tool.poetry.include]
-files = [
+include = [
     "pyproject.toml",
+    "app.wsgi",
+    "supervisord_programs/*",
 ]
 
 [tool.poetry.dependencies]
