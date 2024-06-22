@@ -7,6 +7,7 @@ python3 -m venv .venv
 
 pip install bioc_webstats-0.1.5-py3-none-any.whl
 
+# TODO only run this if aws is not installed
 . aws_installer.sh
 # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 # unzip awscliv2.zip
@@ -27,3 +28,13 @@ sso_start_url = https://bioconductor.awsapps.com/start
 sso_region = us-east-1
 sso_registration_scopes = sso:account:access
 eof
+
+### End of awscli install
+
+# TODO Create/verify aws role. default: bioc-webstats-webrunner
+# TODO Need to make log directory available for update
+sudo chmod +w /var/log/bioc-webstats
+sudo chown ubuntu /var/log/bioc-webstats
+
+export FLASK_APP="bioc_webstats.app:create_app('Production')"
+export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
