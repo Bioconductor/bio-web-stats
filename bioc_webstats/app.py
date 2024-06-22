@@ -162,6 +162,15 @@ def configure_logger(app):
     logger = logging.getLogger("webstats")
     logger.setLevel(app.config["LOG_LEVEL"])
     log_file = app.config["LOG_FILEPATH"]
+
+    # create the log file if necessasry    
+    dir_path = os.path.dirname(log_file)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    # Create the file if it does not exist
+    with open(log_file, 'a'):
+        os.utime(log_file, None)
+
     file_handler = logging.handlers.RotatingFileHandler(
         log_file, maxBytes=100000000, backupCount=5
     )

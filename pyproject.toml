@@ -47,6 +47,7 @@ Flask-Caching = ">=2.0,<3.0"
 Flask-DebugToolbar = ">=0.13,<1.0"
 environs = "*"
 boto3 = "*"
+ptvsd = "*"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3,<4.0"
