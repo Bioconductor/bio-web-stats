@@ -44,7 +44,7 @@ COPY supervisord_programs /etc/supervisor/conf.d
 COPY . .
 
 EXPOSE 5000
-ENTRYPOINT ["/bin/bash", "shell_scripts/supervisord_entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "installer_scripts/supervisord_entrypoint.sh"]
 CMD ["-c", "/etc/supervisor/supervisord.conf"]
 
 

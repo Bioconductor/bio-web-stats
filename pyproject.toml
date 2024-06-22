@@ -19,7 +19,7 @@ include = [
     "pyproject.toml",
     "app.wsgi",
     "supervisord_programs/*",
-    "shell_scripts/*",
+    "installer_scripts/*",
 ]
 
 [tool.poetry.dependencies]

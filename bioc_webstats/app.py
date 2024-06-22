@@ -94,12 +94,12 @@ def create_app(
         "SECRET_KEY"
     ] = "1849cb85026145adc5164b9568d6afbde65351264f87c25aebdadc576ae662f5"
 
+    configure_logger(app)
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
-    configure_logger(app)
     return app
 
 
@@ -132,8 +132,11 @@ def register_errorhandlers(app):
         error_code = getattr(error, "code", 500)
         return render_template(f"{error_code}.html"), error_code
 
-    for errcode in [401, 404, 500]:
-        app.errorhandler(errcode)(render_error)
+    # Pass through http error codes if this is production
+    if (app.config['ENV'] != 'Production'):
+        for errcode in [401, 404, 500]:
+            app.errorhandler(errcode)(render_error)
+
     return None
 
 
