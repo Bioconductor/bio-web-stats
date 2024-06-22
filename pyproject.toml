@@ -19,10 +19,11 @@ include = [
     "pyproject.toml",
     "app.wsgi",
     "supervisord_programs/*",
+    "shell_scripts/*",
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4"
+python = ">=3.11,<4"
 click = ">=7.0"
 Flask = ">=2.3,<3.0"
 Werkzeug = "*"
