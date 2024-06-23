@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bioc_webstats"
-version = "0.1.5"
+version = "0.1.6"
 description = "A web application to serve the content under www.bioconductor.org/packages/stats/"
 authors = ["Robert Shear <rshear@ds.dfck.harvard.edu>"]
 license = "MIT"
@@ -23,7 +23,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4"
+python = "^3.11.0"
 click = ">=7.0"
 Flask = ">=2.3,<3.0"
 Werkzeug = "*"
@@ -40,7 +40,6 @@ email-validator = ">=2.0,<3.0"
 Flask-WTF = ">=1.2,<2.0"
 WTForms = ">=3.1,<4.0"
 gevent = "*"
-gunicorn = ">=22.0.0"
 supervisor = ">=4.2,<5.0"
 Flask-Static-Digest = ">=0.4,<1.0"
 Flask-Caching = ">=2.0,<3.0"
@@ -48,6 +47,7 @@ Flask-DebugToolbar = ">=0.13,<1.0"
 environs = "*"
 boto3 = "*"
 ptvsd = "*"
+gunicorn = "^22.0.0"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3,<4.0"

@@ -2,12 +2,12 @@
 
 sudo apt update
 sudo apt upgrade
-sudo apt install python3 python3-venv curl unzip nano vim -y
-# from host scp -P 2222 dist/bioc_webstats-0.1.5-py3-none-any.whl ubuntu@localhost:.
+sudo apt install python3 poetry curl unzip nano vim tree -y
+# from host scp -P 2222 dist/bioc_webstats-0.1.6-py3-none-any.whl ubuntu@localhost:.
 python3 -m venv .venv
 . .venv/bin/activate
 
-pip install bioc_webstats-0.1.5-py3-none-any.whl
+pip install bioc_webstats-0.1.6-py3-none-any.whl
 
 # TODO only run this if aws is not installed
 # TODO on EC2 - sudo apt  install awscli
@@ -40,13 +40,17 @@ pip install bioc_webstats-0.1.5-py3-none-any.whl
 sudo mkdir /var/log/bioc-webstats
 sudo chown ubuntu /var/log/bioc-webstats
 
+sudo mkdir /var/www/bioc-webstats
+sudo chown ubuntu /www/log/bioc-webstats
+
+# TODO parameterize
 export FLASK_APP="bioc_webstats.app:create_app('Production')"
 export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
-export FLASK_APPROOT=/home/ubuntu/
+export FLASK_APPROOT=/var/www/bioc-webstats/
 
 python -m bioc_webstats.post_install
 
-cd /home/ubuntu/supervisord_programs/
+cd /var/www/bioc-webstats/supervisord_programs/
 sudo systemctl enable bioc-webstats.service
 sudo systemctl start bioc-webstats.service
 sudo systemctl status bioc-webstats.service

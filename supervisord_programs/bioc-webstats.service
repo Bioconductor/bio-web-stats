@@ -1,17 +1,16 @@
-# TODO Hard coded for standalone deployment
-# usage:
-#     sudo systemctl enable bioc-webstats.service
-#     sudo systemctl start bioc-webstats.service
 [Unit]
-Description=bioc-webstats backend web server
+Description=Gunicorn instance to serve bio-web-stats
 After=network.target
 
 [Service]
-ExecStart=/home/ubuntu/bio-web-stats/supervisord_programs/start_gunicorn.sh
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/bioc-webstats
+Environment="ENV_GUNICORN_WORKERS=4" "ENV_LOG_LEVEL=info"
+ExecStart=/usr/bin/env bash -c 'cd /var/www/bioc-webstats && poetry run gunicorn bioc_webstats.app:create_app("Production", "bioc/webstats/prod") -b :5000 -w $ENV_GUNICORN_WORKERS -k gevent --max-requests=5000 --max-requests-jitter=500 --log-level=$ENV_LOG_LEVEL'
+StandardOutput=journal
+StandardError=journal
 Restart=always
-User=ubuntu
-Group=ubuntu
-Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target

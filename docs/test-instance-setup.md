@@ -21,13 +21,7 @@
 - Place the Flask application code on the server.
 - Create a directory for your Flask app and clone your code into it.
 - Create a Python virtual environment to manage your dependencies:
-  - `cd /var/www/`
-  - `git clone https://github.com/Bioconductor/bio-web-stats.git`
-  - `cd /var/www/bio-web-stats`
-  - `python3 -m venv venv`
-  - `source venv/bin/activate`
-  - `pip install -r /requirements/dev.txt`
-
+  - TBS
 ## 5. Configure Apache Virtual Host
 - Create an Apache Virtual Host configuration file for the Flask app.
 - Modify the configuration to suit your specific paths:
@@ -37,8 +31,8 @@
   <VirtualHost *:80>
       ServerName 18.117.254.107
       WSGIDaemonProcess app user=www-data group=www-data threads=5
-      WSGIScriptAlias / /var/www/test4/bio-web-stats/app.wsgi
-      <Directory /var/www/test4/bio-web-stats/bioc_webstats>
+      WSGIScriptAlias / /var/www/bioc-webstats/app.wsgi
+      <Directory /var/www/bioc-webstats/bioc_webstats>
           WSGIProcessGroup app
           WSGIApplicationGroup %{GLOBAL}
           Require all granted
@@ -51,14 +45,14 @@
 ## 6. Create the WSGI File
 Create a .wsgi file for your Flask app. This file will load the Flask app into the Apache WSGI process:
 
-- `sudo nano /var/www/bio-web-stats/app.wsgi`
+- `sudo nano /var/www/bioc-webstats/app.wsgi`
 
 ```python
 #!/usr/bin/python3
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/var/www/test4/bio-web-stats')
+sys.path.insert(0, '/var/www/bioc-webstats')
 from bioc_webstats import app
 application = app.create_app()
 

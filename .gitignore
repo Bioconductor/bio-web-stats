@@ -9,9 +9,6 @@ __pycache__/
 *.sqlite3
 *.tar.gz
 # Virtual environment and dependency management
-venv/
-*.venv/
-*.venv.*
 Pipfile.lock
 *.pip
 pip-log.txt
