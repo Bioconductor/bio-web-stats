@@ -24,7 +24,7 @@ WTForms = "==3.0.1"
 
 # Deployment
 gevent = "==22.10.2"
-gunicorn = ">=19.9.0"
+gunicorn = ">=21.0.0"
 supervisor = "==4.2.4"
 
 # Flask Static Digest

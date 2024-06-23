@@ -2,14 +2,10 @@ import shutil
 import os
 import sys
 
-
-
-
-
 def post_install():
     # Define the source and destination paths
     
-    def copy_file(source_module, destination_directory, filename):
+    def copy_file(source_module, destination_directory, filename, set_executible=False):
         """Copy file from soucre_directory to destination_diretory"""
 
         source_directory = os.path.join(packages_path, source_module)
@@ -24,6 +20,11 @@ def post_install():
         
         destination_full_name = os.path.join(destination_directory, filename)
         shutil.copy(source_full_name, destination_full_name)
+        if set_executible:
+            current_permissions = os.stat(destination_full_name).st_mode
+            os.chmod(destination_full_name, current_permissions | 0o111)
+
+
         print(f"OK. {source_full_name} -> {destination_full_name}")
 
         return
@@ -31,11 +32,12 @@ def post_install():
     anchor_path = os.path.normpath(os.path.dirname(__file__))
     packages_path = os.path.normpath(anchor_path + '/../')
     target_path = os.getenv('FLASK_APPROOT', default=os.getenv('HOME'))
+    superd_path = os.path.join(target_path, "supervisord_programs")
 
-    # TODO DEBUG ONLY
-    target_path = "/Users/robertshear/temp"
-    
-    copy_file("supervisord_programs", target_path, "bioc-webstats.service")
+    copy_file("", "", "app.wsgi")
+    copy_file("supervisord_programs", '/etc/systemd/system', "bioc-webstats.service", True)
+    copy_file("supervisord_programs", superd_path, "gunicorn.conf")
+    copy_file("supervisord_programs", superd_path, "start_gunicorn.sh", True)
 
 if __name__ == "__main__":
     post_install()
