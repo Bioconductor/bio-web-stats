@@ -1,1 +1,1 @@
-docker build -t ubuntu-systemd-ssh .
+docker build -t webstats-server .

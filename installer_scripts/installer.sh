@@ -2,7 +2,8 @@
 
 sudo apt update
 sudo apt upgrade
-sudo apt install python3 poetry curl unzip nano vim tree -y
+sudo apt install python3 python3-pip python3.12-venv curl unzip nano vim tree -y
+
 # from host scp -P 2222 dist/bioc_webstats-0.1.6-py3-none-any.whl ubuntu@localhost:.
 python3 -m venv .venv
 . .venv/bin/activate

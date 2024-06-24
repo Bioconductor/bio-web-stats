@@ -1,1 +1,3 @@
-docker run  -p 2222:22 -p 5555:5000  --privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --name=ubuntu-systemd-ssh-container -d ubuntu-systemd-ssh
+docker run -p 2222:22 -p 5555:5000 --privileged --name=webstats1 -d webstats-server
+
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats1
