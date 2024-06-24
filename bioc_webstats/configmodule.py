@@ -67,27 +67,6 @@ configuration_dictionary = [
         "Value": "TBD",
         "Description": "Secret key for activating web client flask debugging tools",
     },
-    {
-        "Name": "gunicorn/bind_port",
-        "FlaskName": "BIND_PORT",
-        "Type": "String",
-        "Value": "0.0.0.0:8000",
-        "Description": "Default: '0.0.0.0:8000'",
-    },
-    {
-        "Name": "gunicorn/error_log",
-        "FlaskName": "ERROR_LOG",
-        "Type": "String",
-        "Value": "/var/log/bioc-webstats/error.log",
-        "Description": "Default: '/var/log/bioc-webstats/error.log'",
-    },
-    {
-        "Name": "gunicorn/access_log",
-        "FlaskName": "ACCESS_LOG",
-        "Type": "String",
-        "Value": "/var/log/bioc-webstats/access.log",
-        "Description": "Default: '/var/log/bioc-webstats/access.log'",
-    },
 ]
 
 

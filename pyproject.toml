@@ -47,7 +47,7 @@ Flask-DebugToolbar = ">=0.13,<1.0"
 environs = "*"
 boto3 = "*"
 ptvsd = "*"
-gunicorn = "^22.0.0"
+waitress = "*"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3,<4.0"
