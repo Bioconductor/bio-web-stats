@@ -37,11 +37,11 @@ pip install bioc_webstats-0.1.6-py3-none-any.whl
 # TODO Create/verify aws role. default: bioc-webstats-webrunner
 # TODO Need to make log directory available for update
 
-sudo mkdir /var/log/bioc-webstats
-sudo chown ubuntu /var/log/bioc-webstats
+sudo mkdir -p /var/log/bioc-webstats
+sudo chown -R ubuntu /var/log/bioc-webstats
 
-sudo mkdir /var/www/bioc-webstats
-sudo chown ubuntu /www/log/bioc-webstats
+sudo mkdir -p /var/www/bioc-webstats
+sudo chown -R ubuntu /var/www/bioc-webstats
 
 # TODO parameterize
 export FLASK_APP="bioc_webstats.app:create_app('Production')"

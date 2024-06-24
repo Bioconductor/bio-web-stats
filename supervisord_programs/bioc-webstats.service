@@ -3,11 +3,11 @@ Description=Gunicorn instance to serve bio-web-stats
 After=network.target
 
 [Service]
-User=www-data
-Group=www-data
+User=ubuntu
+Group=ubuntu
 WorkingDirectory=/var/www/bioc-webstats
 Environment="ENV_GUNICORN_WORKERS=4" "ENV_LOG_LEVEL=info"
-ExecStart=/usr/bin/env bash -c 'cd /var/www/bioc-webstats && poetry run gunicorn bioc_webstats.app:create_app("Production", "bioc/webstats/prod") -b :5000 -w $ENV_GUNICORN_WORKERS -k gevent --max-requests=5000 --max-requests-jitter=500 --log-level=$ENV_LOG_LEVEL'
+ExecStart=/usr/bin/env bash -c 'source /home/ubuntu/.venv/bin/activate && cd /var/www/bioc-webstats && gunicorn bioc_webstats.app:create_app("Production", "bioc/webstats/prod") -b :5000 -w $ENV_GUNICORN_WORKERS -k gevent --max-requests=5000 --max-requests-jitter=500 --log-level=$ENV_LOG_LEVEL'
 StandardOutput=journal
 StandardError=journal
 Restart=always

@@ -28,16 +28,15 @@ def post_install():
         print(f"OK. {source_full_name} -> {destination_full_name}")
 
         return
-    
+    # TODO use environment variable
     anchor_path = os.path.normpath(os.path.dirname(__file__))
     packages_path = os.path.normpath(anchor_path + '/../')
     target_path = os.getenv('FLASK_APPROOT', default=os.getenv('HOME'))
     superd_path = os.path.join(target_path, "supervisord_programs")
 
+    # TODO both of these targets are incorrect
     copy_file("", "", "app.wsgi")
     copy_file("supervisord_programs", '/etc/systemd/system', "bioc-webstats.service", True)
-    copy_file("supervisord_programs", superd_path, "gunicorn.conf")
-    copy_file("supervisord_programs", superd_path, "start_gunicorn.sh", True)
 
 if __name__ == "__main__":
     post_install()
