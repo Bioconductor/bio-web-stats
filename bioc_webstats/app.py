@@ -73,11 +73,11 @@ def create_app(
         xref = {}
         for u in configuration_dictionary:
             xref[u["Name"]] = u["FlaskName"]
-            for k, v in param_dict.items():
-                try:
-                    app.config[xref[k]] = v
-                except Exception as e:
-                    logging.error(f"Could not map AWS SSM parameter {k}.")
+        for k, v in param_dict.items():
+            try:
+                app.config[xref[k]] = v
+            except Exception as e:
+                logging.error(f"Could not map AWS SSM parameter {k}.")
 
     # Override with environment variables with FLASK_ prefix
     app.config.from_prefixed_env()

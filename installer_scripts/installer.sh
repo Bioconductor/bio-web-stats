@@ -1,4 +1,6 @@
 #!/bin/bash
+export TARGET_PLATFORM=EC2
+
 
 sudo apt update
 sudo apt upgrade
@@ -9,18 +11,15 @@ python3 -m venv .venv
 . .venv/bin/activate
 
 
-pip install bioc_webstats-0.1.6-py3-none-any.whl
+pip install bioc_webstats-0.1.7-py3-none-any.whl
 
 # TODO only run this if aws is not installed
 # TODO on EC2 - sudo apt  install awscli
 # . aws_installer.sh
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# unzip awscliv2.zip
-# sudo ./aws/install
-# aws --version
 
 
-# # TODO aws config info -- condition on availabiity of role
+# # # TODO aws config info -- condition on availabiity of role
+# mkdir .aws
 # cat > .aws/config <<eof
 # [profile default]
 # sso_session = webstats
@@ -48,7 +47,8 @@ sudo chown -R ubuntu /var/www/bioc-webstats
 # TODO parameterize
 export FLASK_APP="bioc_webstats.app:create_app('Production')"
 export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
-export FLASK_APPROOT=/var/www/bioc-webstats/
+export FLASK_APPROOT=/home/ubuntu/
+
 
 python -m bioc_webstats.post_install
 
