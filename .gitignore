@@ -85,7 +85,7 @@ env/
 /bioc_webstats/static/build/
 # Configuration
 .env
-# Development database
+# development database
 /instance
 /test-results/
 /playwright-report/

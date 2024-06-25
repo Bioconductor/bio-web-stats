@@ -43,7 +43,7 @@ configuration_dictionary = [
         "Name": "flask/flask_app",
         "FlaskName": "APP",
         "Type": "String",
-        "Value": "bioc_webstats.app:create_app('Development')",
+        "Value": "bioc_webstats.app:create_app('development')",
         "Description": "Default initiation call for Flask",
     },
     {
@@ -82,8 +82,8 @@ class Config(object):
     URI_PATH_PREFIX = "/packages/stats"
     SECRET_KEY = ''
 
-class ProductionConfig(Config):
-    ENV="Production"
+class productionConfig(Config):
+    ENV="production"
     DATABASE_URL=""
     DEVELOPMENT=False
     TESTING=False
@@ -91,8 +91,8 @@ class ProductionConfig(Config):
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=0
 
-class DevelopmentConfig(Config):
-    ENV="Development"
+class developmentConfig(Config):
+    ENV="development"
     DEVELOPMENT=True
     TESTING=True
     LOG_LEVEL="DEBUG"
@@ -102,9 +102,9 @@ class DevelopmentConfig(Config):
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL="sqlite:///dev.db"
 
-class DebugConfig(Config):
+class sebugConfig(Config):
     # TODO Create a Debug ENV value
-    ENV = "Development"
+    ENV = "development"
     TESTING = True
     DEBUG = True
     DATABASE_URL = 'sqlite:///:memory:'

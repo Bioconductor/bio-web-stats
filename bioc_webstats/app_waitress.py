@@ -9,4 +9,4 @@ logging.basicConfig(stream=sys.stderr)
 
 # TODO parameterize port 5000
 if __name__ == "__main__":
-    serve(app.create_app('Production', '/bioc/webstats/prod'), host='0.0.0.0', port=5000)
+    serve(app.create_app('production', '/bioc/webstats/prod'), host='0.0.0.0', port=5000)

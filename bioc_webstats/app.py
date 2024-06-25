@@ -43,13 +43,13 @@ from bioc_webstats.extensions import (
 
 
 def create_app(
-    config_type="Production",
+    config_type="production",
     aws_parameeter_path=None,
     enable_remote_debugging=False
 ):
     """The Application Factory. Set up the particular instance of the Flask class.
 
-    :param config_type: The configmodule subclass object to use. Allowed values "Production" and "Development"
+    :param config_type: The configmodule subclass object to use. Allowed values "production" and "development"
     """
 
     if enable_remote_debugging:
@@ -60,8 +60,11 @@ def create_app(
         ptvsd.wait_for_attach()
 
     app = Flask(__name__.split(".")[0])
+    
+    # Bootstrap variables
+    app.config["ENV"] = os.getenv('FLASK_ENV', config_type)
 
-    config_object_name = f"bioc_webstats.configmodule.{config_type}Config"
+    config_object_name = f"bioc_webstats.configmodule.{app.config["ENV"]}Config"
 
     # Populate the configuration from config and its sublcasses
     cfg = import_string(config_object_name)()
@@ -110,7 +113,11 @@ def register_extensions(app):
     cache.init_app(app)
     db.init_app(app)
     csrf_protect.init_app(app)
-    debug_toolbar.init_app(app)
+
+    # No debug toolbar for production
+    if app.config["ENV"] != "production":
+        debug_toolbar.init_app(app)
+
     migrate.init_app(app, db)
     flask_static_digest.init_app(app)
     return None
@@ -120,7 +127,7 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(stats.bp)
     # Exclude debuging tools if this is a production environment
-    if app.config["ENV"] != "Production":
+    if app.config["ENV"] != "production":
         app.register_blueprint(splash.blueprint)
     return None
 
@@ -135,7 +142,7 @@ def register_errorhandlers(app):
         return render_template(f"{error_code}.html"), error_code
 
     # Pass through http error codes if this is production
-    if (app.config['ENV'] != 'Production'):
+    if (app.config['ENV'] != 'production'):
         for errcode in [401, 404, 500]:
             app.errorhandler(errcode)(render_error)
 

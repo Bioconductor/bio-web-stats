@@ -46,7 +46,7 @@ sudo mkdir -p /var/www/bioc-webstats
 sudo chown -R ubuntu /var/www/bioc-webstats
 
 # TODO parameterize. Note now file flask_environment
-export FLASK_APP="bioc_webstats.app:create_app('Production', '/bioc/webstats/prod')"
+export FLASK_APP="bioc_webstats.app:create_app('production', '/bioc/webstats/prod')"
 export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
 export FLASK_APPROOT=/home/ubuntu/
 
