@@ -3,6 +3,7 @@
 import os
 from datetime import date, datetime
 from glob import glob
+import logging
 from subprocess import call
 
 import click
@@ -181,12 +182,15 @@ def configp(namespace, profile, region):
     ssm_client = session.client('ssm')
 
     # TODO Test for previously existing. Create --force parameter
-    # TODO Add tages
+    # TODO Add tags
     
-    for p in configuration_dictionary:
-        q = p
-        q["Name"] = namespace + p["Name"]
-        response = ssm_client.put_parameter(**q)
-        # TODO check response for errors
-        
-    # TODO log the event
+    try:
+        for p in configuration_dictionary:
+            q = p
+            q["Name"] = namespace + p["Name"]
+            response = ssm_client.put_parameter(**q)
+            # TODO check response for errors
+    except Exception as e:
+        logging.error(f"Failed to store parameters. {e}")
+        raise e
+    logging.info("AWs Parameter set configured namespace:{namespace} profile:{profile} {region}.")

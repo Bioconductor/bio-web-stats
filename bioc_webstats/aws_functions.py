@@ -1,28 +1,37 @@
 """ aws_functions TODO rename this. """
 import json
-
+import logging
 import boto3
 import psycopg2
 from botocore.exceptions import ClientError
 
 
+import boto3
+import logging
+
+
 def aws_assume_sts_role(role_arn, role_session_name):
 
-    # Create an STS client
-    sts_client = boto3.client('sts')
+    try:
+        # Create an STS client
+        sts_client = boto3.client('sts')
 
-    # Assume the specified role
-    assumed_role_object = sts_client.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName=role_session_name
-    )
+        # Assume the specified role
+        assumed_role_object = sts_client.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName=role_session_name
+        )
 
-    # Credentials to be used for the session with the assumed role
-    credentials = assumed_role_object['Credentials']
-    return credentials
+        # Credentials to be used for the session with the assumed role
+        credentials = assumed_role_object['Credentials']
+        return credentials
+
+    except Exception as e:
+        logging.critical(f"Could not assume AWS role {role_arn}. {e}")
+        raise SystemExit(1) 
 
     
-def get_parameter_store_values(parameter_path: str) -> dict:
+def get_parameter_store_values(parameter_path: str, region_name='us-east-1') -> dict:
     """Get all SSM parameter store values for a specific configuration.
 
     Arguments:
@@ -31,20 +40,21 @@ def get_parameter_store_values(parameter_path: str) -> dict:
     Returns:
         A dictionary of parameter names (excluding the prefix) and their values.
     """
- 
-    # TODO replace with call that does not assume a default region
-    # TODO wrap boto calls with trys
-    ssm_client = boto3.client('ssm', region_name = 'us-east-1')
-    plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
-    # HACK Start from the top with SSM paramater store included
-    for item in plist["Parameters"]:
+
+    try:
+        ssm_client = boto3.client('ssm', region_name = region_name)
         plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
-        result = {item["Name"][len(parameter_path)+1:] : item["Value"] for item in plist["Parameters"]}
-    return result
+        for item in plist["Parameters"]:
+            plist = ssm_client.get_parameters_by_path(Path = parameter_path, Recursive=True)
+            result = {item["Name"][len(parameter_path)+1:] : item["Value"] for item in plist["Parameters"]}
+        return result
+
+    except Exception as e:
+        logging.critical(f"Failed to read AWS parameter store {parameter_path}. {e}")
+        raise SystemExit(1) 
 
 
 def get_secret(secret_name, region_name):
-
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -57,21 +67,27 @@ def get_secret(secret_name, region_name):
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
         )
-    except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-        raise e
 
-    # Decrypts secret using the associated KMS key.
-    secret = get_secret_value_response['SecretString']
-    return secret
+        # Decrypts secret using the associated KMS key.
+        secret = get_secret_value_response['SecretString']
+        return secret
 
-# TODO Do we need region_name?
+    except Exception as e:
+        logging.critical(f"Could not read AWS secret {secret_name}. {e}")
+        raise SystemExit(1) 
+
 def psql_get_connection(secret_name, region_name, database_name):
     """TODO."""
-    connection_string = aws_secret_to_psql_url(secret_name, region_name, database_name)
-    conn = psycopg2.connect(connection_string)
-    return conn
+
+    try:
+        connection_string = aws_secret_to_psql_url(secret_name, region_name, database_name)
+        conn = psycopg2.connect(connection_string)
+        return conn
+
+    except Exception as e:
+        logging.critical(f"Could not open psql {database_name} with {secret_name}. {e}")
+        raise SystemExit(1) 
+
 
 def aws_secret_to_psql_url(secret_name, region_name, database_name):
     secret = get_secret(secret_name, region_name)
