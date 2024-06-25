@@ -58,3 +58,4 @@ sudo chmod +x /home/ubuntu/flask_environment
 sudo systemctl enable bioc-webstats.service
 sudo systemctl start bioc-webstats.service
 sudo systemctl status bioc-webstats.service
+# TODO move flask_ingest.sh and flask_ingest_rontabs_setup.sh to target machiine

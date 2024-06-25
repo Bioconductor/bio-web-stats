@@ -51,7 +51,7 @@ def ingest_logs(
         end_date = datetime.utcnow().date() - timedelta(days=1)
         
     if start_date > end_date:
-        log.error(f"Start date {start_date} greater than end date {end_date}. No log records ingested", 
+        log.warning(f"Start date {start_date} greater than end date {end_date}. No log records ingested", 
                     start_date,
                     end_date)
         return
