@@ -23,7 +23,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12.4"
+python = "^3.12.3"
 click = ">=7.0"
 Flask = ">=2.3,<3.0"
 Werkzeug = "*"

@@ -3,7 +3,8 @@ FROM ubuntu:latest
 ENV container docker
 
 RUN apt-get update && \
-    apt-get install -y systemd systemd-sysv openssh-server apache2 sudo && \
+    apt-get install -y systemd systemd-sysv openssh-server apache2 sudo \
+        python3 python3-pip python3.12-venv curl unzip nano vim tree && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -27,7 +28,6 @@ RUN echo 'webstats-user:webstats-user' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 RUN systemctl enable ssh
-
 
 EXPOSE 22 80 5000
 

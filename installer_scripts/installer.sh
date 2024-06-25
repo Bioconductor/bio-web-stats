@@ -8,6 +8,7 @@ sudo apt install python3 python3-pip python3.12-venv curl unzip nano vim tree -y
 python3 -m venv .venv
 . .venv/bin/activate
 
+
 pip install bioc_webstats-0.1.6-py3-none-any.whl
 
 # TODO only run this if aws is not installed
