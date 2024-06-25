@@ -85,6 +85,8 @@ class Config(object):
 class ProductionConfig(Config):
     ENV="Production"
     DATABASE_URL=""
+    DEVELOPMENT=False
+    TESTING=False
     AWS_PARAMETER_PATH='/bioc/webstats/prod'
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=0

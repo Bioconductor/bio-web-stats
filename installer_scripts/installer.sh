@@ -14,7 +14,8 @@ python3 -m venv .venv
 pip install bioc_webstats-0.1.7-py3-none-any.whl
 
 # TODO only run this if aws is not installed
-# TODO on EC2 - sudo apt  install awscli
+# TODO on EC2 - sudo apt install awscli
+# on docker:
 # . aws_installer.sh
 
 
@@ -44,15 +45,16 @@ sudo chown -R ubuntu /var/log/bioc-webstats
 sudo mkdir -p /var/www/bioc-webstats
 sudo chown -R ubuntu /var/www/bioc-webstats
 
-# TODO parameterize
-export FLASK_APP="bioc_webstats.app:create_app('Production')"
+# TODO parameterize. Note now file flask_environment
+export FLASK_APP="bioc_webstats.app:create_app('Production', '/bioc/webstats/prod')"
 export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
 export FLASK_APPROOT=/home/ubuntu/
 
 
-python -m bioc_webstats.post_install
-
-cd /var/www/bioc-webstats/supervisord_programs/
+# TODO put this in python -m bioc_webstats.post_install
+sudo cp ~/.venv/lib/python3.12/site-packages/supervisord_programs/bioc-webstats.service /etc/systemd/system/
+sudo cp ~/.venv/lib/python3.12/site-packages/supervisord_programs/flask_environment /home/ubuntu
+sudo chmod +x /home/ubuntu/flask_environment
 sudo systemctl enable bioc-webstats.service
 sudo systemctl start bioc-webstats.service
 sudo systemctl status bioc-webstats.service

@@ -6,7 +6,7 @@ PROFILE_ID=bioc
 # Allocate an Elastic IP (uncomment if you haven't allocated one yet)
 # EIP_ALLOCATION_ID=$(aws --profile=$PROFILE_ID ec2 allocate-address --domain vpc --query 'AllocationId' --output text)
 # or uncomment the line below one if we already ahve an EIP
-EIP_ALLOCATION_ID="eipassoc-02af555a2463e5556"  # Replace with your Elastic IP allocation ID
+EIP_ALLOCATION_ID="eipalloc-09836615eabe474d9"  # Replace with your Elastic IP allocation ID
 
 # TODO MOdify creation so that EIP will survive termination of Instance
 # Parameterize the Name tag value
@@ -21,6 +21,10 @@ INSTANCE_ID=$(aws --profile=$PROFILE_ID ec2 run-instances --image-id "ami-04b70f
 
 # Wait for the instance to be in running state
 aws --profile=$PROFILE_ID ec2 wait instance-running --instance-ids $INSTANCE_ID
+
+# associate bioc-webstats-runner instance profile with instance
+# TODO this assumes that the iip is already defined
+aws --profile=$PROFILE_ID ec2 replace-iam-instance-profile-association --association-id "iip-assoc-05817f9302900b693" --iam-instance-profile '{"Arn":"arn:aws:iam::555219204010:instance-profile/bioc-webstats-webrunner","Name":"bioc-webstats-webrunner"}' 
 
 # Associate the Elastic IP with the instance
 aws --profile=$PROFILE_ID ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $EIP_ALLOCATION_ID

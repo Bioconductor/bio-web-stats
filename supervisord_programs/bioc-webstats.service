@@ -1,13 +1,11 @@
 [Unit]
-Description=Gunicorn instance to serve www-webstats
+Description=Waitress service for www-webstats
 After=network.target
 
 [Service]
-User=ubuntu
-Group=ubuntu
-WorkingDirectory=/var/www/bioc-webstats
-# TODO Fix path to project
-ExecStartPre=/bin/bash -c 'source /path/to/your/project/venv/bin/activate'
-ExecStart=/path/to/venv/bin/python /path/to/yourproject/app.py
+WorkingDirectory=/home/ubuntu
+EnvironmentFile=/home/ubuntu/flask_environment
+ExecStart=/home/ubuntu/.venv/bin/python3 -m bioc_webstats.app_waitress --host=0.0.0.0 --port=5000
+
 [Install]
 WantedBy=multi-user.target
