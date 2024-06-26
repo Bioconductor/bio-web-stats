@@ -22,7 +22,7 @@ from .factories import PackagesFactory, StatsFactory, WebstatsInfoFactory
 @pytest.fixture(scope="session")
 def app():
     """Create application for the tests."""
-    _app = create_app("Debug")
+    _app = create_app("debug")
     create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},

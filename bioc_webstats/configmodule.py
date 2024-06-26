@@ -102,7 +102,7 @@ class developmentConfig(Config):
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL="sqlite:///dev.db"
 
-class sebugConfig(Config):
+class debugConfig(Config):
     # TODO Create a Debug ENV value
     ENV = "development"
     TESTING = True

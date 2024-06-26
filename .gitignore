@@ -83,8 +83,6 @@ env/
 /node_modules/
 # webpack-built files
 /bioc_webstats/static/build/
-# Configuration
-.env
 # development database
 /instance
 /test-results/
