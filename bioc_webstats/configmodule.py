@@ -47,6 +47,27 @@ configuration_dictionary = [
         "Description": "Default initiation call for Flask",
     },
     {
+        "Name": "flask/approot",
+        "FlaskName": "APPROOT",
+        "Type": "String",
+        "Value": "/var/www/webstats",
+        "Description": "Working directory for app",
+    },
+    {
+        "Name": "flask/osgroup",
+        "FlaskName": "OSGROUP",
+        "Type": "String",
+        "Value": "webstats",
+        "Description": "Execution group name",
+    },
+    {
+        "Name": "flask/osuser",
+        "FlaskName": "OSUSER",
+        "Type": "String",
+        "Value": "webstats",
+        "Description": "Execution user name",
+    },
+    {
         "Name": "flask/flask_debug",
         "FlaskName": "DEBUG",
         "Type": "String",

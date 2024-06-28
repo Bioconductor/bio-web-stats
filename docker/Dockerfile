@@ -1,5 +1,10 @@
 FROM ubuntu:latest
 
+ARG OSGROUP=webstats
+ARG OSUSER=webstats
+
+ENV OSGROUP=${FLASK_OSGROUP}
+ENV OSUSER=${FLASK_OSUSER}
 ENV container docker
 
 RUN apt-get update && \
@@ -21,9 +26,10 @@ COPY apache2.service /etc/systemd/system/multi-user.target.wants/
 
 # Configure and enable SSH service
 RUN mkdir /var/run/sshd
+# TODO secure passwords
 RUN echo 'root:root' | chpasswd
 RUN echo 'ubuntu:ubuntu' | chpasswd
-RUN echo 'webstats-user:webstats-user' | chpasswd
+RUN echo ${OSUSER}:${OSUSER} | chpasswd
 
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
