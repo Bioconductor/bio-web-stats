@@ -44,7 +44,7 @@ from bioc_webstats.extensions import (
 
 def create_app(
     config_type="production",
-    aws_parameeter_path=None,
+    aws_parameter_path=None,
     enable_remote_debugging=False
 ):
     """The Application Factory. Set up the particular instance of the Flask class.
@@ -71,7 +71,7 @@ def create_app(
     app.config.from_object(cfg)
 
     # Next, load parameters from the SSM Parameter store.
-    if aws_parameeter_path is not None:
+    if aws_parameter_path is not None:
         param_dict = aws.get_parameter_store_values(app.config["AWS_PARAMETER_PATH"])
         xref = {}
         for u in configuration_dictionary:
