@@ -25,7 +25,7 @@ RUN echo useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER}
 RUN if id -u ${OSUSER} >/dev/null 2>&1; then \
         echo "User ${OSUSER} exists"; \
     else \
-        useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} && \
+        useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} --home /home/${OSUSER} && \
         echo "${OSUSER}:${OSUSER}" | chpasswd && \
         echo "${OSUSER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
     fi
