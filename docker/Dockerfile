@@ -3,8 +3,8 @@ FROM ubuntu:latest
 ARG OSGROUP=webstats
 ARG OSUSER=webstats
 
-ENV OSGROUP=${FLASK_OSGROUP}
-ENV OSUSER=${FLASK_OSUSER}
+ENV OSGROUP=${OSGROUP}
+ENV OSUSER=${OSUSER}
 ENV container docker
 
 RUN apt-get update && \
@@ -13,10 +13,22 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user and add to sudoers
-RUN useradd -m -s /bin/bash webstats-user && \
-    echo 'webstats-user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Check if group exists, if not create it
+RUN if getent group ${OSGROUP} >/dev/null; then \
+        echo "Group ${OSGROUP} exists"; \
+    else \
+        groupadd ${OSGROUP}; \
+    fi
+
+RUN echo useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} 
+# Check if user exists, if not create it
+RUN if id -u ${OSUSER} >/dev/null 2>&1; then \
+        echo "User ${OSUSER} exists"; \
+    else \
+        useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} && \
+        echo "${OSUSER}:${OSUSER}" | chpasswd && \
+        echo "${OSUSER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
+    fi
 
 # Enable the Apache service
 RUN systemctl enable apache2
@@ -26,11 +38,7 @@ COPY apache2.service /etc/systemd/system/multi-user.target.wants/
 
 # Configure and enable SSH service
 RUN mkdir /var/run/sshd
-# TODO secure passwords
 RUN echo 'root:root' | chpasswd
-RUN echo 'ubuntu:ubuntu' | chpasswd
-RUN echo ${OSUSER}:${OSUSER} | chpasswd
-
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 RUN systemctl enable ssh
