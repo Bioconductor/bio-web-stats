@@ -83,39 +83,7 @@ flask db upgrade
 
 ## Deployment
 
-When using Docker, reasonable production defaults are set in `docker-compose.yml`
-
-```text
-FLASK_ENV=production
-FLASK_DEBUG=0
-```
-
-Therefore, starting the app in "production" mode is as simple as
-
-```bash
-docker-compose up flask-prod
-```
-
-If running without Docker
-
-```bash
-export FLASK_ENV=production
-export FLASK_DEBUG=0
-export DATABASE_URL="<YOUR DATABASE URL>"
-npm run build   # build assets with webpack
-flask run       # start the flask server
-```
-
-## Shell
-
-To open the interactive shell, run
-
-```bash
-docker-compose run --rm manage shell
-flask shell # If running locally without Docker
-```
-
-By default, you will have access to the flask `app`.
+TODO
 
 ## Running Tests/Linter
 
