@@ -1,0 +1,7 @@
+export FLASK_APP="bioc_webstats.app:create_app('production', '/bioc/webstats/prod')"
+export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
+export FLASK_OSUSER="webstats"
+export FLASK_OSGROUP="webstats"
+export FLASK_APPROOT="/var/www/bioc-webstats"
+export FLASK_LOGROOT="/var/log/bioc-webstats"
+export FLASK_AWS_PATH_PARAMETER='/bioc/webstats/prod'

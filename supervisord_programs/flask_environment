@@ -1,3 +1,0 @@
-export FLASK_APP="bioc_webstats.app:create_app('production', '/bioc/webstats/prod')"
-export FLASK_AWS_PATH_PARAMETER=/bioc/webstats/prod
-export FLASK_APPROOT=/home/ubuntu/

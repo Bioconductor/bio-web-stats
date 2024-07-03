@@ -54,6 +54,13 @@ configuration_dictionary = [
         "Description": "Working directory for app",
     },
     {
+        "Name": "flask/logroot",
+        "FlaskName": "LOGROOT",
+        "Type": "String",
+        "Value": "/var/log/bioc-webstats",
+        "Description": "Location of log files for the app",
+    },
+    {
         "Name": "flask/osgroup",
         "FlaskName": "OSGROUP",
         "Type": "String",
@@ -108,7 +115,7 @@ class productionConfig(Config):
     DATABASE_URL=""
     DEVELOPMENT=False
     TESTING=False
-    AWS_PARAMETER_PATH='/bioc/webstats/prod'
+    AWS_PATH_PARAMETER='/bioc/webstats/prod'
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=0
 
@@ -117,7 +124,7 @@ class developmentConfig(Config):
     DEVELOPMENT=True
     TESTING=True
     LOG_LEVEL="DEBUG"
-    AWS_PARAMETER_PATH='/bioc/webstats/dev'
+    AWS_PATH_PARAMETER='/bioc/webstats/dev'
     # TODO Temporarily harrd-coded to sandbox rds cluster
     LOG_FILEPATH = './instance/webstats.log'
     SEND_FILE_MAX_AGE_DEFAULT=31556926

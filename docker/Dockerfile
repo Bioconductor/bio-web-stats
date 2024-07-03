@@ -20,7 +20,9 @@ RUN if getent group ${OSGROUP} >/dev/null; then \
         groupadd ${OSGROUP}; \
     fi
 
-RUN echo useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} 
+# ubuntu is a sudoer
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 # Check if user exists, if not create it
 RUN if id -u ${OSUSER} >/dev/null 2>&1; then \
         echo "User ${OSUSER} exists"; \

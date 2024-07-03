@@ -17,9 +17,7 @@ classifiers = [
 
 include = [
     "pyproject.toml",
-    "app.wsgi",
-    "supervisord_programs/*",
-    "installer_scripts/*",
+    "bioc_webstats/installer_scripts/*",
 ]
 
 [tool.poetry.dependencies]

@@ -72,7 +72,7 @@ def create_app(
 
     # Next, load parameters from the SSM Parameter store.
     if aws_parameter_path is not None:
-        param_dict = aws.get_parameter_store_values(app.config["AWS_PARAMETER_PATH"])
+        param_dict = aws.get_parameter_store_values(app.config["AWS_PATH_PARAMETER"])
         xref = {}
         for u in configuration_dictionary:
             xref[u["Name"]] = u["FlaskName"]
