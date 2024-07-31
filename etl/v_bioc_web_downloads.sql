@@ -29,11 +29,12 @@ WITH
    , LPAD(CAST(day("date") AS VARCHAR), 2, '0') "day"
    FROM
      "cloudfront_logs"
-   WHERE
-    "status" in (200, 301, 302, 307, 308) AND 
-    regexp_like("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'))
+   WHERE (("status" IN (200, 301, 302, 307, 308)) AND regexp_like("uri", '^/+packages/+[^/]*/+(bioc|workflows|data/+experiment|data/+annotation)/+(?:bin|src)/+(?:[^/]*/+)*([^_]*)_.*\.(?:tar|gz|zip|tgz)$'))
 ) 
 SELECT *
-FROM
-  T
-WHERE (package <> '')
+FROM T
+WHERE package <> ''
+    AND length("c-ip") <= 40
+    AND length(category) <= 16
+    AND length("package") <= 64
+
