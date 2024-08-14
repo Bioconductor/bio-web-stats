@@ -20,7 +20,7 @@ aws_location=$(which aws)
 
 if [ -z "$aws_location" ]; then
     if [ "$TARGET_PLATFORM" = "EC2" ]; then
-        sudo apt install awscli
+        sudo snap install aws-cli --classic
     else
     . $(find .venv/lib/ -name aws_installer.sh)
     fi
