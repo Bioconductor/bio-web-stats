@@ -37,6 +37,8 @@ RUN systemctl enable apache2
 
 # Copy the Apache service file
 COPY apache2.service /etc/systemd/system/multi-user.target.wants/
+COPY installer.sh /home/ubuntu/
+
 
 # Configure and enable SSH service
 RUN mkdir /var/run/sshd

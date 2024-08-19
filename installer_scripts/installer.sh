@@ -1,7 +1,16 @@
 #!/bin/bash
-export TARGET_PLATFORM=docker
-# export TARGET_PLATFORM=EC2
+# usage script installer.sh TARGET_PLATFORM
+#  TARGET_PLATFORM = EC2 | docker (default is EC2)
 
+TARGET_PLATFORM="${1:-EC2}"
+echo "Starting installation of bioc-webstats"
+echo $(date -R)
+if [ "$TARGET_PLATFORM" != "EC2" ] && [ "$TARGET_PLATFORM" != "docker" ]; then
+    echo "Error: Platform must be either 'EC2' or 'docker'."
+    exit 1
+else
+    echo "TARGET_PLATFORM=$TARGET_PLATFORM"
+fi
 
 
 sudo apt update
