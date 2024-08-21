@@ -44,6 +44,7 @@ secrets.yml
 # OS-specific
 .DS_Store
 Thumbs.db
+node_modules
 # Samples and input data
 /etl/data
 # C extensions
@@ -100,3 +101,5 @@ bio-web-stats.Rproj
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+node_modules
+node_modules
