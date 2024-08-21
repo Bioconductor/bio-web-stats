@@ -49,8 +49,15 @@ def create_app(
 ):
     """The Application Factory. Set up the particular instance of the Flask class.
 
-    :param config_type: The configmodule subclass object to use. Allowed values "production" and "development"
-    """
+    Keyword Arguments:
+        config_type -- The configmodule subclass object to use. Allowed values "production" and "development" (default: {"production"})
+        aws_parameter_path -- If present, the the AWS System Manager Parameter Store will be searched for runtime parameters. See function aws.get_parameter_store_values for more information  (default: {None})
+        enable_remote_debugging -- If True, the system wil attempt to enable the Visual Studio COde remote debugging protocl. See package ptvsd for details. (default: {False})
+
+    Returns:
+        A fully configured Flask App object.
+    """    
+
 
     if enable_remote_debugging:
         # This will allow the use of the VS Code remote debugger.
