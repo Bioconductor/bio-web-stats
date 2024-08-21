@@ -80,6 +80,7 @@ docs/_build
 .webassets-cache
 # Virtualenvs
 env/
+/.env
 # npm
 /node_modules/
 # webpack-built files
