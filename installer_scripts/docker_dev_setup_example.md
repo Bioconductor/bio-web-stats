@@ -9,7 +9,7 @@ source ./build_docker.sh
 ```
 We now have a docker image named  `webstats-server` We will create a container and clone the source repo
 ```bash
-docker run  -p 22 -p 5000 -p 80 --privileged --name=webstats-dev -d webstats-server
+docker run  -p 22:2222 -p 5000:5555 -p 80:8888 --privileged --name=webstats-dev -d webstats-server
 # Here is the local IP address for ther server
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats-dev
 ```
@@ -74,11 +74,11 @@ Commands:
   poetry environment available.
   ```shell
 poetry shell
-test
-gendb
-flask
+flask test
+flask gendb
+flask run
 ```
-How should see this:
+You should now see this:
 ```
  * Serving Flask app 'autoapp.py'
  * Debug mode: off
@@ -86,3 +86,6 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 ```
+and be able to access the site locally via `http://127.0.0.1:5000/packages/stats/` 
+or remotely (assuming that the local IP address of the server is `172.17.0.2`) via 
+`http://172.17.0.2:5555/packages/stats/`.
