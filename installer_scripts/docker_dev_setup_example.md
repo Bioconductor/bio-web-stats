@@ -9,7 +9,7 @@ source ./build_docker.sh
 ```
 We now have a docker image named  `webstats-server` We will create a container and clone the source repo
 ```bash
-docker run  -p 22:2222 -p 5000:5555 -p 80:8888 --privileged --name=webstats-dev -d webstats-server
+docker run  -p 2222:22 -p 5555:5000 -p 8888:80 --privileged --name=webstats-dev -d webstats-server
 # Here is the local IP address for ther server
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats-dev
 ```
@@ -74,6 +74,12 @@ Commands:
   poetry environment available.
   ```shell
 poetry shell
+```
+Now, you are within the shell but in the poetry environment.
+The prompt should looks something like this: `(bioc-webstats-py3.12) ubuntu@88dc3287cc84:~/bio-web-stats$ `
+
+Run these commands:
+```bash
 flask test
 flask gendb
 flask run
