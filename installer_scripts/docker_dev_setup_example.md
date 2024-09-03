@@ -92,6 +92,8 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 ```
-and be able to access the site locally via `http://127.0.0.1:5000/packages/stats/` 
-or remotely (assuming that the local IP address of the server is `172.17.0.2`) via 
+and be able to access the site locally via `http://127.0.0.1:5000/packages/stats/`.
+
+If you also want to run it on the host machine, you should `flask run --host=0.0.0.0`. Then
+(assuming that the local IP address of the server is `172.17.0.2`) you can access the site at 
 `http://172.17.0.2:5555/packages/stats/`.
