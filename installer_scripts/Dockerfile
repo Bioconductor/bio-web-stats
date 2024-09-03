@@ -5,11 +5,11 @@ ARG OSUSER=webstats
 
 ENV OSGROUP=${OSGROUP}
 ENV OSUSER=${OSUSER}
-ENV container docker
+ENV container=docker
 
 RUN apt-get update && \
-    apt-get install -y systemd systemd-sysv openssh-server apache2 sudo \
-        python3 python3-pip python3.12-venv curl unzip nano vim tree && \
+    apt-get install -y systemd systemd-sysv openssh-server apache2 sudo ufw git \
+        python3 python3-pip python3.12-venv pipx curl unzip nano vim tree && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
