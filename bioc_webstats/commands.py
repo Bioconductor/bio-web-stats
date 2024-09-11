@@ -8,6 +8,7 @@ from subprocess import call
 
 import click
 
+from flask import current_app
 from bioc_webstats.ingest_logs import ingest_logs
 from bioc_webstats.configmodule import configuration_dictionary
 
@@ -94,10 +95,13 @@ def lint(fix_imports, check):
 def gendb():
     """Generate small test database."""
     from bioc_webstats.database import db
-    from tests.conftest import generate_small_test_db_stats
+    from tests.conftest import generate_small_test_db
 
     click.echo("Creating small test database")
-    generate_small_test_db_stats()
+    app = current_app._get_current_object()
+
+    test_db_contents = generate_small_test_db(app)
+    pass
 
 
 @click.command()
