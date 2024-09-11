@@ -40,18 +40,8 @@ def app():
 @pytest.fixture(scope="session")
 def db(app: Flask):
     """Session-wide test database."""
-    _db.app = app
-    with app.app_context():
-        _db.create_all()
-        u = generate_small_test_db_stats()
-        [StatsFactory(**v) for v in u]
-        u = [{"key": "ValidThru", "value": "2023-10-04"}]
-        [WebstatsInfoFactory(**v) for v in u]
-        [PackagesFactory(**v) for v in generate_small_test_db_packages()]
-        _db.session.commit()
-
+    _db = generate_small_test_db(app)
     yield _db
-
     _db.session.close()
     _db.drop_all()
 
@@ -156,6 +146,19 @@ def generate_small_test_db_stats():
             stats_dict.append(u)
 
     return stats_dict
+
+def generate_small_test_db(app: Flask):
+    """Session-wide test database."""
+    _db.app = app
+    with app.app_context():
+        _db.create_all()
+        u = generate_small_test_db_stats()
+        [StatsFactory(**v) for v in u]
+        u = [{"key": "ValidThru", "value": "2023-10-04"}]
+        [WebstatsInfoFactory(**v) for v in u]
+        [PackagesFactory(**v) for v in generate_small_test_db_packages()]
+        _db.session.commit()
+        return _db
 
 
 def check_hashed_counts(d: dict) -> bool:
