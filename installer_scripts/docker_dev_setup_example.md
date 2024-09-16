@@ -9,7 +9,7 @@ source ./build_docker.sh
 ```
 We now have a docker image named  `webstats-server` We will create a container and clone the source repo
 ```bash
-docker run  -p 2222:22 -p 5555:5000 -p 8888:80 --privileged --name=webstats-dev -d webstats-server
+docker run  -p 22:2222 -p 80:8080 --privileged --name=webstats-dev -d webstats-server
 # Here is the local IP address for ther server
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats-dev
 ```
@@ -44,6 +44,11 @@ docker exec -it --user ubuntu webstats-dev /bin/bash
 ```bash
 cd $HOME/bio-web-stats
 poetry install
+```
+
+The application is now installed. Accessing the applicaiton and any of its utilities can be accomplished with this command
+
+```bash
 export FLASK_APP=autoapp.py
 poetry run flask --help
 ```
@@ -82,7 +87,7 @@ Run these commands:
 ```bash
 flask test
 flask gendb
-flask run
+flask run # or flask run --host=0.0.0.0
 ```
 You should now see this:
 ```
