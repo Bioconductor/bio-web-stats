@@ -11,7 +11,7 @@ import click
 
 from flask import current_app
 from bioc_webstats.ingest_logs import ingest_logs
-from bioc_webstats.packages_table_update import packages_table_update
+from bioc_webstats.packages_table_update import update_packages
 from bioc_webstats.configmodule import configuration_dictionary
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -201,7 +201,5 @@ def configp(namespace, profile, region):
 def packages():
     """Read package information from the Bioconductor infrastructure and update the packages table to reflect current status"""
 
-    pass
-    packages_table_update()
-    pass
-
+    update_packages()
+    #TODO parameters and logging
