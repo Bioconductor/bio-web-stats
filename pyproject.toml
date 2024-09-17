@@ -46,6 +46,8 @@ environs = "*"
 boto3 = "*"
 ptvsd = "*"
 waitress = "*"
+gitpython = "^3.1.43"
+pyyaml = "^6.0.2"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3,<4.0"

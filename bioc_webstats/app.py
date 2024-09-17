@@ -173,6 +173,7 @@ def register_commands(app):
     app.cli.add_command(commands.gendb)
     app.cli.add_command(commands.ingest)
     app.cli.add_command(commands.configp)
+    app.cli.add_command(commands.packages)
 
 
 def configure_logger(app):

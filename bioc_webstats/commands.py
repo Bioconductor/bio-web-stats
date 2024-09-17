@@ -6,10 +6,12 @@ from glob import glob
 import logging
 from subprocess import call
 
+import boto3
 import click
 
 from flask import current_app
 from bioc_webstats.ingest_logs import ingest_logs
+from bioc_webstats.packages_table_update import packages_table_update
 from bioc_webstats.configmodule import configuration_dictionary
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -158,10 +160,6 @@ def ingest(start, end, database, filename, cloudfront, path):
     )
 
 
-# TODO split into seperate file with directory for commands
-import boto3
-
-
 @click.command()
 @click.option(
     "-n", "--namespace", required=False, help="Namespace (parameter path prefix)"
@@ -198,3 +196,12 @@ def configp(namespace, profile, region):
         logging.error(f"Failed to store parameters. {e}")
         raise e
     logging.info("AWs Parameter set configured namespace:{namespace} profile:{profile} {region}.")
+
+@click.command()
+def packages():
+    """Read package information from the Bioconductor infrastructure and update the packages table to reflect current status"""
+
+    pass
+    packages_table_update()
+    pass
+
