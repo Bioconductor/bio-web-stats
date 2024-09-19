@@ -128,9 +128,16 @@ def packages_table_update(first_version=None, last_version=None):
         # Clean up the temporary directory
         shutil.rmtree(cloned_repo_dir)
 
-    return package_history
+    summary = package_history.groupby(['category', 'package_name']).agg(
+        first_version=('version', 'min'),
+        last_version=('version', 'max')
+    ).reset_index()
+    pass
+    return summary
+
+
 
 def update_packages():
-    history = packages_table_update("2.9", "3.8")
+    history = packages_table_update("3.17")
     # TODO transform and save
     pass
