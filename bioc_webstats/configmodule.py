@@ -112,7 +112,7 @@ class Config(object):
 
 class productionConfig(Config):
     ENV="production"
-    DATABASE_URL=""
+    DATABASE_URL=os.getenv('DATABASE_URL', '')
     DEVELOPMENT=False
     TESTING=False
     AWS_PATH_PARAMETER='/bioc/webstats/prod'
@@ -128,7 +128,7 @@ class developmentConfig(Config):
     # TODO Temporarily harrd-coded to sandbox rds cluster
     LOG_FILEPATH = './instance/webstats.log'
     SEND_FILE_MAX_AGE_DEFAULT=31556926
-    DATABASE_URL="sqlite:///dev.db"
+    DATABASE_URL = os.getenv('DATABASE_URL', "sqlite:///dev.db")
 
 class debugConfig(Config):
     # TODO Create a Debug ENV value

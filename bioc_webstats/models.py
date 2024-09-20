@@ -91,7 +91,7 @@ class WebstatsInfo(Model):
 class Packages(Model):
     """All Package Names from git.bioconductor.org."""
 
-    category: Mapped[PackageType] = mapped_column(PackageTypeDecorator, primary_key=True)
+    category: Mapped[PackageType] = mapped_column(PackageTypeDecorator)
     package: Mapped[str] = mapped_column(String, primary_key=True)
     first_version: Mapped[str] = mapped_column(String)
     last_version: Mapped[str] = mapped_column(String, nullable=True)
@@ -113,6 +113,15 @@ class Packages(Model):
                 Packages.last_version).
             where(Packages.package == package)
         ).fetchone()
+        
+    @staticmethod
+    def all_package_details():
+        """Return the summary information about a specific pacakge."""
+        return db.session.execute(
+            select(Packages.package, 
+                Packages.category, 
+                Packages.first_version, 
+                Packages.last_version)).fetchall()
         
 
 

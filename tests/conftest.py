@@ -156,7 +156,8 @@ def generate_small_test_db(app: Flask):
         [StatsFactory(**v) for v in u]
         u = [{"key": "ValidThru", "value": "2023-10-04"}]
         [WebstatsInfoFactory(**v) for v in u]
-        [PackagesFactory(**v) for v in generate_small_test_db_packages()]
+        u = generate_small_test_db_packages()
+        [PackagesFactory(**v) for v in u]
         _db.session.commit()
         return _db
 
