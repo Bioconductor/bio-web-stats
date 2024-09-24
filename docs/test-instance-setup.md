@@ -54,7 +54,7 @@ import logging
 logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0, '/var/www/bioc-webstats')
 from bioc_webstats import app
-application = app.create_app()
+application = app.create_app("production")
 
 
 

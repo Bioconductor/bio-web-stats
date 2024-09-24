@@ -122,6 +122,11 @@ class Packages(Model):
                 Packages.category, 
                 Packages.first_version, 
                 Packages.last_version)).fetchall()
+    
+    @staticmethod
+    def update_package_last_version(package:str, last_version: str):
+        """Update the last_last version for a specific package"""
+        
         
 
 

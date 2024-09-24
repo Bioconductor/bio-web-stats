@@ -43,7 +43,7 @@ from bioc_webstats.extensions import (
 
 
 def create_app(
-    config_type="production",
+    config_type=None,
     aws_parameter_path=None,
     enable_remote_debugging=False
 ):
@@ -69,7 +69,9 @@ def create_app(
     app = Flask(__name__.split(".")[0])
     
     # Bootstrap variables
-    app.config["ENV"] = os.getenv('FLASK_ENV', config_type)
+    if config_type is None:
+        config_type = os.getenv('FLASK_ENV', config_type)
+    app.config["ENV"] = config_type
 
     config_object_name = f"bioc_webstats.configmodule.{app.config["ENV"]}Config"
 
