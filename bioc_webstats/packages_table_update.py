@@ -10,7 +10,8 @@ from flask import current_app
 # Local manifest constants
 BIOCONDUCTOR_HOME_URI = "https://www.bioconductor.org/"
 PACKAGE_CATEGORIES = ["bioc", "data-annotation", "data-experiment", "workflows"]
-    
+PACKAGE_UPDATE_MAXIMUM_ALLOWED = 50
+
 def version_str_to_int(version_number:chr):
     parts = version_number.split('.')
     if len(parts) == 2:
@@ -29,28 +30,30 @@ def web_download( stem:str, fqdn: str = BIOCONDUCTOR_HOME_URI):
     return response.text
 
 
-def packages_table_update(dry_run:bool = False, verbose: bool = True, force: bool = False):
-    """Update packages table from web    
-    Args:
-        TODO
+def packages_table_update(dry_run:bool, verbose:bool, force:bool):
+    """Update database table packages from manifests on www.bioconductor.org
+
+    Keyword Arguments:
+        dry_run -- Calcluate changes to packges but do not update the database (default: {False})
+        verbose -- Additional information to log file (default: {True})
+        force -- Proceed with update even if the number of changes exceeds PACKAGE_UPDATE_MAXIMUM_ALLOWED. (default: {False})
 
     Returns:
-        TODO
+        _description_
     """
-
     bioconductor_config = yaml.safe_load(web_download("config.yaml"))
     
     release_version = bioconductor_config["release_version"]
     devel_version = bioconductor_config["devel_version"]
     
     # TODO manage any possible changes in category. (rare but should be taken into account)
-    dev_packages = []
+    manifest_packages = {}
     for category in PACKAGE_CATEGORIES:
         package_text = web_download(f"packages/devel/{category.replace("-", "/")}/src/contrib/PACKAGES")
         package_list = package_text.splitlines()
-        package_names = [line.split(": ")[1] for line in package_list if line.startswith("Package:")]
-        dev_packages.extend(package_names)
-
+        p = {line.split(": ")[1]: db.PackageType[category.removeprefix("data-").upper()] for line in package_list if line.startswith("Package:")}
+        manifest_packages.update(p)
+        
     # dev_pcakages represents the currently active packages in the "devel" version.
     # all_packages is the complete package history
     # A package that is in dev but not all is new in the devel version
@@ -60,8 +63,7 @@ def packages_table_update(dry_run:bool = False, verbose: bool = True, force: boo
     # If it is in both dev and all, the last_version should be null. If it is not, then
     #   the package was reinstated in the devel release and the last_version will be reset to NULL
     
-    
-    dev_packages = set(dev_packages)
+    dev_packages = set(manifest_packages.keys())
     # the Packages model will return 4-tuples. Turn this into a dictionary, indexted by package name
     all_package_details = db.Packages.all_package_details()
     all_active_packages = {t[0] for t in all_package_details if t[3] is None}
@@ -70,14 +72,28 @@ def packages_table_update(dry_run:bool = False, verbose: bool = True, force: boo
     new_package_names = dev_packages - all_active_packages
     removed_package_names = all_active_packages - dev_packages
     reinstated_package_names = all_inactive_packages & dev_packages
-    # TODO add new_package_names
-    # TODO mark removed_package_names last_verion <- release_version
-    # TODO mark reinstated_package_names last_Version <- NULL
-    # TODO report numbers for each of the above
-    return dev_packages
+    if (verbose):
+        logging.info(f"Total packages before update: {len(all_package_details)}")
+        logging.info(f"Packages removed: {len(removed_package_names)}")
+        logging.info(f"Packages added: {len(new_package_names)}")
+        logging.info(f"Packages reinstated: {len(reinstated_package_names)}")
+    
+    total_changes = len(removed_package_names) + len(reinstated_package_names) + len(new_package_names)
+    if total_changes > PACKAGE_UPDATE_MAXIMUM_ALLOWED:
+        logging.warn(f"total number of changes ({total_changes}) excceds maximum allowed ({PACKAGE_UPDATE_MAXIMUM_ALLOWED})")
+        if not force:
+            logging.error("No update made")
+            return
+        logging.warning("Force parameter is TRUE. Update will proceed")
+    
+    # mark the inactive packages with the value of the last release
+    db.Packages.update_package_last_version(removed_package_names, release_version)
+    # mark any reinstated packages by setting the last_vesion to NLL
+    db.Packages.update_package_last_version(reinstated_package_names, None)
+    # insert any new packages
+    records = [{"package": package, "category": manifest_packages[package], "first_version": devel_version, "last_version": None} for package in new_package_names]
+    if (len(records) > 0):
+        db.Packages.insert_records(records)
+    logging.info("Update complete.")
+    return
 
-
-def update_packages():
-    history = packages_table_update()
-    # TODO transform and save
-    pass

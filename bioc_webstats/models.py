@@ -21,6 +21,7 @@ from sqlalchemy import (
     insert,
     select,
     text,
+    update,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import TypeDecorator
@@ -124,11 +125,27 @@ class Packages(Model):
                 Packages.last_version)).fetchall()
     
     @staticmethod
-    def update_package_last_version(package:str, last_version: str):
+    def update_package_last_version(package:list[str], last_version: str) -> None:
         """Update the last_last version for a specific package"""
         
-        
+        if len(package) > 0:
+            for pkg in package:
 
+                stmt = (
+                    update(Packages)
+                    .where(Packages.package == pkg)
+                    .values(last_version=last_version)
+                )
+                db.session.execute(stmt)
+                
+                # Commit the transaction
+            db.session.commit()
+            
+    def insert_records(package_items):
+        """Insert new packages from a dataframe"""
+
+        db.session.execute(insert(Packages), package_items)
+        db.session.commit()
 
 class Categorystats(Model):
     """This is a projection of Stats with the package column removed."""
@@ -322,7 +339,7 @@ class Stats(Model):
         return result.fetchall()
 
 
-class    BiocWebDownloads(Model):
+class BiocWebDownloads(Model):
     """Source records for downloads table bioc_web_downloads"""
 
     __tablename__ = 'bioc_web_downloads'

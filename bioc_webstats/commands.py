@@ -11,7 +11,7 @@ import click
 
 from flask import current_app
 from bioc_webstats.ingest_logs import ingest_logs
-from bioc_webstats.packages_table_update import update_packages
+from bioc_webstats.packages_table_update import packages_table_update
 from bioc_webstats.configmodule import configuration_dictionary
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -198,8 +198,10 @@ def configp(namespace, profile, region):
     logging.info("AWs Parameter set configured namespace:{namespace} profile:{profile} {region}.")
 
 @click.command()
-def packages():
+@click.option("-d", "--dry_run", is_flag=True, required=False, help="Report packages changes but do not update database")
+@click.option("-v", "--verbose", is_flag=True, required=False, help="More reporting")
+@click.option("-f", "--force", is_flag=True, required=False, help="Update table even though the update is suspicously large")
+def packages(dry_run:bool = False, verbose: bool = True, force: bool = False):
     """Read package information from the Bioconductor infrastructure and update the packages table to reflect current status"""
 
-    update_packages()
-    #TODO parameters and logging
+    packages_table_update(dry_run, verbose, force)
