@@ -41,12 +41,15 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     Returns:
         _description_
     """
+    
+    log = current_app.logger
+    log.log(logging.INFO, f'starting pacakges update')
+
     bioconductor_config = yaml.safe_load(web_download("config.yaml"))
     
     release_version = bioconductor_config["release_version"]
     devel_version = bioconductor_config["devel_version"]
     
-    # TODO manage any possible changes in category. (rare but should be taken into account)
     manifest_packages = {}
     for category in PACKAGE_CATEGORIES:
         package_text = web_download(f"packages/devel/{category.replace("-", "/")}/src/contrib/PACKAGES")
@@ -73,18 +76,18 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     removed_package_names = all_active_packages - dev_packages
     reinstated_package_names = all_inactive_packages & dev_packages
     if (verbose):
-        logging.info(f"Total packages before update: {len(all_package_details)}")
-        logging.info(f"Packages removed: {len(removed_package_names)}")
-        logging.info(f"Packages added: {len(new_package_names)}")
-        logging.info(f"Packages reinstated: {len(reinstated_package_names)}")
+        log.log(logging.INFO, f"Total packages before update: {len(all_package_details)}")
+        log.log(logging.INFO, f"Packages removed: {len(removed_package_names)}")
+        log.log(logging.INFO, f"Packages added: {len(new_package_names)}")
+        log.log(logging.INFO, f"Packages reinstated: {len(reinstated_package_names)}")
     
     total_changes = len(removed_package_names) + len(reinstated_package_names) + len(new_package_names)
     if total_changes > PACKAGE_UPDATE_MAXIMUM_ALLOWED:
-        logging.warn(f"total number of changes ({total_changes}) excceds maximum allowed ({PACKAGE_UPDATE_MAXIMUM_ALLOWED})")
+        log.log(logging.WARN, f"total number of changes ({total_changes}) excceds maximum allowed ({PACKAGE_UPDATE_MAXIMUM_ALLOWED})")
         if not force:
-            logging.error("No update made")
+            log.log(logging.ERROR, "No update made")
             return
-        logging.warning("Force parameter is TRUE. Update will proceed")
+        log.log(logging.WARN, "Force parameter is TRUE. Update will proceed")
     
     # mark the inactive packages with the value of the last release
     db.Packages.update_package_last_version(removed_package_names, release_version)
@@ -94,6 +97,6 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     records = [{"package": package, "category": manifest_packages[package], "first_version": devel_version, "last_version": None} for package in new_package_names]
     if (len(records) > 0):
         db.Packages.insert_records(records)
-    logging.info("Update complete.")
+    log.log(logging.INFO, "Update complete.")
     return
 
