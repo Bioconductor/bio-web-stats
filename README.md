@@ -1,157 +1,58 @@
-# ⚠️ Important Warning ⚠️
+# `bioc-webstats`
 
-**WARNING**: This repository is currently under development.
+This document provides a high level overview of the operation of the `bioc-webstats` system, an anciallary system to [www.biocconductor.org](https://www.biocconductor.org). 
 
-Please note:
-- It includes experimental code that may be abandoned after evaluation.
-- It has code for tools that may be removed. Some of the tools currently in the repo are mutually exclusive.
-- Many commits include incomplete code. (These are typically, but not necessarily, identified by having "WIP" in the comment.
-- It is a custom application with processsing rules that are specific to the history of the Bioconductor project. We have no intention, and do not recommend, attempting to use this system in other contexts.
-- Much of the text below is a vestige of the original cookiecutter-flask code base. Do not rely on it.
+This is an internal production system. It has characteristics that are specific to its single mode of use. For additional information, refer to the code base.
 
-# bioc_webstats
+The purpose of bioc-webstats is to maintain a permanent record of the download counts for each Bioconductor package in an SQL database and to report this information on www.bioconductor.org. It includes records from January 1, 2009, to the present.
 
-Public accss to Bioconductor package download history
+This application replaces the "stats server" application. That server produced static pages for all the content under `www.bioconductor.org/packages/stats/`. The `bio-webstats` appliation, in its initial implementation, is designed to match the eact form of the application that it replaces.
 
-Portions of this code base are derived from 
-[cookie-cutter-flask](https://github.com/cookiecutter-flask/cookiecutter-flask/)
-and used with permission granted under the 
-[MIT license](https://github.com/cookiecutter-flask/cookiecutter-flask/blob/master/LICENSE).
+The `bioc-webstats  application is implementd as in Python application and supported by a SQL database. It has two major functions.
 
-## Docker Quickstart
+1. Data ingestion. Consume web traffic logs in Common Log Format (CLF), select those records which are package downloads, store them in a SQL table, and maintain summary statistics for each package.
+2. Web reporting. The application can serve as a backend to any web server that supports the `WSGI` standard. It consumes `http get` requests, infers their semantics from the the `URI` stem, and returns content that is functionally the same as the system it replaces. In the case of `html` responses, this means that both the content as well as the look and feel are the same. Other responses are unformatted text downloags (`.tab` and `.txt`), which are byte-for-byte idenitcal to the prior system.
 
-This app can be run completely using `Docker` and `docker-compose`. **Using Docker is recommended, as it guarantees the application is run using compatible versions of Python and Node**.
+## Technical Stack
 
-There are three main services:
+The application implmenetation is based on several frameworks and libraries:
 
-To run the development version of the app
+- Python 3.12
+- [Poetry](https://python-poetry.org) - Dependency management and padckaging.
+- [Flask](https://flask.palletsprojects.com) - Web application framework.
+- [SQLAlchemy](https://www.sqlalchemy.org) -  Pythn SQL toolkit and bject-rlational mapper.
+- [Chart.js](https://www.chartjs.org/) - JavaScript charting library.
+- [Bootstrap 5](https://getbootstrap.com) - Responsive JavaScript frontend toolkit.
 
-```bash
-docker-compose up flask-dev
-```
 
-To run the production version of the app
+There are various additional Python and JavaScript dependencies that support the application. See `pyproject.toml` in the project root directory for details.
 
-```bash
-docker-compose up flask-prod
-```
+The application is distibuted as a `whl` file and can be installed by any installation and package manager, including `poetry`, `pipenv`, `pipx`, `virtualenv`, or `conda`.
 
-The list of `environment:` variables in the `docker-compose.yml` file takes precedence over any variables specified in `.env`.
+## General System Flow
 
-To run any commands using the `Flask CLI`
+The general system flow as deployed as of this writing is depicted figure 1 below. The Python application can be run on any server that has secure access to `master.biconductor.org` and the AWS `Athena` service that can read the CloudFront CLF logs. This includes `master.biocnductor.org` itself. Other components, including the SQL Server, and the interal web server, are easily replaced. 
 
-```bash
-docker-compose run --rm manage <<COMMAND>>
-```
+Not depicted in the stack are AWS-specific features for configuration (the AWS Systems Manager Parameter Store) and security (the AWS Security Manager).
 
-Therefore, to initialize a database you would run
+Note: The direction of each line indicates the functional flow of information. That is, for every request-response pattern, the arrow points to the consumer of the response.
 
-```bash
-docker-compose run --rm manage db init
-docker-compose run --rm manage db migrate
-docker-compose run --rm manage db upgrade
-```
+![General System Flow](docs/bioc-webstats-architecture-v2.excalidraw.png)
+<p align="center">
+  <em>Figure 1: General System Flow.</em>
+</p>
 
-A docker volume `node-modules` is created to store NPM packages and is reused across the dev and prod versions of the application. For the purposes of DB testing with `sqlite`, the file `dev.db` is mounted to all containers. This volume mount should be removed from `docker-compose.yml` if a production DB server is used.
+A. A [Waitress](https://pypi.org/project/waitress/) lightweight webserver that consumes incoming `http get` requests from and returns results to an upstream webserver (arrow 3).
 
-Go to `http://localhost:8080`. You will see a pretty welcome screen.
+B. A cron job that runs daily at 01:00 UTC that:
+- Detects detects changes in the development version of the manifest (arrow 1).
+- Invokes an AWS Athena View to return all CloudFront log entries for dates newer than those previously uploaded (arrow 2), but only if they have a URI stem that implies a download, and only if the package name is valid.
+- Updates the summary tables, `stats` and `categorystats` (see Database Structure below).
 
-### Running locally
+C. A SQL Database server. Currently implemented as a serverless AWS RDS instance, Postgres 15.
 
-Run the following commands to bootstrap your environment if you are unable to run the application using Docker
+### Database Model
 
-```bash
-cd bioc_webstats
-pip install -r requirements/dev.txt
-npm install
-npm run-script build
-npm start  # run the webpack dev server and flask server using concurrently
-```
+![Database Model](docs/webstats-erd-0_1_9.png)
 
-Go to `http://localhost:5000`. You will see a pretty welcome screen.
 
-#### Database Initialization (locally)
-
-Once you have installed your DBMS, run the following to create your app's
-database tables and perform the initial migration
-
-```bash
-flask db init
-flask db migrate
-flask db upgrade
-```
-
-## Deployment
-
-TODO
-
-## Running Tests/Linter
-
-To run all tests, run
-
-```bash
-docker-compose run --rm manage test
-flask test # If running locally without Docker
-```
-
-To run the linter, run
-
-```bash
-docker-compose run --rm manage lint
-flask lint # If running locally without Docker
-```
-
-The `lint` command will attempt to fix any linting/style errors in the code. If you only want to know if the code will pass CI and do not wish for the linter to make changes, add the `--check` argument.
-
-## Migrations
-
-Whenever a database migration needs to be made. Run the following commands
-
-```bash
-docker-compose run --rm manage db migrate
-flask db migrate # If running locally without Docker
-```
-
-This will generate a new migration script. Then run
-
-```bash
-docker-compose run --rm manage db upgrade
-flask db upgrade # If running locally without Docker
-```
-
-To apply the migration.
-
-For a full migration command reference, run `docker-compose run --rm manage db --help`.
-
-If you will deploy your application remotely (e.g on Heroku) you should add the `migrations` folder to version control.
-You can do this after `flask db migrate` by running the following commands
-
-```bash
-git add migrations/*
-git commit -m "Add migrations"
-```
-
-Make sure folder `migrations/versions` is not empty.
-
-## Asset Management
-
-Files placed inside the `assets` directory and its subdirectories
-(excluding `js` and `css`) will be copied by webpack's
-`file-loader` into the `static/build` directory. In production, the plugin
-`Flask-Static-Digest` zips the webpack content and tags them with a MD5 hash.
-As a result, you must use the `static_url_for` function when including static content,
-as it resolves the correct file name, including the MD5 hash.
-For example
-
-```html
-<link rel="shortcut icon" href="{{static_url_for('static', filename='build/favicon.ico') }}">
-```
-
-If all of your static files are managed this way, then their filenames will change whenever their
-contents do, and you can ask Flask to tell web browsers that they
-should cache all your assets forever by including the following line
-in ``.env``:
-
-```text
-SEND_FILE_MAX_AGE_DEFAULT=31556926  # one year
-```
