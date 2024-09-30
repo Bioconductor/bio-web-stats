@@ -1,5 +1,5 @@
 # Start the server
-docker run  -p 22:2222 -p 5000:5555 -p 80:8888 --privileged --name=webstats1 -d webstats-server
+docker run --privileged --name=webstats1 -d webstats-server
 # Retrieve the local ip address
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats1
 # Move the most recent whl file to the docker container

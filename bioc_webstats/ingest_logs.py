@@ -56,30 +56,43 @@ def ingest_logs(
                     end_date)
         return
 
-    log.info(f"Ingesting logs from {start_date} to {end_date}")
-        
-    query_str = f"""
-select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" from v_bioc_web_downloads
-    where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
-        and DATE '{end_date.strftime("%Y-%m-%d")}'
-"""
-    if source_database is None:
-        source_database = "default"
-
-    # TODO try/except protection
-    result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
-    log.info(f"{len(result)} records read")
-
-    # Dump records to csv file if requested
-    if result_filename is not None:
-    # Write output to csv file
-        result.to_csv(result_filename, index = False)
-        log.info(f"All records written to {result_filename}")
-        return
+    last_log_date = db.BiocWebDownloads.get_last_date_log_date()
     
-    # Write out put to database table
-    db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
-    log.info("Upload to database complete")
+    if last_log_date >= end_date:
+        # Protect against duplicate inserts of the lgos
+        log.warning(f"Database already contains logs through {last_log_date} - ingest skipped")
+    else:
+        # Some dates need uploading. All of them?
+        if last_log_date >= start_date:
+            log.warning(f"Logs already uploaded through {last_log_date}.")
+            start_date = last_log_date + timedelta(days=1)
+        log.info(f"Ingesting logs from {start_date} to {end_date}")
+            
+        query_str = f"""
+    select  "date", "c-ip" as c_ip, "sc-status" as sc_status, "category", "package" from v_bioc_web_downloads
+        where "date" between DATE '{start_date.strftime( "%Y-%m-%d")}' 
+            and DATE '{end_date.strftime("%Y-%m-%d")}'
+    """
+        if source_database is None:
+            source_database = "default"
+
+        # TODO try/except protection
+        result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
+        log.info(f"{len(result)} records read")
+
+        # Dump records to csv file if requested
+        if result_filename is not None:
+        # Write output to csv file
+            result.to_csv(result_filename, index = False)
+            log.info(f"All records written to {result_filename}")
+            return
+        
+        # Write out put to database table
+        db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
+        log.info("Upload to database complete")
+        # End of log uploads
+    
+    # Now update the stats from the start date to the current time
     db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
     log.info("Update of stats complete")
     

@@ -47,6 +47,7 @@ boto3 = "*"
 ptvsd = "*"
 waitress = "*"
 pyyaml = "^6.0.2"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3,<4.0"

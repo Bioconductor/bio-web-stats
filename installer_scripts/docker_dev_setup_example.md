@@ -34,15 +34,9 @@ git clone https://github.com/bioconductor/bio-web-stats.git
 cd bio-web-stats
 pipx install poetry
 pipx ensurepath
-```
-Now, log out and log back in to get the PATH variable updated by the poetry installation.
-The build the app and see if it is working.
-```bash
+. ~/.bashrc
+# Build the app and see if it is working.
 docker exec -it --user ubuntu webstats-dev /bin/bash
-```
-
-```bash
-cd $HOME/bio-web-stats
 poetry install
 ```
 

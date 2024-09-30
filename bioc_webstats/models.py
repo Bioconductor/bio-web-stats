@@ -392,6 +392,13 @@ class BiocWebDownloads(Model):
             raise e  # Re-raise the exception after rollback
         finally:
             db.session.close()  # Ensure the session is closed
+            
+    @staticmethod
+    def get_last_date_log_date() -> dt.date:
+        """Retrieve the maximum date in the bioc_webdownloads table."""
+        x = max_date = db.session.query(func.max(BiocWebDownloads.date)).scalar()
+        return dt.datetime.strptime(x, "%Y-%m-%d").date()
+        
 
     def __repr__(self):
         return f"<BiocWebDownloads(date={self.date}, c_ip={self.c_ip}, sc_status={self.sc_status}, category={self.category}, package={self.package})>"

@@ -91,17 +91,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.35.28"
+version = "1.35.29"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.35.28-py3-none-any.whl", hash = "sha256:dc088b86a14f17d3cd2e96915c6ccfd31bce640dfe9180df579ed311bc6bf0fc"},
-    {file = "boto3-1.35.28.tar.gz", hash = "sha256:8960fc458b9ba3c8a9890a607c31cee375db821f39aefaec9ff638248e81644a"},
+    {file = "boto3-1.35.29-py3-none-any.whl", hash = "sha256:2244044cdfa8ac345d7400536dc15a4824835e7ec5c55bc267e118af66bb27db"},
+    {file = "boto3-1.35.29.tar.gz", hash = "sha256:7bbb1ee649e09e956952285782cfdebd7e81fc78384f48dfab3d66c6eaf3f63f"},
 ]
 
 [package.dependencies]
-botocore = ">=1.35.28,<1.36.0"
+botocore = ">=1.35.29,<1.36.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -110,13 +110,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.35.28"
+version = "1.35.29"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.35.28-py3-none-any.whl", hash = "sha256:b66c78f3d6379bd16f0362f07168fa7699cdda3921fc880047192d96f2c8c527"},
-    {file = "botocore-1.35.28.tar.gz", hash = "sha256:115d13f2172d8e9fa92e8d913f0e80092b97624d190f46772ed2930d4a355d55"},
+    {file = "botocore-1.35.29-py3-none-any.whl", hash = "sha256:f8e3ae0d84214eff3fb69cb4dc51cea6c43d3bde82027a94d00c52b941d6c3d5"},
+    {file = "botocore-1.35.29.tar.gz", hash = "sha256:4ed28ab03675bb008a290c452c5ddd7aaa5d4e3fa1912aadbdf93057ee84362b"},
 ]
 
 [package.dependencies]
@@ -623,17 +623,18 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "30.0.0"
+version = "30.1.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-30.0.0-py3-none-any.whl", hash = "sha256:f0a60009150736c1c033bea31aa19ae63071c9dcf10adfaf9f1a87a3add84bc8"},
-    {file = "faker-30.0.0.tar.gz", hash = "sha256:bf0207af5777950054a2a3b43f4b5bdc33b585918d2b28f1dab52ac0ffe2bac0"},
+    {file = "Faker-30.1.0-py3-none-any.whl", hash = "sha256:dbf81295c948270a9e96cd48a9a3ebec73acac9a153d0c854fbbd0294557609f"},
+    {file = "faker-30.1.0.tar.gz", hash = "sha256:e0593931bd7be9a9ea984b5d8c302ef1cec19392585d1e90d444199271d0a94d"},
 ]
 
 [package.dependencies]
 python-dateutil = ">=2.4"
+typing-extensions = "*"
 
 [[package]]
 name = "fastparquet"
@@ -741,25 +742,17 @@ Flask = "*"
 
 [[package]]
 name = "flask-debugtoolbar"
-version = "0.15.1"
+version = "0.16.0"
 description = "A toolbar overlay for debugging Flask applications."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "Flask_DebugToolbar-0.15.1-py3-none-any.whl", hash = "sha256:f3043d96e9fb9bc3b13ee8a02a5ecc531974f2fdceefa19ce3ba4a700ad40f36"},
-    {file = "flask_debugtoolbar-0.15.1.tar.gz", hash = "sha256:8c76666f1553641567da8d91c74fe92caa072cfc01429564aa5e109de10b1806"},
+    {file = "flask_debugtoolbar-0.16.0-py3-none-any.whl", hash = "sha256:2857a58ef20b88cf022a88bb7f0c6f6be1fb91a2e8b2d9fcc9079357a692083e"},
+    {file = "flask_debugtoolbar-0.16.0.tar.gz", hash = "sha256:3b925d4dcc09205471e5021019dfeb0eb6dabd6c184de16a3496dfb1f342afe1"},
 ]
 
 [package.dependencies]
-Blinker = "*"
-Flask = ">=2.2.0"
-itsdangerous = "*"
-MarkupSafe = "*"
-packaging = "*"
-werkzeug = "*"
-
-[package.extras]
-docs = ["Pallets-Sphinx-Themes", "Sphinx (>=1.2.2)"]
+flask = ">=2.3.0"
 
 [[package]]
 name = "flask-migrate"
@@ -2196,4 +2189,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12.3"
-content-hash = "e8fff6c3b37d3cd7a0a71646cf105bfadf3922062f8665c6caa3f59d19f14205"
+content-hash = "9e0f0169acb5cbafca441ba9c4df66179ba26c1529576df0bdc822552a155311"
