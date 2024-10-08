@@ -7,13 +7,13 @@ Start in the home directory of a current clone of the bioconductor/bio-web-stats
 cd ~/Projects/bio-web-stats/installer_scripts/
 source ./build_docker.sh
 ```
-We now have a docker image named  `webstats-server` We will create a container and clone the source repo
+We now have a docker image named  `webstats-server` We will create a container and clone the source repo.
 ```bash
-docker run  -p 22:2222 -p 80:8080 --privileged --name=webstats-dev -d webstats-server
+docker run --privileged  -p 5000:5000 -p 22:22 -p 80:80 --name=webstats-dev -d webstats-server
 # Here is the local IP address for ther server
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webstats-dev
 ```
-Note the IP address reported. (frequently it is 172.17.0.2) Connect to the server.
+Note the IP address reported (ysually, `172.17.0.2`). Connect to the server.
 
 ```bash
 docker exec -it --user ubuntu webstats-dev /bin/bash
@@ -36,7 +36,6 @@ pipx install poetry
 pipx ensurepath
 . ~/.bashrc
 # Build the app and see if it is working.
-docker exec -it --user ubuntu webstats-dev /bin/bash
 poetry install
 ```
 
@@ -81,18 +80,21 @@ Run these commands:
 ```bash
 flask test
 flask gendb
-flask run # or flask run --host=0.0.0.0
+# the --host parameter directs the development web server to bind to all IP addresses
+flask run --host="0.0.0.0"
 ```
 You should now see this:
 ```
  * Serving Flask app 'autoapp.py'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
+ * Running on http://172.17.0.2:5000
 Press CTRL+C to quit
 ```
 and be able to access the site locally via `http://127.0.0.1:5000/packages/stats/`.
 
 If you also want to run it on the host machine, you should `flask run --host=0.0.0.0`. Then
 (assuming that the local IP address of the server is `172.17.0.2`) you can access the site at 
-`http://172.17.0.2:5555/packages/stats/`.
+`http://172.17.0.2:5000/packages/stats/`.

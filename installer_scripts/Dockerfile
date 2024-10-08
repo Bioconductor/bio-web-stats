@@ -47,7 +47,5 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 RUN systemctl enable ssh
 
-EXPOSE 22 80 5000
-
 # Set the default command to run systemd
 CMD ["/lib/systemd/systemd"]
