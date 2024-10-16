@@ -69,12 +69,12 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     dev_packages = set(manifest_packages.keys())
     # the Packages model will return 4-tuples. Turn this into a dictionary, indexted by package name
     all_package_details = db.Packages.all_package_details()
-    all_active_packages = {t[0] for t in all_package_details if t[3] is None}
+    all_active_packages = {t[0] for t in all_package_details if t[3] == 'NULL'}
     all_inactive_packages = {t[0] for t in all_package_details} - all_active_packages
     
-    new_package_names = dev_packages - all_active_packages
     removed_package_names = all_active_packages - dev_packages
     reinstated_package_names = all_inactive_packages & dev_packages
+    new_package_names = dev_packages - all_active_packages - reinstated_package_names
     if (verbose):
         log.log(logging.INFO, f"Total packages before update: {len(all_package_details)}")
         log.log(logging.INFO, f"Packages removed: {len(removed_package_names)}")
@@ -94,7 +94,7 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     # mark any reinstated packages by setting the last_vesion to NLL
     db.Packages.update_package_last_version(reinstated_package_names, None)
     # insert any new packages
-    records = [{"package": package, "category": manifest_packages[package], "first_version": devel_version, "last_version": None} for package in new_package_names]
+    records = [{"package": package, "category": manifest_packages[package], "first_version": str(version_str_to_int(devel_version)), "last_version": None} for package in new_package_names]
     if (len(records) > 0):
         db.Packages.insert_records(records)
     log.log(logging.INFO, "Update complete.")
