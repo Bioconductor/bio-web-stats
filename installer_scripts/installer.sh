@@ -55,6 +55,19 @@ fi
 . $(find .venv/lib/ -name flask_environment)
 
 
+# Create group if it doesn't exist
+if ! getent group "$FLASK_OSGROUP" > /dev/null; then
+  sudo groupadd "$FLASK_OSGROUP"
+fi
+
+# Create user if it doesn't exist and add to the group
+if ! id "$FLASK_OSUSER" > /dev/null 2>&1; then
+  sudo useradd -m -g "$FLASK_OSGROUP" "$FLASK_OSUSER"
+  echo "User $FLASK_OSUSER created and added to group $FLASK_OSGROUP."
+else
+  echo "User $FLASK_OSUSER already exists."
+fi
+
 sudo mkdir -p $FLASK_APPROOT
 sudo chown -R $FLASK_OSUSER:$FLASK_OSGROUP $FLASK_APPROOT
 
@@ -105,9 +118,11 @@ sudo chmod 644 /etc/systemd/system/bioc-webstats.service
 sudo cp "$(find .venv/lib/ -name flask_environment)" $FLASK_APPROOT/
 sudo chown root:root /etc/systemd/system/bioc-webstats.service
 sudo chmod 644 $FLASK_APPROOT/flask_environment
+SITE_PACKAGES_PATH=$(python -c "import site; print(site.getsitepackages()[0])")
+sudo cp  "$SITE_PACKAGES_PATH/bioc_webstats/flask_ingest_crontab_setup.sh"  $FLASK_APPROOT/
+sudo cp  "$SITE_PACKAGES_PATH/bioc_webstats/flask_ingest.sh"  $FLASK_APPROOT/
 
 
 sudo systemctl enable bioc-webstats.service
 sudo systemctl start bioc-webstats.service
 sudo systemctl status bioc-webstats.service
-# TODO move flask_ingest.sh and flask_ingest_crontabs_setup.sh to target machiine
