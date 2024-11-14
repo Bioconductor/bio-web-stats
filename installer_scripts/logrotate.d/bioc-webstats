@@ -1,0 +1,9 @@
+/var/log/bioc-webstats/webstats.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    create 0640 root root
+    delaycompress
+}
