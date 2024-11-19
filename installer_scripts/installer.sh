@@ -111,6 +111,8 @@ ExecStart=/home/ubuntu/.venv/bin/python3 -m bioc_webstats.app_waitress
 WantedBy=multi-user.target
 eof
 
+# TODO install logrotate from ./installer_scripts/logrotate.d
+# TODO logrotate.d/bioc-wobstats has hardcoded user as ubuntu. should be FLASK_OSUSER and FLASK_OSGROUP.
 sudo cp bioc-webstats.service /etc/systemd/system/
 # TODO clean up local copy of bioc-webstats.service
 sudo chown root:root /etc/systemd/system/bioc-webstats.service

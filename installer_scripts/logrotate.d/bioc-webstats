@@ -4,6 +4,6 @@
     compress
     missingok
     notifempty
-    create 0640 root root
+    create 0640 ubuntu ubuntu
     delaycompress
 }
