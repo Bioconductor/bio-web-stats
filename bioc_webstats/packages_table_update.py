@@ -97,6 +97,6 @@ def packages_table_update(dry_run:bool, verbose:bool, force:bool):
     records = [{"package": package, "category": manifest_packages[package], "first_version": str(version_str_to_int(devel_version)), "last_version": None} for package in new_package_names]
     if (len(records) > 0):
         db.Packages.insert_records(records)
-    log.log(logging.INFO, "Update complete.")
+    # TODO REPORT ON CONSOLe IF ERROR
     return
 

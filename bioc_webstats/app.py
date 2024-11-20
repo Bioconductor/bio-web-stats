@@ -193,6 +193,7 @@ def configure_logger(app):
     with open(log_file, 'a'):
         os.utime(log_file, None)
 
+    # TODO Why do we need a logrotate.d entry if I have the code below
     file_handler = logging.handlers.RotatingFileHandler(
         log_file, maxBytes=100000000, backupCount=5
     )
