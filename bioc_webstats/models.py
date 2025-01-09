@@ -397,7 +397,7 @@ class BiocWebDownloads(Model):
     def get_last_date_log_date() -> dt.date:
         """Retrieve the maximum date in the bioc_webdownloads table."""
         x = max_date = db.session.query(func.max(BiocWebDownloads.date)).scalar()
-        return dt.datetime.strptime(x, "%Y-%m-%d").date()
+        return x
         
 
     def __repr__(self):

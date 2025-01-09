@@ -1,51 +1,84 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
-ARG OSGROUP=webstats
-ARG OSUSER=webstats
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TARGETARCH
 
-ENV OSGROUP=${OSGROUP}
-ENV OSUSER=${OSUSER}
 ENV container=docker
+STOPSIGNAL SIGRTMIN+3
 
+# Update package index and install required base packages
 RUN apt-get update && \
-    apt-get install -y systemd systemd-sysv openssh-server apache2 sudo ufw git \
-        python3 python3-pip python3.12-venv pipx curl unzip nano vim tree && \
+    apt-get install -y systemd systemd-sysv ca-certificates wget gnupg software-properties-common g++ freeglut3-dev build-essential libx11-dev libxmu-dev libxi-dev libglu1-mesa libglu1-mesa-dev python3.10 python3.10-venv python3.10-dev openssh-server tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xorg xfce4 dbus-x11 sudo git curl nano tmux ffmpeg htop vlc x11-xserver-utils xfce4-terminal dbus snapd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
+    rm -f /lib/systemd/system/multi-user.target.wants/* && \
+    rm -f /etc/systemd/system/*.wants/* && \
+    rm -f /lib/systemd/system/local-fs.target.wants/* && \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev* && \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl* && \
+    rm -f /lib/systemd/system/basic.target.wants/* && \
+    rm -f /lib/systemd/system/anaconda.target.wants/* && \
+    find /etc/systemd/system /lib/systemd/system -path '*.wants/*' -exec rm {} \; && \
+    echo 'tmpfs /run tmpfs mode=755,nosuid,nodev 0 0' > /etc/fstab && \
+    echo 'tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0' >> /etc/fstab
+
+# Generate machine-id
+RUN systemd-machine-id-setup
+
+# Add OBS Studio repository (works for both architectures)
+RUN add-apt-repository -y ppa:obsproject/obs-studio && \
+    apt-get update && \
+    apt-get install -y obs-studio && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Check if group exists, if not create it
-RUN if getent group ${OSGROUP} >/dev/null; then \
-        echo "Group ${OSGROUP} exists"; \
+# Conditional Google Chrome installation based on architecture
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome.deb; \
     else \
-        groupadd ${OSGROUP}; \
-    fi
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb -O chrome.deb; \
+    fi && \
+    apt-get update && \
+    apt-get install -y ./chrome.deb || apt-get install -f -y && \
+    rm chrome.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# ubuntu is a sudoer
-RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# Check if user exists, if not create it
-RUN if id -u ${OSUSER} >/dev/null 2>&1; then \
-        echo "User ${OSUSER} exists"; \
+# Conditional VS Code installation based on architecture
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+        wget -q https://update.code.visualstudio.com/latest/linux-deb-x64/stable -O vscode.deb; \
     else \
-        useradd -m -s /bin/bash -g ${OSGROUP} ${OSUSER} --home /home/${OSUSER} && \
-        echo "${OSUSER}:${OSUSER}" | chpasswd && \
-        echo "${OSUSER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
-    fi
+        wget -q https://update.code.visualstudio.com/latest/linux-deb-arm64/stable -O vscode.deb; \
+    fi && \
+    apt-get update && \
+    dpkg -i vscode.deb || apt-get install -f -y && \
+    rm vscode.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Enable the Apache service
-RUN systemctl enable apache2
+# Configure SSH and logging
+RUN sed -i 's/#Port 22/Port 22/g' /etc/ssh/sshd_config && \
+    mkdir /var/run/sshd && \
+    sed -i 's/Storage=auto/Storage=persistent/' /etc/systemd/journald.conf
 
-# Copy the Apache service file
-COPY apache2.service /etc/systemd/system/multi-user.target.wants/
-COPY installer.sh /home/ubuntu/
+# Install snapd
+RUN apt-get update && \
+    apt-get install -y snapd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+# Set environment variables
+ENV USER="" \
+    PASSWORD="" \
+    VNCPASSWORD=""
 
-# Configure and enable SSH service
-RUN mkdir /var/run/sshd
-RUN echo 'root:root' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
-RUN systemctl enable ssh
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Set the default command to run systemd
-CMD ["/lib/systemd/systemd"]
+# Expose necessary ports
+EXPOSE 22 5901 3389
+
+# Set entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
