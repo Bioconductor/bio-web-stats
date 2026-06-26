@@ -373,6 +373,32 @@ class BiocWebDownloads(Model):
         db.session.execute(insert(BiocWebDownloads), dataframe.to_dict(orient='records'))
         db.session.commit()
 
+    @staticmethod
+    def insert_from_dataframe_chunked(dataframe: pd.DataFrame, chunk_size: int = 10000) -> int:
+        """Insert dataframe records in chunks to prevent OOM errors.
+        
+        Arguments:
+            dataframe -- A pandas dataframe that matches the format of this class
+            chunk_size -- Number of records to insert per chunk (default: 10000)
+            
+        Returns:
+            Total number of records inserted
+        """
+        total_records = len(dataframe)
+        records_inserted = 0
+        
+        for i in range(0, total_records, chunk_size):
+            chunk = dataframe.iloc[i:i+chunk_size]
+            try:
+                db.session.execute(insert(BiocWebDownloads), chunk.to_dict(orient='records'))
+                db.session.commit()
+                records_inserted += len(chunk)
+            except Exception as e:
+                db.session.rollback()
+                raise e
+                    
+        return records_inserted
+
     # @staticmethod
     # def update_stats_from_downloads(start_date: Date):
     #     chr_date = start_date.strftime('%Y-%m-%d')

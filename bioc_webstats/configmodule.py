@@ -95,6 +95,13 @@ configuration_dictionary = [
         "Value": "TBD",
         "Description": "Secret key for activating web client flask debugging tools",
     },
+    {
+        "Name": "ingest/chunk_size",
+        "FlaskName": "INGEST_CHUNK_SIZE",
+        "Type": "String",
+        "Value": "10000",
+        "Description": "Number of records to insert per chunk during ingestion. Default: 10000",
+    },
 ]
 
 
@@ -109,6 +116,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     URI_PATH_PREFIX = "/packages/stats"
     SECRET_KEY = ''
+    INGEST_CHUNK_SIZE = 10000
 
 class productionConfig(Config):
     ENV="production"
@@ -118,6 +126,7 @@ class productionConfig(Config):
     AWS_PATH_PARAMETER='/bioc/webstats/prod'
     # TODO Temporarily harrd-coded to sandbox rds cluster
     SEND_FILE_MAX_AGE_DEFAULT=0
+    INGEST_CHUNK_SIZE=int(os.getenv('INGEST_CHUNK_SIZE', 10000))
 
 class developmentConfig(Config):
     ENV="development"
@@ -129,6 +138,7 @@ class developmentConfig(Config):
     LOG_FILEPATH = './instance/webstats.log'
     SEND_FILE_MAX_AGE_DEFAULT=31556926
     DATABASE_URL = os.getenv('DATABASE_URL', "sqlite:///dev.db")
+    INGEST_CHUNK_SIZE=int(os.getenv('INGEST_CHUNK_SIZE', 10000))
 
 class debugConfig(Config):
     # TODO Create a Debug ENV value
@@ -141,3 +151,4 @@ class debugConfig(Config):
     CACHE_TYPE = "simple"  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False  # Allows form testing
+    INGEST_CHUNK_SIZE=10000
