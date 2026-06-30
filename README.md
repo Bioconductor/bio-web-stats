@@ -55,4 +55,24 @@ C. A SQL Database server. Currently implemented as a serverless AWS RDS instance
 
 ![Database Model](docs/webstats-erd-0_1_9.png)
 
+### Testing
 
+    poetry shell    
+    # you may need to source the environment with `. path/to/env`
+    # run test
+    poetry run pytest
+    # this may update the poetry.lock file
+
+### Deployment
+
+1. Update the `tool.poetry` version in pyproject.toml
+2. Build the wheel with poetry:
+
+    poetry build
+    
+3. Copy the wheel from `/dist` to target machine.
+4. Install a clean virtual environment. 
+5. Set production configurations if not already set in
+   `installer_scripts/flask_environment`.
+6. Verify IAM role attachment. EC2 needs `bioc-webstats-webrunner` role attached.
+7. Restart waitress.
