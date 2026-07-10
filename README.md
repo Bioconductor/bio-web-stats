@@ -70,26 +70,25 @@ To run the flask pytests:
 1. Update the `tool.poetry` version in pyproject.toml
 2. Build the wheel with poetry:
 
-    poetry build
+       poetry build
     
-3. Copy the wheel from `/dist` to the target machine.
-4. Install a clean virtual environment. 
+4. Copy the wheel from `/dist` to the target machine.
+5. Install a clean virtual environment. 
 
-    python3 -m venv .venv
-    . .venv/bin/activate
-    # Install new wheel
-    pip install bioc_webstats-0.1.11-py3-none-any.whl
-   
-5. Set production configurations if not already set in
+       python3 -m venv .venv
+       . .venv/bin/activate
+       # Install new wheel
+       pip install bioc_webstats-0.1.11-py3-none-any.whl
+
+6. Set production configurations if not already set in
    `installer_scripts/flask_environment`.
-6. Verify IAM role attachment. EC2 needs `bioc-webstats-webrunner` role attached.
-7. Restart waitress.
+7. Verify IAM role attachment. EC2 needs `bioc-webstats-webrunner` role attached.
+8. Restart waitress.
 
-    sudo service bioc-webstats stop
-
-    # if you change what's in /etc/systemsd/systems/bioc_webstats.service you should
-    sudo systemctl daemon-reload
-    sudo service bioc-webstats start 
+       sudo service bioc-webstats stop
+       # if you change what's in /etc/systemsd/systems/bioc_webstats.service you should
+       sudo systemctl daemon-reload
+       sudo service bioc-webstats start
 
 ### AWS Notes
 
