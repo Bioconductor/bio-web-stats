@@ -76,25 +76,37 @@ def ingest_logs(
         if source_database is None:
             source_database = "default"
 
-        # TODO try/except protection
-        result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
-        log.info(f"{len(result)} records read")
+        try:
+            result = wr.athena.read_sql_query(sql=query_str, database=source_database, ctas_approach=True)
+            log.info(f"{len(result)} records read")
+        except Exception as e:
+            log.error(f"Failed to read records from Athena: {e}")
+            raise e
 
         # Dump records to csv file if requested
         if result_filename is not None:
-        # Write output to csv file
+            # Write output to csv file
             result.to_csv(result_filename, index = False)
             log.info(f"All records written to {result_filename}")
             return
         
-        # Write out put to database table
-        db.BiocWebDownloads.insert_from_dataframe(dataframe=result)
-        log.info("Upload to database complete")
+        # Write output to database table using chunked insert
+        chunk_size = current_app.config.get('INGEST_CHUNK_SIZE', 10000)
+        try:
+            db.BiocWebDownloads.insert_from_dataframe_chunked(dataframe=result, chunk_size=chunk_size)
+            log.info(f"Upload to database complete ({len(result)} records in chunks of {chunk_size})")
+        except Exception as e:
+            log.error(f"Failed to insert records: {e}")
+            raise e
         # End of log uploads
     
     # Now update the stats from the start date to the current time
-    db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
-    log.info("Update of stats complete")
+    try:
+        db.BiocWebDownloads.update_stats_from_downloads(start_date.replace(day=1))
+        log.info("Update of stats complete")
+    except Exception as e:
+        log.error(f"Failed to update stats: {e}")
+        raise e
     
     if cloudfront_id is None:
         log.info("Cache invalidation skipped")

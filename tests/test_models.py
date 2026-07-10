@@ -1,6 +1,7 @@
 """Model unit tests."""
 import datetime as dt
 
+import pandas as pd
 import pytest
 from sqlalchemy import select
 
@@ -10,6 +11,7 @@ from bioc_webstats.models import (
     Stats,
     WebstatsInfo,
     list_to_dict,
+    BiocWebDownloads
 )
 
 from .conftest import check_hashed_count_list
@@ -145,3 +147,33 @@ class TestStats:
 
         # Assert
         assert result == expected
+
+    def test_override_chunk_size(self):
+        """Test that insert allows overriding chunk size"""
+
+        df = pd.DataFrame({"date": [dt.date(2026, 6, 23)], "package": ["pkg"],
+                           "c_ip": ["192.168.1.1"], "sc_status": [200],
+                           "category": ["bioc"]})
+        result = BiocWebDownloads.insert_from_dataframe_chunked(df, 1)
+        assert result == 1
+
+    def test_chunk_larger_than_data(self):
+        """Test that insert handles data smaller than chunk"""
+
+        df = pd.DataFrame({"date": [dt.date(2026, 6, 24)], "package": ["pkg"],
+                           "c_ip": ["192.168.1.1"], "sc_status": [200],
+                           "category": ["bioc"]})
+        result = BiocWebDownloads.insert_from_dataframe_chunked(df)
+        assert result == 1
+
+    def test_insert_chunk_rollback_on_error(self, db, mocker):
+        """Test that insert rolls back on error"""
+
+        df = pd.DataFrame({"date": [dt.date(2026, 6, 24)], "package": ["pkg"],
+                           "c_ip": ["192.168.1.1"], "sc_status": [200],
+                           "category": ["bioc"]})
+        mocker.patch.object(db.session, "execute", side_effect=Exception("DB error"))
+        mock_rollback = mocker.patch.object(db.session, "rollback")
+        with pytest.raises(Exception):
+            BiocWebDownloads.insert_from_dataframe_chunked(df, chunk_size=1)
+        mock_rollback.assert_called_once()

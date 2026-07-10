@@ -55,4 +55,49 @@ C. A SQL Database server. Currently implemented as a serverless AWS RDS instance
 
 ![Database Model](docs/webstats-erd-0_1_9.png)
 
+### Testing
 
+To run the flask pytests:
+
+    poetry shell    
+    # you may need to source the environment with `. path/to/env`
+    # run test
+    poetry run pytest
+    # this may update the poetry.lock file
+
+### Deployment
+
+1. Update the `tool.poetry` version in pyproject.toml
+2. Build the wheel with poetry:
+
+    poetry build
+    
+3. Copy the wheel from `/dist` to the target machine.
+4. Install a clean virtual environment. 
+
+    python3 -m venv .venv
+    . .venv/bin/activate
+    # Install new wheel
+    pip install bioc_webstats-0.1.11-py3-none-any.whl
+   
+5. Set production configurations if not already set in
+   `installer_scripts/flask_environment`.
+6. Verify IAM role attachment. EC2 needs `bioc-webstats-webrunner` role attached.
+7. Restart waitress.
+
+    sudo service bioc-webstats stop
+
+    # if you change what's in /etc/systemsd/systems/bioc_webstats.service you should
+    sudo systemctl daemon-reload
+    sudo service bioc-webstats start 
+
+### AWS Notes
+
+    aws secretsmanager list-secrets
+    aws secretsmanager get-secret-value --secret-id "<secret_id>"
+
+### Postgres Notes
+
+You can get these values from the secret.
+
+    psql -h <host> -U <username> -d <dbname> -p <dbport> 
